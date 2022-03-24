@@ -10,7 +10,9 @@ const Profile = () => {
 			></div>
 			<div className='container'>
 				<div className='desktop'>
-					<div className='left'>{/* <ProfileCard /> */}</div>
+					<div className='left'>
+						<ProfileCard />
+					</div>
 					<div className='right'></div>
 				</div>
 			</div>

@@ -14,12 +14,11 @@ const App = () => {
 	return (
 		<IconSettings iconPath='/assets/icons'>
 			<Header />
-			{/* <Switch> */}
-			{/* <Route path='/id' exact component={Profile} />
+			<Switch>
+				<Route path='/id' exact component={Profile} />
 				<Route path='/settings' exact component={Settings} />
-				{/* <Route path='*' component={Profile} /> */}
-			{/* </Switch> */}
-			{/* <Profile /> */}
+				<Route path='*' component={Profile} />
+			</Switch>
 		</IconSettings>
 	);
 };

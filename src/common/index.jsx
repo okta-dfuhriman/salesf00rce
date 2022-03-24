@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import {
+	Avatar,
 	Button,
 	Card,
 	Combobox,
@@ -12,6 +13,7 @@ import {
 } from '@salesforce/design-system-react';
 
 const LDS = {
+	Avatar,
 	Button,
 	Card,
 	Combobox,

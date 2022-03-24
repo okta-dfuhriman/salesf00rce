@@ -1,0 +1,419 @@
+:root {
+	--tds-color-white-h: 0;
+	--tds-color-white-s: 0%;
+	--tds-color-white-l: 100%;
+	--tds-color-white: hsl(
+		var(--tds-color-white-h),
+		var(--tds-color-white-s),
+		var(--tds-color-white-l)
+	);
+	--tds-color-fog-h: 0;
+	--tds-color-fog-s: 0%;
+	--tds-color-fog-l: 88.62745098039215%;
+	--tds-color-fog: hsl(var(--tds-color-fog-h), var(--tds-color-fog-s), var(--tds-color-fog-l));
+	--tds-color-sand-h: 0;
+	--tds-color-sand-s: 0%;
+	--tds-color-sand-l: 96.07843137254902%;
+	--tds-color-sand: hsl(var(--tds-color-sand-h), var(--tds-color-sand-s), var(--tds-color-sand-l));
+	--tds-color-granite-h: 0;
+	--tds-color-granite-s: 0%;
+	--tds-color-granite-l: 67.84313725490196%;
+	--tds-color-granite: hsl(
+		var(--tds-color-granite-h),
+		var(--tds-color-granite-s),
+		var(--tds-color-granite-l)
+	);
+	--tds-color-meteorite-h: 0;
+	--tds-color-meteorite-s: 0%;
+	--tds-color-meteorite-l: 34.509803921568626%;
+	--tds-color-meteorite: hsl(
+		var(--tds-color-meteorite-h),
+		var(--tds-color-meteorite-s),
+		var(--tds-color-meteorite-l)
+	);
+	--tds-color-black-h: 0;
+	--tds-color-black-s: 0%;
+	--tds-color-black-l: 11.76470588235294%;
+	--tds-color-black: hsl(
+		var(--tds-color-black-h),
+		var(--tds-color-black-s),
+		var(--tds-color-black-l)
+	);
+	--tds-color-ocean-h: 208;
+	--tds-color-ocean-s: 100%;
+	--tds-color-ocean-l: 41.17647058823529%;
+	--tds-color-ocean: hsl(
+		var(--tds-color-ocean-h),
+		var(--tds-color-ocean-s),
+		var(--tds-color-ocean-l)
+	);
+	--tds-color-midnight-h: 216;
+	--tds-color-midnight-s: 61.403508771929836%;
+	--tds-color-midnight-l: 22.352941176470587%;
+	--tds-color-midnight: hsl(
+		var(--tds-color-midnight-h),
+		var(--tds-color-midnight-s),
+		var(--tds-color-midnight-l)
+	);
+	--tds-color-evergreen-h: 153.12;
+	--tds-color-evergreen-s: 93.98496240601504%;
+	--tds-color-evergreen-l: 26.078431372549016%;
+	--tds-color-evergreen: hsl(
+		var(--tds-color-evergreen-h),
+		var(--tds-color-evergreen-s),
+		var(--tds-color-evergreen-l)
+	);
+	--tds-color-sunshine-h: 39.428571428571445;
+	--tds-color-sunshine-s: 98.13084112149534%;
+	--tds-color-sunshine-l: 58.03921568627452%;
+	--tds-color-sunshine: hsl(
+		var(--tds-color-sunshine-h),
+		var(--tds-color-sunshine-s),
+		var(--tds-color-sunshine-l)
+	);
+	--tds-color-fire-h: 21.01265822784808;
+	--tds-color-fire-s: 96.73469387755102%;
+	--tds-color-fire-l: 51.96078431372548%;
+	--tds-color-fire: hsl(var(--tds-color-fire-h), var(--tds-color-fire-s), var(--tds-color-fire-l));
+	--tds-color-ruby-h: 2.112676056338046;
+	--tds-color-ruby-s: 57.72357723577236%;
+	--tds-color-ruby-l: 48.23529411764705%;
+	--tds-color-ruby: hsl(var(--tds-color-ruby-h), var(--tds-color-ruby-s), var(--tds-color-ruby-l));
+	--tds-color-azure-h: 220.1612903225806;
+	--tds-color-azure-s: 53.44827586206896%;
+	--tds-color-azure-l: 45.490196078431374%;
+	--tds-color-azure: hsl(
+		var(--tds-color-azure-h),
+		var(--tds-color-azure-s),
+		var(--tds-color-azure-l)
+	);
+	--tds-color-calypso-h: 197.57575757575762;
+	--tds-color-calypso-s: 53.51351351351351%;
+	--tds-color-calypso-l: 36.274509803921575%;
+	--tds-color-calypso: hsl(
+		var(--tds-color-calypso-h),
+		var(--tds-color-calypso-s),
+		var(--tds-color-calypso-l)
+	);
+	--tds-color-ice-h: 216;
+	--tds-color-ice-s: 22.727272727272734%;
+	--tds-color-ice-l: 74.11764705882354%;
+	--tds-color-ice: hsl(var(--tds-color-ice-h), var(--tds-color-ice-s), var(--tds-color-ice-l));
+	--tds-color-lochinvar-h: 175.75757575757575;
+	--tds-color-lochinvar-s: 53.51351351351351%;
+	--tds-color-lochinvar-l: 36.274509803921575%;
+	--tds-color-lochinvar: hsl(
+		var(--tds-color-lochinvar-h),
+		var(--tds-color-lochinvar-s),
+		var(--tds-color-lochinvar-l)
+	);
+	--tds-color-stencil-light-h: 0;
+	--tds-color-stencil-light-s: 0%;
+	--tds-color-stencil-light-l: 94.50980392156862%;
+	--tds-color-stencil-light: hsl(
+		var(--tds-color-stencil-light-h),
+		var(--tds-color-stencil-light-s),
+		var(--tds-color-stencil-light-l)
+	);
+	--tds-color-stencil-dark-h: 0;
+	--tds-color-stencil-dark-s: 0%;
+	--tds-color-stencil-dark-l: 92.54901960784314%;
+	--tds-color-stencil-dark: hsl(
+		var(--tds-color-stencil-dark-h),
+		var(--tds-color-stencil-dark-s),
+		var(--tds-color-stencil-dark-l)
+	);
+	--tds-color-stencil-overlay-h: 0;
+	--tds-color-stencil-overlay-s: 0%;
+	--tds-color-stencil-overlay-l: 100%;
+	--tds-color-stencil-overlay: hsl(
+		var(--tds-color-stencil-overlay-h),
+		var(--tds-color-stencil-overlay-s),
+		var(--tds-color-stencil-overlay-l)
+	);
+	--tds-color-architect-light-h: 252;
+	--tds-color-architect-light-s: 100%;
+	--tds-color-architect-light-l: 99.01960784313727%;
+	--tds-color-architect-light: hsl(
+		var(--tds-color-architect-light-h),
+		var(--tds-color-architect-light-s),
+		var(--tds-color-architect-light-l)
+	);
+	--tds-color-architect-dark-h: 180;
+	--tds-color-architect-dark-s: 100%;
+	--tds-color-architect-dark-l: 15.686274509803921%;
+	--tds-color-architect-dark: hsl(
+		var(--tds-color-architect-dark-h),
+		var(--tds-color-architect-dark-s),
+		var(--tds-color-architect-dark-l)
+	);
+	--tds-color-commerce-dark-h: 114.66666666666669;
+	--tds-color-commerce-dark-s: 27.272727272727277%;
+	--tds-color-commerce-dark-l: 32.35294117647059%;
+	--tds-color-commerce-dark: hsl(
+		var(--tds-color-commerce-dark-h),
+		var(--tds-color-commerce-dark-s),
+		var(--tds-color-commerce-dark-l)
+	);
+	--tds-color-commerce-light-h: 105;
+	--tds-color-commerce-light-s: 24.999999999999957%;
+	--tds-color-commerce-light-l: 96.86274509803921%;
+	--tds-color-commerce-light: hsl(
+		var(--tds-color-commerce-light-h),
+		var(--tds-color-commerce-light-s),
+		var(--tds-color-commerce-light-l)
+	);
+	--tds-color-developer-dark-h: 226.1538461538462;
+	--tds-color-developer-dark-s: 98.11320754716982%;
+	--tds-color-developer-dark-l: 20.784313725490193%;
+	--tds-color-developer-dark: hsl(
+		var(--tds-color-developer-dark-h),
+		var(--tds-color-developer-dark-s),
+		var(--tds-color-developer-dark-l)
+	);
+	--tds-color-developer-light-h: 209.9999999999999;
+	--tds-color-developer-light-s: 50%;
+	--tds-color-developer-light-l: 96.078431372549%;
+	--tds-color-developer-light: hsl(
+		var(--tds-color-developer-light-h),
+		var(--tds-color-developer-light-s),
+		var(--tds-color-developer-light-l)
+	);
+	--tds-color-trailblazer-dark-h: 94.83870967741933;
+	--tds-color-trailblazer-dark-s: 40.25974025974026%;
+	--tds-color-trailblazer-dark-l: 15.098039215686274%;
+	--tds-color-trailblazer-dark: hsl(
+		var(--tds-color-trailblazer-dark-h),
+		var(--tds-color-trailblazer-dark-s),
+		var(--tds-color-trailblazer-dark-l)
+	);
+	--tds-color-trailblazer-light-h: 40;
+	--tds-color-trailblazer-light-s: 27.272727272727202%;
+	--tds-color-trailblazer-light-l: 97.84313725490196%;
+	--tds-color-trailblazer-light: hsl(
+		var(--tds-color-trailblazer-light-h),
+		var(--tds-color-trailblazer-light-s),
+		var(--tds-color-trailblazer-light-l)
+	);
+	--tds-color-admin-dark-h: 89.67741935483872;
+	--tds-color-admin-dark-s: 57.05521472392638%;
+	--tds-color-admin-dark-l: 31.960784313725487%;
+	--tds-color-admin-dark: hsl(
+		var(--tds-color-admin-dark-h),
+		var(--tds-color-admin-dark-s),
+		var(--tds-color-admin-dark-l)
+	);
+	--tds-color-admin-light-h: 185.4545454545455;
+	--tds-color-admin-light-s: 57.894736842105246%;
+	--tds-color-admin-light-l: 96.27450980392156%;
+	--tds-color-admin-light: hsl(
+		var(--tds-color-admin-light-h),
+		var(--tds-color-admin-light-s),
+		var(--tds-color-admin-light-l)
+	);
+	--tds-color-starter-dark-h: 196.07142857142856;
+	--tds-color-starter-dark-s: 71.79487179487178%;
+	--tds-color-starter-dark-l: 30.58823529411765%;
+	--tds-color-starter-dark: hsl(
+		var(--tds-color-starter-dark-h),
+		var(--tds-color-starter-dark-s),
+		var(--tds-color-starter-dark-l)
+	);
+	--tds-color-starter-light-h: 192;
+	--tds-color-starter-light-s: 55.555555555555536%;
+	--tds-color-starter-light-l: 96.4705882352941%;
+	--tds-color-starter-light: hsl(
+		var(--tds-color-starter-light-h),
+		var(--tds-color-starter-light-s),
+		var(--tds-color-starter-light-l)
+	);
+	--tds-color-careers-dark-h: 220.23529411764707;
+	--tds-color-careers-dark-s: 49.70760233918128%;
+	--tds-color-careers-dark-l: 33.529411764705884%;
+	--tds-color-careers-dark: hsl(
+		var(--tds-color-careers-dark-h),
+		var(--tds-color-careers-dark-s),
+		var(--tds-color-careers-dark-l)
+	);
+	--tds-color-careers-light-h: 225;
+	--tds-color-careers-light-s: 33.33333333333325%;
+	--tds-color-careers-light-l: 97.6470588235294%;
+	--tds-color-careers-light: hsl(
+		var(--tds-color-careers-light-h),
+		var(--tds-color-careers-light-s),
+		var(--tds-color-careers-light-l)
+	);
+	--tds-color-work-dark-h: 220.23529411764707;
+	--tds-color-work-dark-s: 49.70760233918128%;
+	--tds-color-work-dark-l: 33.529411764705884%;
+	--tds-color-work-dark: hsl(
+		var(--tds-color-work-dark-h),
+		var(--tds-color-work-dark-s),
+		var(--tds-color-work-dark-l)
+	);
+	--tds-color-work-light-h: 40.00000000000006;
+	--tds-color-work-light-s: 52.941176470588225%;
+	--tds-color-work-light-l: 96.66666666666666%;
+	--tds-color-work-light: hsl(
+		var(--tds-color-work-light-h),
+		var(--tds-color-work-light-s),
+		var(--tds-color-work-light-l)
+	);
+	--tds-color-salesforce-dark-h: 194.43037974683546;
+	--tds-color-salesforce-dark-s: 100%;
+	--tds-color-salesforce-dark-l: 15.490196078431373%;
+	--tds-color-salesforce-dark: hsl(
+		var(--tds-color-salesforce-dark-h),
+		var(--tds-color-salesforce-dark-s),
+		var(--tds-color-salesforce-dark-l)
+	);
+	--tds-color-salesforce-light-h: 196.36363636363626;
+	--tds-color-salesforce-light-s: 100%;
+	--tds-color-salesforce-light-l: 97.84313725490196%;
+	--tds-color-salesforce-light: hsl(
+		var(--tds-color-salesforce-light-h),
+		var(--tds-color-salesforce-light-s),
+		var(--tds-color-salesforce-light-l)
+	);
+	--tds-color-theme-dark-h: 216;
+	--tds-color-theme-dark-s: 61.403508771929836%;
+	--tds-color-theme-dark-l: 22.352941176470587%;
+	--tds-color-theme-dark: hsl(
+		var(--tds-color-theme-dark-h),
+		var(--tds-color-theme-dark-s),
+		var(--tds-color-theme-dark-l)
+	);
+	--tds-color-theme-light-h: 0;
+	--tds-color-theme-light-s: 0%;
+	--tds-color-theme-light-l: 96.07843137254902%;
+	--tds-color-theme-light: hsl(
+		var(--tds-color-theme-light-h),
+		var(--tds-color-theme-light-s),
+		var(--tds-color-theme-light-l)
+	);
+	--tds-color-brand-h: 208;
+	--tds-color-brand-s: 100%;
+	--tds-color-brand-l: 41.17647058823529%;
+	--tds-color-brand: hsl(
+		var(--tds-color-brand-h),
+		var(--tds-color-brand-s),
+		var(--tds-color-brand-l)
+	);
+	--tds-color-success-h: 153.12;
+	--tds-color-success-s: 93.98496240601504%;
+	--tds-color-success-l: 26.078431372549016%;
+	--tds-color-success: hsl(
+		var(--tds-color-success-h),
+		var(--tds-color-success-s),
+		var(--tds-color-success-l)
+	);
+	--tds-color-destructive-h: 2.112676056338046;
+	--tds-color-destructive-s: 57.72357723577236%;
+	--tds-color-destructive-l: 48.23529411764705%;
+	--tds-color-destructive: hsl(
+		var(--tds-color-destructive-h),
+		var(--tds-color-destructive-s),
+		var(--tds-color-destructive-l)
+	);
+	--tds-color-important-h: 21.01265822784808;
+	--tds-color-important-s: 96.73469387755102%;
+	--tds-color-important-l: 51.96078431372548%;
+	--tds-color-important: hsl(
+		var(--tds-color-important-h),
+		var(--tds-color-important-s),
+		var(--tds-color-important-l)
+	);
+	--tds-color-stencil-h: 0;
+	--tds-color-stencil-s: 0%;
+	--tds-color-stencil-l: 94.50980392156862%;
+	--tds-color-stencil: hsl(
+		var(--tds-color-stencil-h),
+		var(--tds-color-stencil-s),
+		var(--tds-color-stencil-l)
+	);
+	--tds-font-size-xs: 12px;
+	--tds-font-size-sm: 14px;
+	--tds-font-size-md: 16px;
+	--tds-font-size-lg: 18px;
+	--tds-font-size-xl: 20px;
+	--tds-font-size-2xl: 24px;
+	--tds-font-size-3xl: 28px;
+	--tds-font-size-4xl: 32px;
+	--tds-font-size-5xl: 36px;
+	--tds-font-size-6xl: 40px;
+	--tds-font-size-7xl: 44px;
+	--tds-font-size-8xl: 48px;
+	--tds-radius-none: 0px;
+	--tds-radius-sm: 2px;
+	--tds-radius-md: 4px;
+	--tds-radius-lg: 8px;
+	--tds-radius-xl: 12px;
+	--tds-radius-full: 15984px;
+	--tds-shadow-xs: 0 0 0 1px rgba(0, 0, 0, 0.04);
+	--tds-shadow-sm: 0 1px 3px 1px rgba(0, 0, 0, 0.06);
+	--tds-shadow-md: 0 3px 7px 1px rgba(0, 0, 0, 0.08);
+	--tds-shadow-lg: 0 4px 14px 1px rgba(0, 0, 0, 0.1);
+	--tds-duration-xshort: 75ms;
+	--tds-duration-short: 150ms;
+	--tds-duration-normal: 250ms;
+	--tds-duration-long: 400ms;
+	--tds-duration-xlong: 600ms;
+	--tds-spacing-0: 0px;
+	--tds-spacing-1: 4px;
+	--tds-spacing-2: 8px;
+	--tds-spacing-3: 12px;
+	--tds-spacing-4: 16px;
+	--tds-spacing-5: 20px;
+	--tds-spacing-6: 24px;
+	--tds-spacing-8: 32px;
+	--tds-spacing-10: 40px;
+	--tds-spacing-12: 48px;
+	--tds-spacing-16: 64px;
+	--tds-spacing-20: 80px;
+	--tds-spacing-24: 96px;
+	--tds-spacing-32: 128px;
+	--tds-spacing-40: 160px;
+	--tds-spacing-48: 192px;
+	--tds-spacing-px: 16px;
+	--tds-page-grid-column-gap: var(--tds-spacing-12);
+	--tds-page-grid-row-gap: var(--tds-spacing-5);
+	--tds-page-sidebar-width: 384px;
+	--tds-page-main-width: 100%;
+	--tds-breakpoint-sm: 30rem;
+	--tds-breakpoint-md: 48rem;
+	--tds-breakpoint-lg: 64rem;
+	--tds-line-height-none: 16px;
+	--tds-line-height-tight: 18px;
+	--tds-line-height-snug: 20.4px;
+	--tds-line-height-normal: 24px;
+	--tds-line-height-relaxed: 26px;
+	--tds-line-height-loose: 32px;
+	--tds-container-sm: 480px;
+	--tds-container-md: 768px;
+	--tds-container-lg: 1024px;
+	--tds-container-xl: 1280px;
+	--tds-z-index-negative: -1;
+	--tds-z-index-default: 0;
+	--tds-z-index-foreground: 1;
+	--tds-z-index-page-1: 1100;
+	--tds-z-index-page-2: 1200;
+	--tds-z-index-page-3: 1300;
+	--tds-z-index-page-4: 1400;
+	--tds-z-index-page-5: 1500;
+	--tds-z-index-page-6: 1600;
+	--tds-z-index-page-7: 1700;
+	--tds-z-index-page-8: 1800;
+	--tds-z-index-page-9: 1900;
+	--tds-z-index-header: 3000;
+	--tds-z-index-tooltip: 6000;
+	--tds-z-index-menu: 7000;
+	--tds-z-index-overlay: 8000;
+	--tds-z-index-modal: 9000;
+	--tds-z-index-toast: 10000;
+}
+@media screen and (max-width: 64rem) {
+	:host {
+		--tds-page-grid-column-gap: var(--tds-spacing-5);
+		--tds-page-grid-row-gap: var(--tds-spacing-5);
+	}
+}
