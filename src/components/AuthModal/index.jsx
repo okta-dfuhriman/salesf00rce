@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Auth, LDS, useEffect, PropTypes } from '../../common';
 import { actions } from '../../providers/AuthProvider/AuthReducer';
+import './styles.css';
 
 const ENV = process.env.NODE_ENV;
 const ORIGINS = process.env.REACT_APP_ORIGIN_ALLOW?.split(/, {0,2}/) || [window.location.origin];
@@ -80,7 +81,9 @@ const AuthModal = ({ onClose }) => {
 
 	return (
 		<LDS.Modal isOpen={isVisibleAuthModal} onRequestClose={onCancel}>
-			{isLoadingLogin && <p>Loading...</p>}
+			{isLoadingLogin && (
+				<LDS.Spinner size='large' variant='brand' hasContainer={false} align='center'></LDS.Spinner>
+			)}
 			{authUrl && isVisibleIframe && (
 				<iframe
 					src={authUrl}
@@ -95,6 +98,10 @@ const AuthModal = ({ onClose }) => {
 			)}
 		</LDS.Modal>
 	);
+};
+
+AuthModal.defaultProps = {
+	onClose: () => {},
 };
 
 AuthModal.propTypes = {

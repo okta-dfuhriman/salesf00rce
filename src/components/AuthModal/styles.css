@@ -1,0 +1,19 @@
+.slds-modal__container {
+	min-width: 28rem;
+	min-height: 40rem;
+}
+
+.slds-modal__content {
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	min-height: 40rem;
+}
+
+@media (min-width: 48em) {
+	.slds-modal__container {
+		width: 100%;
+		min-width: 28rem;
+		min-height: 40rem;
+	}
+}
