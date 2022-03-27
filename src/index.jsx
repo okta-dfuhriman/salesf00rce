@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import './styles/TDS';
 import './styles/tds.css';
-import './styles/tds-colors.css';
 import './styles/root.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
