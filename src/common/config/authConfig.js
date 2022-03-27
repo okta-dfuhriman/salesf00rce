@@ -19,6 +19,9 @@ const authConfig = {
 		tokenManager: {
 			autoRenew: true,
 		},
+		services: {
+			autoRenew: false,
+		},
 		disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK,
 	},
 };
