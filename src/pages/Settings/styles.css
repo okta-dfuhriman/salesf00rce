@@ -1,0 +1,8 @@
+#settings-page .nav {
+	top: 4.75rem;
+	width: 100%;
+}
+
+#settings-page .grid {
+	align-items: unset;
+}
