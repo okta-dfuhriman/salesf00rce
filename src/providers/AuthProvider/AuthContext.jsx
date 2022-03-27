@@ -3,7 +3,7 @@
 import { createContext, useEffect, useReducer, PropTypes } from '../../common';
 import { useOktaAuth } from '@okta/okta-react';
 import useAuthActions from '../../hooks/useAuthActions';
-import { AuthReducer, initialState } from './AuthReducer';
+import { AuthReducer, initialState, actions } from './AuthReducer';
 import AuthDispatchContext from './AuthDispatcher';
 
 export const AuthStateContext = createContext();
@@ -23,6 +23,7 @@ const AuthProvider = ({ children }) => {
 	const contextValues = {
 		...useAuthActions(),
 		...state,
+		actions,
 	};
 
 	return (

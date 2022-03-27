@@ -4,6 +4,20 @@ import { actions } from '../providers/AuthProvider/AuthReducer';
 import { useOktaAuth } from '@okta/okta-react';
 import { removeNils, toQueryString } from '@okta/okta-auth-js';
 
+const GOOGLE_IDP_ID = process.env.REACT_APP_GOOGLE_IDP_ID;
+const LINKEDIN_IDP_ID = process.env.REACT_APP_LINKEDIN_IDP_ID;
+const APPLE_IDP_ID = process.env.REACT_APP_APPLE_IDP_ID;
+const FACEBOOK_IDP_ID = process.env.REACT_APP_FACEBOOK_IDP_ID;
+const SALESFORCE_IDP_ID = process.env.REACT_APP_SALESFORCE_IDP_ID;
+
+const idpMap = {
+	google: GOOGLE_IDP_ID,
+	linkedin: LINKEDIN_IDP_ID,
+	apple: APPLE_IDP_ID,
+	facebook: FACEBOOK_IDP_ID,
+	salesforce: SALESFORCE_IDP_ID,
+};
+
 const buildAuthorizeParams = tokenParams => {
 	let params = {};
 
@@ -68,36 +82,45 @@ const useAuthActions = () => {
 			try {
 				const config = {};
 
-				let hasSession = options?.hasSession || (await oktaAuth.isAuthenticated());
+				dispatch({ type: actions.login.silentAuth.start.type });
 
-				if (hasSession === undefined) {
-					console.debug('checking for existing Okta session...');
+				// Check if we can get tokens using either a refresh_token or, if our tokens are expired, if getWithoutPrompt works.
+				const isAuthenticated = await oktaAuth.isAuthenticated();
 
-					hasSession = await oktaAuth.session.exists();
+				console.log('isAuthenticated:', isAuthenticated);
+
+				if (!isAuthenticated) {
+					const hasSession = options?.hasSession || (await oktaAuth.session.exists());
+
+					if (hasSession) {
+						// Have a session but no tokens in tokenManager.
+						// ** Hail Mary attempt to authenticate via existing session. **
+
+						if (!options) {
+							config.redirectUri = `${window.location.origin}/login/callback`;
+						}
+
+						const { tokens } = await oktaAuth.token.getWithoutPrompt(config);
+
+						if (tokens) {
+							await oktaAuth.tokenManager.setTokens(tokens);
+
+							dispatch({
+								type: actions.login.silentAuth.success.type,
+								payload: { isAuthenticated },
+							});
+						}
+					}
 				}
 
-				if (hasSession) {
-					dispatch({ type: actions.login.silentAuth.start.type });
+				dispatch({
+					type: actions.login.silentAuth.complete.type,
+				});
 
-					if (!options) {
-						config.redirectUri = `${window.location.origin}/login/callback`;
-					}
-
-					const { tokens } = await oktaAuth.token.getWithoutPrompt(config);
-
-					if (tokens) {
-						await oktaAuth.tokenManager.setTokens(tokens);
-
-						dispatch({ type: actions.login.silentAuth.success.type });
-					}
-				} else {
-					dispatch({ type: actions.login.silentAuth.complete.type });
-				}
-
-				return hasSession;
+				return { isAuthenticated };
 			} catch (error) {
 				if (dispatch) {
-					// console.error(error);
+					console.log(error);
 					dispatch({ type: actions.login.silentAuth.error.type, error });
 				} else {
 					throw new Error(error);
@@ -107,35 +130,37 @@ const useAuthActions = () => {
 
 		const getUser = async dispatch => {
 			try {
-				const isAuthenticated = await silentAuth(dispatch);
+				const { isAuthenticated } = await silentAuth(dispatch);
 
-				let payload = { isAuthenticated, isLoadingProfile: false };
+				let payload = { isAuthenticated, isLoadingProfile: true };
 
-				if (dispatch) {
-					dispatch({
-						type: actions.user.fetch.start.type,
-						payload,
-					});
-				}
-
-				const user = await oktaAuth.getUser();
-
-				if (user) {
-					if (user.headers) {
-						delete user.headers;
+				if (isAuthenticated) {
+					if (dispatch) {
+						dispatch({
+							type: actions.user.fetch.start.type,
+							payload,
+						});
 					}
 
-					payload = { ...payload, user };
+					const user = await oktaAuth.getUser();
 
-					localStorage.setItem('user', JSON.stringify(user));
-				}
+					if (user) {
+						if (user.headers) {
+							delete user.headers;
+						}
 
-				if (dispatch) {
-					dispatch({ type: actions.user.fetch.success.type, payload });
+						payload = { ...payload, user, isLoadingProfile: false };
+
+						localStorage.setItem('user', JSON.stringify(user));
+					}
+
+					if (dispatch) {
+						dispatch({ type: actions.user.fetch.success.type, payload });
+					}
 				}
 			} catch (error) {
 				if (dispatch) {
-					// console.error(error);
+					console.log(error);
 					dispatch({ type: actions.user.fetch.error.type, error });
 				} else {
 					throw new Error(error);
@@ -143,7 +168,7 @@ const useAuthActions = () => {
 			}
 		};
 
-		const loginWithiFrame = async (dispatch, options) => {
+		const loginWithModal = async (dispatch, options) => {
 			try {
 				const { loginHint } = options || {};
 
@@ -153,14 +178,34 @@ const useAuthActions = () => {
 
 				console.debug('generating URL...');
 
-				dispatch({ type: actions.login.start.withIframe.type });
+				dispatch({ type: actions.login.start.withModal.type });
 
 				const { authUrl, tokenParams } = await generateAuthUrl(oktaAuth);
 
-				return dispatch({ type: actions.login.started.type, payload: { authUrl, tokenParams } });
+				return dispatch({ type: actions.login.pending.type, payload: { authUrl, tokenParams } });
 			} catch (error) {
 				if (dispatch) {
-					// console.error(error);
+					console.log('loginWithModal error:', error);
+					dispatch({ type: actions.login.error.type, error });
+				} else {
+					throw new Error(error);
+				}
+			}
+		};
+
+		const loginWithCredentials = async (dispatch, { username, password }) => {
+			try {
+				dispatch({ type: actions.login.start.withCredentials.type });
+
+				oktaAuth
+					.signInWithCredentials({ username, password, sendFingerprint: true })
+					.then(async transaction => {
+						if (transaction.status === 'SUCCESS') {
+							oktaAuth.signInWithRedirect({ sessionToken: transaction.sessionToken });
+						}
+					});
+			} catch (error) {
+				if (dispatch) {
 					dispatch({ type: actions.login.error.type, error });
 				} else {
 					throw new Error(error);
@@ -170,9 +215,19 @@ const useAuthActions = () => {
 
 		const login = async (dispatch, props) => {
 			try {
-				const { tokens, tokenParams } = props || {};
+				const { tokens, tokenParams, username, password, idp } = props || {};
 				// eslint-disable-next-line camelcase
 				const { authorizationCode, interaction_code } = tokenParams || {};
+
+				if (username && password) {
+					return await loginWithCredentials(dispatch, { username, password });
+				}
+
+				if (idp) {
+					dispatch({ type: actions.login.start.withRedirect.type });
+
+					return await oktaAuth.signInWithRedirect({ idp: idpMap[idp] });
+				}
 
 				// eslint-disable-next-line camelcase
 				const isCodeExchange = authorizationCode || interaction_code || false;
@@ -195,15 +250,19 @@ const useAuthActions = () => {
 				}
 
 				if (oktaAuth.isLoginRedirect() || tokens) {
-					dispatch({ type: actions.login.start.withRedirect.type });
+					dispatch({ type: actions.login.pending.type });
 
-					await oktaAuth.storeTokensFromRedirect();
+					await oktaAuth.handleLoginRedirect();
 
-					oktaAuth.removeOriginalUri();
+					// await oktaAuth.storeTokensFromRedirect();
 
-					await oktaAuth.authStateManager.updateAuthState();
+					// oktaAuth.removeOriginalUri();
 
-					return;
+					// await oktaAuth.authStateManager.updateAuthState();
+
+					dispatch({ type: actions.login.success.type });
+
+					return await getUser(dispatch);
 				}
 
 				if (!authState?.isAuthenticated) {
@@ -214,7 +273,7 @@ const useAuthActions = () => {
 					if (!hasSession) {
 						const loginHint = props?.loginhint;
 
-						return await loginWithiFrame(dispatch, { loginHint });
+						return await loginWithModal(dispatch, { loginHint });
 					}
 
 					return await silentAuth(dispatch, { hasSession });
@@ -227,6 +286,22 @@ const useAuthActions = () => {
 				}
 			}
 		};
+
+		// const resetPassword = async (dispatch, { username, verificationCode }) => {
+		// 	try {
+		// 		const { status, nextStep: { inputs } } = await oktaAuth.idx.recoverPassword({ username, authenticators: ['okta_email'] });
+
+		// 		const { status, nextStep: { inputs }} = await oktaAuth.idx.proceed({ verificationCode })
+
+		// 	} catch (error) {
+		// 		if (dispatch) {
+		// 			dispatch({ type: actions.recovery.error.type, error });
+		// 		} else {
+		// 			throw new Error(error);
+		// 		}
+		// 	}
+
+		// }
 
 		const logout = (dispatch, postLogoutRedirect) => {
 			let config = {};
@@ -242,12 +317,36 @@ const useAuthActions = () => {
 			return oktaAuth.signOut(config).then(() => dispatch({ type: 'LOGOUT_SUCCESS' }));
 		};
 
+		const toggleSignUp = (dispatch, isSignUp) =>
+			dispatch({
+				type: actions.login.init.signUp.type,
+				payload: { isSignUp: !isSignUp },
+			});
+
+		const toggleEmailAuth = (dispatch, { isRecovery, isSignUp, isEmailAuth }) => {
+			if (isRecovery) {
+				dispatch({
+					type: actions.login.init.withEmail.type,
+					payload: { isRecovery: !isRecovery, isEmailAuth: false },
+				});
+			} else if (isSignUp) {
+				dispatch({ type: actions.login.init.signUp.type, payload: { isEmailAuth: !isEmailAuth } });
+			} else {
+				dispatch({
+					type: actions.login.init.withEmail.type,
+					payload: { isEmailAuth: !isEmailAuth },
+				});
+			}
+		};
+
 		return {
 			getUser,
 			login,
-			loginWithiFrame,
+			loginWithModal,
 			logout,
 			silentAuth,
+			toggleEmailAuth,
+			toggleSignUp,
 		};
 	} catch (error) {
 		// console.error(`init error [${error}]`);
