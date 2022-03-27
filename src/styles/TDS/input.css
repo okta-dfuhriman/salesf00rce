@@ -1,0 +1,322 @@
+/**
+ * @summary Initializes text input
+ *
+ * @name base
+ * @selector .slds-input
+ * @restrict input
+ * @support dev-ready
+ * @variant
+ */
+.slds-input {
+	background-color: white;
+	border: 1px solid #dddbda;
+	border-radius: 0.25rem;
+	width: 100%;
+	transition: border 0.1s linear, background-color 0.1s linear;
+	display: inline-block;
+	padding: 0 1rem 0 0.75rem;
+	line-height: 1.875rem;
+	min-height: calc(1.875rem + (1px * 2));
+	/**
+   * @selector [readonly]
+   * @restrict .slds-input
+   */
+	/**
+   * Removes aesthetic nature from an input
+   *
+   * @selector .slds-input_bare
+   * @restrict .slds-input, input, textarea
+   * @modifier
+   */
+	/**
+   * @summary Modifier for number input with increment and decrement buttons
+   *
+   * @selector .slds-input_counter
+   * @restrict .slds-input, input
+   * @modifier
+   */
+	/**
+   * Used to apply an input size to another element thats a non input
+   * Because sometimes I need elements the same height as inputs
+   *
+   * @selector .slds-input_height
+   * @restrict .slds-input
+   */
+}
+.slds-input:required {
+	box-shadow: none;
+}
+.slds-input:focus,
+.slds-input:active {
+	outline: 0;
+	border-color: #1589ee;
+	background-color: white;
+	box-shadow: 0 0 3px #0070d2;
+}
+.slds-input[disabled],
+.slds-input.slds-is-disabled {
+	background-color: #e2e2e2;
+	border-color: #c9c7c5;
+	cursor: not-allowed;
+	user-select: none;
+}
+.slds-input[disabled]:focus,
+.slds-input[disabled]:active,
+.slds-input.slds-is-disabled:focus,
+.slds-input.slds-is-disabled:active {
+	box-shadow: none;
+}
+.slds-input[readonly] {
+	padding-left: 0;
+	border-color: transparent;
+	background-color: transparent;
+	font-size: 0.875rem;
+	font-weight: 400;
+}
+.slds-input[type='search']::-ms-clear {
+	display: none;
+	width: 0;
+	height: 0;
+}
+.slds-input_bare,
+.slds-input--bare {
+	background-color: transparent;
+	border: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0.75rem;
+	color: #1e1e1e;
+	line-height: 1.875rem;
+}
+.slds-input_bare:focus,
+.slds-input_bare:active,
+.slds-input--bare:focus,
+.slds-input--bare:active {
+	outline: 0;
+	box-shadow: none;
+}
+.slds-input_counter {
+	text-align: center;
+	padding: 0 3rem;
+}
+.slds-input_counter[type='number'] {
+	appearance: textfield;
+}
+.slds-input_counter::-webkit-outer-spin-button,
+.slds-input_counter::-webkit-inner-spin-button {
+	appearance: none;
+	margin: 0;
+}
+.slds-input_height,
+.slds-input--height {
+	min-height: calc(1.875rem + (1px * 2));
+}
+
+/**
+ * @summary Modifier to allow a [readonly] input to have borders
+ *
+ * @selector .slds-input_borders
+ * @restrict .slds-input
+ */
+.slds-input_borders {
+	padding-left: 0.75rem;
+	border-color: #dddbda;
+}
+
+/**
+ * @summary Modifier if text input has svg icon adjacent to input
+ *
+ * @selector .slds-input-has-icon
+ * @restrict .slds-form-element div
+ */
+.slds-input-has-icon {
+	position: relative;
+	/**
+   * @summary Hook for .slds-input-has-icon
+   *
+   * @selector .slds-input__icon
+   * @restrict .slds-input-has-icon svg, .slds-input-has-icon button, .slds-input-has-icon span
+   */
+	/**
+   * @summary Positions .slds-input__icon to the left of the text input
+   *
+   * @selector .slds-input-has-icon_left
+   * @restrict .slds-input-has-icon
+   */
+	/**
+   * @summary Positions .slds-input__icon to the right of the text input
+   *
+   * @selector .slds-input-has-icon_right
+   * @restrict .slds-input-has-icon
+   */
+	/**
+   * @summary Positions .slds-input__icon_left to the left of the text input and .slds-input__icon_right to the right of the text input
+   *
+   * @selector .slds-input-has-icon_left-right
+   * @restrict .slds-input-has-icon
+   */
+}
+.slds-input-has-icon .slds-input__icon {
+	width: 0.875rem;
+	height: 0.875rem;
+	position: absolute;
+	top: 50%;
+	margin-top: -0.4375rem;
+	line-height: 1;
+	border: 0;
+	z-index: 2;
+	/* @Todo - we need to be sure this is deprecated since the color sems to be the correct gray I see in specs */
+	fill: #b0adab;
+}
+.slds-input-has-icon .slds-input__icon:not(button) {
+	pointer-events: none;
+}
+.slds-input-has-icon_left .slds-input__icon,
+.slds-input-has-icon--left .slds-input__icon {
+	left: 0.75rem;
+}
+.slds-input-has-icon_left .slds-input,
+.slds-input-has-icon_left .slds-input_bare,
+.slds-input-has-icon_left .slds-input--bare,
+.slds-input-has-icon--left .slds-input,
+.slds-input-has-icon--left .slds-input_bare,
+.slds-input-has-icon--left .slds-input--bare {
+	padding-left: 2rem;
+}
+.slds-input-has-icon_right .slds-input__icon,
+.slds-input-has-icon--right .slds-input__icon {
+	right: 0.75rem;
+}
+.slds-input-has-icon_right .slds-input,
+.slds-input-has-icon_right .slds-input_bare,
+.slds-input-has-icon_right .slds-input--bare,
+.slds-input-has-icon--right .slds-input,
+.slds-input-has-icon--right .slds-input_bare,
+.slds-input-has-icon--right .slds-input--bare {
+	padding-right: 2rem;
+}
+.slds-input-has-icon_left-right,
+.slds-input-has-icon--left-right {
+	/**
+     * @summary Hook for .slds-input-has-icon--left-right
+     *
+     * @selector .slds-input__icon_left
+     * @restrict .slds-input__icon
+     */
+	/**
+     * @summary Hook for .slds-input-has-icon_left-right
+     *
+     * @selector .slds-input__icon_right
+     * @restrict .slds-input__icon
+     */
+}
+.slds-input-has-icon_left-right .slds-input__icon_left,
+.slds-input-has-icon_left-right .slds-input__icon--left,
+.slds-input-has-icon--left-right .slds-input__icon_left,
+.slds-input-has-icon--left-right .slds-input__icon--left {
+	left: 0.75rem;
+}
+.slds-input-has-icon_left-right .slds-input__icon_right,
+.slds-input-has-icon_left-right .slds-input__icon--right,
+.slds-input-has-icon--left-right .slds-input__icon_right,
+.slds-input-has-icon--left-right .slds-input__icon--right {
+	right: 0.75rem;
+}
+.slds-input-has-icon_left-right .slds-input,
+.slds-input-has-icon_left-right .slds-input_bare,
+.slds-input-has-icon_left-right .slds-input--bare,
+.slds-input-has-icon--left-right .slds-input,
+.slds-input-has-icon--left-right .slds-input_bare,
+.slds-input-has-icon--left-right .slds-input--bare {
+	padding: 0 2rem;
+}
+.slds-input-has-icon_group-right .slds-input,
+.slds-input-has-icon_group-right .slds-input_bare,
+.slds-input-has-icon_group-right .slds-input--bare {
+	padding-right: 3.25rem;
+}
+
+/**
+ * @summary Positions two items (icons and/or spinners) on one side or the other of the input
+ *
+ * @selector .slds-input__icon-group
+ * @restrict .slds-input-has-icon div
+ */
+.slds-input__icon-group {
+	position: absolute;
+	height: 1rem;
+	margin-top: -0.5rem;
+}
+
+/**
+ * @summary Positions the close icon and spinner on the right side of the input while searching
+ *
+ * @selector .slds-input__icon-group_right
+ * @restrict .slds-input__icon-group
+ */
+.slds-input__icon-group_right {
+	right: 0;
+	top: 50%;
+}
+.slds-input__icon-group_right .slds-input__icon_right,
+.slds-input__icon-group_right .slds-input__icon--right {
+	right: 0.5rem;
+}
+.slds-input__icon-group_right .slds-input__spinner {
+	right: 1.5rem;
+	left: auto;
+}
+
+/**
+ * @summary Use on input container to let it know there is fixed text to the left or right of the input
+ *
+ * @selector .slds-input-has-fixed-addon
+ * @restrict .slds-form-element .slds-form-element__control
+ */
+.slds-input-has-fixed-addon {
+	display: flex;
+}
+
+.slds-input:required:focus {
+	box-shadow: 0 0 3px #0070d2;
+}
+
+.slds-has-error .slds-input {
+	background-color: white;
+	border-color: #c23934;
+	box-shadow: #c23934 0 0 0 1px inset;
+	background-clip: padding-box;
+}
+.slds-has-error .slds-input:focus,
+.slds-has-error .slds-input:active {
+	box-shadow: #c23934 0 0 0 1px inset, 0 0 3px #0070d2;
+}
+
+.slds-has-error .slds-input__icon {
+	fill: #c23934;
+	color: #c23934;
+}
+
+/**
+ * @summary Positions decrement button within counter input field
+ *
+ * @selector .slds-input__button_decrement
+ * @restrict button
+ */
+.slds-input__button_decrement {
+	position: absolute;
+	bottom: 0.25rem;
+	left: 0.75rem;
+}
+
+/**
+ * @summary Positions increment button within counter input field
+ *
+ * @selector .slds-input__button_increment
+ * @restrict button
+ */
+.slds-input__button_increment {
+	position: absolute;
+	bottom: 0.25rem;
+	right: 0.75rem;
+}

@@ -1,0 +1,323 @@
+
+/**
+ * @summary Initializes page header
+ *
+ * @variant
+ * @name base
+ * @selector .slds-page-header
+ * @restrict div
+ * @support dev-ready
+ */
+.slds-page-header {
+	padding: 1rem 1rem;
+	border-bottom: 1px solid #dddbda;
+	border-radius: 0.25rem;
+	background: #f3f2f2;
+	background-clip: padding-box;
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+	border: 1px solid #dddbda;
+}
+
+/**
+ * @summary Used for creating rows in a page header
+ *
+ * @selector .slds-page-header__row
+ * @restrict .slds-page-header div
+ */
+.slds-page-header__row {
+	display: flex;
+}
+
+/**
+ * @summary Used to create rows with gutters in the page header
+ *
+ * @selector .slds-page-header__row_gutters
+ * @restrict .slds-page-header__row
+ */
+.slds-page-header__row_gutters {
+	margin-left: -1rem;
+	margin-right: -1rem;
+}
+
+/**
+ * @summary Used to create a column containing the page title
+ *
+ * @selector .slds-page-header__col_title
+ * @restrict .slds-page-header__row
+ */
+.slds-page-header__col-title {
+	flex: 1 1 0%;
+	min-width: 0;
+}
+
+.slds-page-header__icon {
+	width: 2.25rem;
+	height: 2.25rem;
+}
+
+/**
+ * @summary Used to create a column containing the page actions
+ *
+ * @selector .slds-page-header__col_actions
+ * @restrict .slds-page-header__row
+ */
+.slds-page-header__col-actions {
+	align-self: flex-start;
+	flex: none;
+	padding-bottom: 0.25rem;
+	vertical-align: top;
+}
+
+/**
+ * @summary Used to create a column containing the page meta data
+ *
+ * @selector .slds-page-header__col_meta
+ * @restrict .slds-page-header__row
+ */
+.slds-page-header__col-meta {
+	align-self: center;
+	flex: 1 1 auto;
+	vertical-align: middle;
+}
+
+/**
+ * @summary Used to create a column containing the page controls
+ *
+ * @selector .slds-page-header__col_controls
+ * @restrict .slds-page-header__row
+ */
+.slds-page-header__col-controls {
+	align-self: flex-end;
+	flex: none;
+	vertical-align: bottom;
+}
+
+/**
+ * @summary Used to create a column containing the page record details
+ *
+ * @selector .slds-page-header__col_controls
+ * @restrict .slds-page-header__row
+ */
+.slds-page-header__col-details {
+	flex: 1 1 auto;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	max-width: 100%;
+}
+
+/**
+ * @summary Holds all the elements that make up the overall page name
+ *
+ * @selector .slds-page-header__name
+ * @restrict .slds-page-header div
+ */
+.slds-page-header__name {
+	display: inline-flex;
+	padding-right: 0.5rem;
+	max-width: 100%;
+}
+.slds-page-header__name h1 {
+	line-height: 1;
+}
+
+/**
+ * @summary Used to contain the page name title
+ *
+ * @selector .slds-page-header__name-title
+ * @restrict .slds-page-header__name div
+ */
+.slds-page-header__name-title {
+	min-width: 0;
+}
+
+/**
+ * @summary Used to position the list view switcher
+ *
+ * @selector .slds-page-header__name-switcher
+ * @restrict .slds-page-header__name div
+ */
+.slds-page-header__name-switcher {
+	align-self: flex-end;
+	margin: 0 0 0.125rem 0.125rem;
+}
+.slds-page-header__name-switcher .slds-button__icon {
+	fill: #1e1e1e;
+}
+
+/**
+ * @summary Used to display the meta-text related to the page name
+ *
+ * @selector .slds-page-header__name-meta
+ * @restrict .slds-page-header p
+ */
+.slds-page-header__name-meta {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 0.75rem;
+	padding-right: 0.5rem;
+}
+
+/**
+ * @summary Contains the page header meta text
+ *
+ * @selector .slds-page-header__meta-text
+ * @restrict .slds-page-header p
+ */
+.slds-page-header__meta-text {
+	font-size: 0.875rem;
+}
+
+/**
+ * @sumamry Used to display the main page heading title
+ *
+ * @selector .slds-page-header__title
+ * @restrict .slds-page-header h1 span
+ */
+.slds-page-header__title {
+	font-size: 1.125rem;
+	font-weight: 700;
+	line-height: 1.25;
+	display: block;
+}
+.slds-page-header__title .slds-icon {
+	fill: currentColor;
+}
+
+/**
+ * @summary Used to create a row of page header controls
+ *
+ * @selector .slds-page-header__controls
+ * @restrict .slds-page-header div
+ */
+.slds-page-header__controls {
+	display: flex;
+}
+
+/**
+ * @summary Used to create spacing between each page header control
+ *
+ * @selector .slds-page-header__control
+ * @restrict .slds-page-header div
+ */
+.slds-page-header__control {
+	margin-left: 0.25rem;
+}
+
+.slds-page-header_joined,
+.slds-page-header.slds-has-bottom-magnet {
+	border-bottom: 1px solid #dddbda;
+	border-radius: 0.25rem 0.25rem 0 0;
+	box-shadow: none;
+}
+
+.slds-tabs_card .slds-page-header,
+.slds-card .slds-page-header {
+	border: 0;
+	box-shadow: none;
+	border-radius: 0.25rem;
+}
+
+/**
+ * @summary Bottom section containing record details
+ *
+ * @variant
+ * @name record-home
+ * @selector .slds-page-header_record-home
+ * @restrict .slds-page-header
+ * @support dev-ready
+ */
+/**
+ * @summary Creates margins around the detail section of record home
+ * @selector .slds-page-header__detail-row
+ * @restrict .slds-page-header ul
+ * @notes Only the record home page header contains this detail area
+ */
+.slds-page-header__detail-row {
+	display: flex;
+	margin: 0.75rem -1rem -1rem;
+	padding: 1rem;
+	border-radius: 0 0 0.25rem 0.25rem;
+	background-color: white;
+	position: relative;
+	z-index: 2;
+}
+
+/**
+* @summary Creates margins around the detail section of record home
+* @selector .slds-page-header__detail-block
+* @restrict .slds-page-header__detail-row li
+* @notes Only the record home page header contains this detail area
+*/
+.slds-page-header__detail-block {
+	padding-right: 2rem;
+	padding-left: 2rem;
+	max-width: 25%;
+}
+.slds-page-header__detail-block:first-child {
+	padding-left: 0;
+}
+.slds-page-header__detail-block:last-child {
+	padding-right: 0;
+}
+
+/**
+ * @summary Initializes vertical page header
+ *
+ * @variant
+ * @name record-home-vertical
+ * @selector .slds-page-header_vertical
+ * @restrict .slds-page-header
+ * @support dev-ready
+ */
+.slds-page-header_vertical,
+.slds-page-header--vertical {
+	padding: 0.75rem;
+	background: white;
+	border-bottom: 0;
+}
+.slds-page-header_vertical .slds-page-header__controls,
+.slds-page-header--vertical .slds-page-header__controls {
+	padding-top: 0.5rem;
+	margin-top: 0.5rem;
+	border-top: 1px solid #dddbda;
+}
+.slds-page-header_vertical .slds-page-header__name-title,
+.slds-page-header--vertical .slds-page-header__name-title {
+	margin-top: 0.25rem;
+}
+
+/**
+ * @summary Vertical list of detail items
+ * @selector .slds-page-header__detail-list
+ * @restrict .slds-page-header_vertical ul
+ */
+.slds-page-header__detail-list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+/**
+ * @summary List items of vertical detail list
+ * @selector .slds-page-header__detail-item
+ * @restrict .slds-page-header__detail-list li
+ */
+.slds-page-header__detail-item {
+	margin-top: 0.75rem;
+	width: 50%;
+}
+
+/**
+ * @summary Initializes object home page header
+ *
+ * @variant
+ * @name object-home
+ * @selector .slds-page-header_object-home
+ * @restrict .slds-page-header
+ * @support dev-ready
+ */
+.slds-page-header_object-home,
+.slds-page-header--object-home {
+	padding-bottom: 0.75rem;
+}
