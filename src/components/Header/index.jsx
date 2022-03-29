@@ -20,9 +20,6 @@ const Header = () => {
 			</div>
 		) : (
 			<>
-				<div className='tds-text-size_3 tds-text_bold slds-text-align_right slds-m-right_small slds-truncate'>
-					{displayName}
-				</div>
 				<div className='slds-m-right_small'>
 					<LDS.Dropdown
 						className='header-dropdown'
@@ -33,11 +30,27 @@ const Header = () => {
 						<DropdownCard />
 						<LDS.DropdownTrigger>
 							<LDS.Button variant='base' className='tds-avatar'>
-								<LDS.Avatar
-									imgSrc={user?.picture ?? '/assets/images/astro.svg'}
-									imgAlt={displayName}
-									size='large'
-								/>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'row',
+										alignContent: 'center',
+										alignItems: 'center',
+										justifyContent: 'flex-start',
+									}}
+								>
+									<div
+										className='tds-text-size_3 tds-text_bold slds-text-align_right slds-m-right_small slds-truncate'
+										style={{ color: 'inherit' }}
+									>
+										{displayName}
+									</div>
+									<LDS.Avatar
+										imgSrc={user?.picture ?? '/assets/images/astro.svg'}
+										imgAlt={displayName}
+										size='large'
+									/>
+								</div>
 							</LDS.Button>
 						</LDS.DropdownTrigger>
 					</LDS.Dropdown>
