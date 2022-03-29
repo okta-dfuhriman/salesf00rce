@@ -1,6 +1,9 @@
 import * as _ from 'lodash';
 import { ulid as ULID } from 'ulid';
 
+import { ApiError } from './_error';
+import cleanProfile from './_cleanProfile';
+
 /**
  *
  * @param {*} id Okta userId for the primary user.
@@ -26,7 +29,7 @@ const mergeProfiles = async (id, associatedUserId, associatedLogin, client) => {
 		linkedUsers.length > 0 &&
 		linkedUsers.includes(associatedLogin)
 	) {
-		throw new Error({
+		throw new ApiError({
 			statusCode: 400,
 			message: `User ${associatedLogin} (${associatedUserId}) already linked to primary user ${id}`,
 		});
@@ -42,16 +45,41 @@ const mergeProfiles = async (id, associatedUserId, associatedLogin, client) => {
 	primaryUser.profile.linkedUsers.push(associatedLogin);
 
 	// 4) Update profiles and return the primary profile.
-	associatedUser.update();
+	const updatedAssociatedUser = await associatedUser.update();
 
-	return await primaryUser
-		.update()
-		.then(user => {
-			return user;
-		})
-		.catch(error => {
-			throw new Error(`.update() failed [${error}]`);
-		});
+	const updatedPrimaryUser = await primaryUser.update();
+
+	const primaryProfile = await cleanProfile(updatedPrimaryUser?.profile);
+
+	primaryProfile['linkedUsers'] = [
+		{
+			id: associatedUserId,
+			...(await cleanProfile(updatedAssociatedUser?.profile)),
+		},
+	];
+
+	if (updatedPrimaryUser?.profile?.linkedUsers?.length > 1) {
+		for (let i = 0; i < updatedPrimaryUser.profile.linkedUsers.length; i++) {
+			const linkedUserLogin = updatedPrimaryUser.profile.linkedUsers[i];
+
+			if (linkedUserLogin !== associatedLogin) {
+				const { id, profile } = await client.getUser(linkedUserLogin);
+
+				primaryProfile.linkedUsers.push({ id, ...(await cleanProfile(profile)) });
+			}
+		}
+	}
+
+	return { ...updatedPrimaryUser, profile: primaryProfile };
+
+	// .then(user => {
+	// 	return user;
+	// })
+	// .catch(error => {
+	// 	throw new ApiError({
+	// 		message: `.update() failed [${error.message.toString()}]`,
+	// 	});
+	// });
 };
 
 export default mergeProfiles;
