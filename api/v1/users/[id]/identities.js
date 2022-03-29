@@ -47,10 +47,8 @@ module.exports = async (req, res) => {
 			return res.send(await mergeProfiles(id, associatedUserId, associatedLogin, client));
 		}
 	} catch (error) {
-		const { code, message, statusCode } = error || {};
-
-		const msg = message.toString();
-
-		return res.status(statusCode ?? 500).json(code ? { code, message: msg } : msg);
+		return res
+			.status(error?.statusCode ?? 500)
+			.json({ code: error?.code, message: error?.message.toString() });
 	}
 };

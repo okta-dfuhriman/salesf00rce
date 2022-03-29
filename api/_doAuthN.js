@@ -1,3 +1,4 @@
+import { ApiError } from './_error';
 import validateJwt from './_validateJwt';
 
 const AUD = process.env.AUD;
@@ -41,7 +42,9 @@ const doAuthN = async (req, aud = AUD) => {
 			return { isValid: false, error };
 		}
 	} catch (error) {
-		throw new Error(`Unable to perform authorization [${error}]`);
+		throw new ApiError({
+			message: `Unable to perform authorization [${error}]`,
+		});
 	}
 };
 

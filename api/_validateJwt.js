@@ -1,4 +1,5 @@
 import OktaJwtVerifier from '@okta/jwt-verifier';
+import { ApiError } from './_error';
 
 const ORG_URL = process.env.REACT_APP_OKTA_URL;
 const AUTH_SERVER_ID = process.env.REACT_APP_OKTA_AUTH_SERVER_ID;
@@ -18,7 +19,7 @@ const validateJwt = async (jwt, aud, config = {}) => {
 
 		return await jwtVerifier.verifyAccessToken(jwt, aud);
 	} catch (error) {
-		throw new Error(error);
+		throw new ApiError({ message: error?.message.toString() });
 	}
 };
 
