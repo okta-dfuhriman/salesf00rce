@@ -1,7 +1,15 @@
 import * as _ from 'lodash';
 import { ulid as ULID } from 'ulid';
 
-const mergeProfiles = async ({ id, associatedUserId, associatedLogin }, client) => {
+/**
+ *
+ * @param {*} id Okta userId for the primary user.
+ * @param {*} associatedUserId Okta userId for the user getting linked to the primary user.
+ * @param {*} associatedLogin Okta login/username for the associated user.
+ * @param {*} client Instance of Okta Node SDK.
+ * @returns {Object} The primary user.
+ */
+const mergeProfiles = async (id, associatedUserId, associatedLogin, client) => {
 	// 1) generate a ULID to be used for the unifiedId. This will be persisted across all profiles.
 	const ulid = ULID();
 

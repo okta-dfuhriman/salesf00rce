@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
 
 		if (response.status === 204) {
 			// 3) Link success! Now onto the profile merge...
-			return res.send(await mergeProfiles({ id, associatedUserId, associatedLogin }, client));
+			return res.send(await mergeProfiles(id, associatedUserId, associatedLogin, client));
 		}
 	} catch (error) {
 		const { code, message, statusCode } = error || {};
