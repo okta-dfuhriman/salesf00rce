@@ -7,7 +7,8 @@ const DropdownCard = () => {
 	const { logout } = Auth.useAuthActions();
 	const { user } = Auth.useAuthState();
 
-	const displayName = user?.name ?? `${user?.given_name} ${user?.family_name}` ?? '';
+	const displayName =
+		user?.nickname ?? user?.name ?? `${user?.given_name} ${user?.family_name}` ?? '';
 
 	return (
 		<div className='slds-text-align_left' id='dropdown-profile'>
