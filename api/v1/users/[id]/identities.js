@@ -1,21 +1,53 @@
-import * as okta from '@okta/okta-sdk-nodejs';
+// import * as okta from '@okta/okta-sdk-nodejs';
 
-import doAuthN from '../../../_doAuthN';
-import mergeProfiles from '../../../_mergeProfiles';
+import Utils from '../../../_utils';
 
-const API_KEY = process.env.API_KEY;
-const ORG_URL = process.env.REACT_APP_OKTA_URL;
 const LINKED_OBJECT_NAME = process.env.LINKED_OBJECT_NAME;
-const client = new okta.Client({ orgUrl: ORG_URL, token: API_KEY });
+const LINK_SCOPES = process.env.LINK_SCOPES;
 
+const doAuthN = async req => {
+	try {
+		const {
+			/* 'authorization' in header === currently logged in (primary) user's JWT */
+			headers,
+			/* 'linkWith' === JWT for account being linked to the primary profile. */
+			body: { linkWith },
+		} = req || {};
+
+		/*
+		 * 	1) validate 'linkWith' JWT => should have 'user:link' scope
+		 *
+		 *  Will throw error if doesn't pass
+		 */
+		// TODO => handle use case where profile is already linked to another profile and JWT has 'primary_profile' claim already!)
+		const linkedWithResult = await Utils.validateJwt({
+			jwt: linkWith,
+			// assertClaims: { 'scp.includes': [LINK_SCOPES.split(' ')] },
+		});
+
+		if (!linkedWithResult?.isValid) {
+			return linkedWithResult;
+		}
+
+		// 2) validate 'authorization' JWT => should pass basic validation
+		const { isValid, error } = await Utils.validateJwt({}, headers);
+
+		return { isValid, accessToken: linkedWithResult?.accessToken, error };
+	} catch (error) {
+		return { isValid: false, error };
+	}
+};
 module.exports = async (req, res) => {
 	try {
+		const client = new Utils.OktaClient();
+
 		const {
 			query: { id },
 		} = req || {};
 
 		// 1) Validate both JWTs
-		const { isValid, linkWithJwt, error } = await doAuthN(req);
+
+		const { isValid, accessToken, error } = await doAuthN(req);
 
 		if (!isValid) {
 			if (error) {
@@ -25,26 +57,18 @@ module.exports = async (req, res) => {
 			}
 		}
 
-		const associatedUserId = linkWithJwt?.claims?.uid;
-		const associatedLogin = linkWithJwt?.claims?.sub;
+		const associatedUserId = accessToken?.claims?.uid;
+		const associatedLogin = accessToken?.claims?.sub;
 
 		// 2) Link objects
 
 		const url = `/api/v1/users/${associatedUserId}/linkedObjects/${LINKED_OBJECT_NAME}/${id}`;
 
-		// TODO swap SSWS out for Okta-4-OAuth
-		const options = {
-			method: 'put',
-			headers: {
-				Authorization: `SSWS ${API_KEY}`,
-			},
-		};
-
-		const response = await client.http.http(`${client.baseUrl}/${url}`, options);
+		const response = await client.fetch({ url, options: { method: 'put' } });
 
 		if (response.status === 204) {
 			// 3) Link success! Now onto the profile merge...
-			return res.send(await mergeProfiles(id, associatedUserId, associatedLogin, client));
+			return res.send(await Utils.mergeProfiles(id, associatedUserId, associatedLogin, client));
 		}
 	} catch (error) {
 		return res
