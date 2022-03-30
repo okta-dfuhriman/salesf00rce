@@ -5,9 +5,6 @@ import DropdownCard from '../DropdownCard';
 const Header = () => {
 	const { isLoadingProfile, user } = Auth.useAuthState();
 
-	const displayName =
-		user?.nickname || user?.name || `${user?.given_name} ${user?.family_name}` || '';
-
 	const userPanel =
 		isLoadingProfile || !user ? (
 			<div style={{ width: '8rem', height: '3rem' }}>
@@ -41,13 +38,13 @@ const Header = () => {
 								>
 									<div
 										className='tds-text-size_3 tds-text_bold slds-text-align_right slds-m-right_small slds-truncate'
-										style={{ color: 'inherit' }}
+										style={{ color: 'black' }}
 									>
-										{displayName}
+										{user?.name}
 									</div>
 									<LDS.Avatar
 										imgSrc={user?.picture ?? '/assets/images/astro.svg'}
-										imgAlt={displayName}
+										imgAlt={user?.name}
 										size='large'
 									/>
 								</div>

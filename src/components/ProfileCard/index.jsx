@@ -4,7 +4,7 @@ import './ProfileCard.css';
 const ProfileCard = () => {
 	const { isLoadingProfile, user } = Auth.useAuthState();
 
-	const displayName = user?.name || `${user?.given_name} ${user?.family_name}` || '';
+	const fullName = user?.displayName ?? `${user?.firstName} ${user?.lastName}`;
 	const picture = user?.picture ?? '/assets/images/astro.svg';
 
 	const UserAvatar = (
@@ -44,12 +44,12 @@ const ProfileCard = () => {
 
 	const UserDetails = (
 		<div className='details'>
-			<h1 title={displayName} className='name truncate'>
-				{displayName}
+			<h1 title={fullName} className='name truncate'>
+				{fullName}
 			</h1>
 			<div className='company truncate'>{user?.organization ?? 'Unknown Employer'}</div>
-			<div className='location'>{`${user?.address?.locality ?? 'Unknown City'}, ${
-				user?.address?.country ?? 'Unknown Country'
+			<div className='location'>{`${user?.city ?? 'Unknown City'}, ${
+				user?.countryCode ?? 'Unknown Country'
 			}`}</div>
 			<div className='social-links'></div>
 		</div>
