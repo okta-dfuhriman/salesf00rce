@@ -5,13 +5,14 @@ import './styles/App.css';
 
 import useBodyClass from './hooks/useBodyClass';
 
-import AuthModal from './components/AuthModal';
-import Header from './components/Header';
+// import AuthModal from './components/AuthModal';
 import AppLoginCallback from './pages/LoginCallback';
-import Settings from './pages/Settings';
+import Header from './components/Header';
 import Profile from './pages/Profile';
-import SignIn from './pages/SignIn';
 import RequireAuth from './components/RequireAuth';
+import Settings from './pages/Settings';
+import SignIn from './pages/SignIn';
+import UserLinkCallback from './pages/UserLinkCallback';
 import Demo from './pages/Demo';
 
 // const oktaAuth = new Okta.Auth(config.authConfig.oidc);
@@ -40,7 +41,7 @@ const App = () => {
 		}
 	}, [pathname]);
 
-	const excludePaths = ['/signin', '/login/callback'];
+	const excludePaths = ['/signin', '/login/callback', '/identities/callback'];
 	const showHeader = !excludePaths.includes(pathname);
 
 	return (
@@ -58,6 +59,7 @@ const App = () => {
 							<Route path='/signin' element={<SignIn />} />
 							<Route path='/demo' element={<Demo />} />
 							<Route path='/login/callback' element={<AppLoginCallback />} />
+							<Route path='/identities/callback' element={<UserLinkCallback />} />
 							<Route path='' element={<RequireAuth />}>
 								<Route path='id' element={<Profile />} />
 								<Route path='/' element={<Profile />} />

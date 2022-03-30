@@ -128,29 +128,33 @@ const useAuthActions = () => {
 			}
 		};
 
-		const getUser = async (dispatch, userId) => {
+		const getUser = async (dispatch, userId, _user) => {
 			try {
 				dispatch({
 					type: actions.user.fetch.start.type,
 					payload: { isLoadingUserProfile: true },
 				});
 
-				const accessToken = oktaAuth.getAccessToken();
-				const url = `${window.location.origin}/api/v1/users/${userId}`;
+				let user = _user;
 
-				const request = new Request(url);
+				if (!user && userId) {
+					const accessToken = oktaAuth.getAccessToken();
+					const url = `${window.location.origin}/api/v1/users/${userId}`;
 
-				request.headers.append('Authorization', `Bearer ${accessToken}`);
+					const request = new Request(url);
 
-				const response = await fetch(request);
+					request.headers.append('Authorization', `Bearer ${accessToken}`);
 
-				if (!response.ok) {
-					const body = await response.json();
-					console.error(body);
-					throw new Error(JSON.stringify(body));
+					const response = await fetch(request);
+
+					if (!response.ok) {
+						const body = await response.json();
+						console.error(body);
+						throw new Error(JSON.stringify(body));
+					}
+
+					user = await response.json();
 				}
-
-				const user = await response.json();
 
 				if (user) {
 					const userProfile = user.profile;
@@ -422,7 +426,49 @@ const useAuthActions = () => {
 				} else if (oktaAuth.isLoginRedirect()) {
 					// const { state } = await oktaAuth.parseOAuthResponseFromUrl(oktaAuth);
 
-					const { tokens, state } = await oktaAuth.token.parseFromUrl();
+					const { access_token, state } = await oktaAuth.token.parseFromUrl();
+
+					const originalUri = await oktaAuth.getOriginalUri(state);
+
+					oktaAuth.removeOriginalUri(state);
+
+					const { restoreOriginalUri } = oktaAuth.options;
+
+					if (restoreOriginalUri) {
+						await restoreOriginalUri(oktaAuth, originalUri);
+					} else if (originalUri) {
+						window.location.replace(originalUri);
+					}
+
+					const accessToken = oktaAuth.getAccessToken();
+
+					const options = {
+						method: 'post',
+						headers: {
+							Authorization: `Bearer ${accessToken}`,
+						},
+						body: {
+							linkWith: access_token,
+						},
+					};
+
+					const url = `api/v1/users/${accessToken?.uid}/identities`;
+
+					const response = await fetch(url, options);
+
+					if (!response.ok) {
+						throw new Error(await response.json());
+					}
+
+					const user = await response.json();
+
+					if (user) {
+						delete user._links;
+
+						dispatch({ type: actions.user.link.success.type });
+
+						await getUser(dispatch, null, user);
+					}
 
 					return;
 				} else {

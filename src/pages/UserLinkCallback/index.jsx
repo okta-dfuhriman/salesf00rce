@@ -9,8 +9,8 @@ export const UserLinkCallback = () => {
 	const { linkUser } = Auth.useAuthActions();
 
 	React.useEffect(() => {
-		// return login(dispatch);
-	}, [login, dispatch]);
+		return linkUser(dispatch);
+	}, [linkUser, dispatch]);
 
 	const authError = authState?.error;
 	const displayError = callbackError || authError;
