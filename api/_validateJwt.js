@@ -1,25 +1,42 @@
 import OktaJwtVerifier from '@okta/jwt-verifier';
-import { ApiError } from './_error';
 
+const AUD = process.env.AUD;
 const ORG_URL = process.env.REACT_APP_OKTA_URL;
 const AUTH_SERVER_ID = process.env.REACT_APP_OKTA_AUTH_SERVER_ID;
 const ISSUER = `${ORG_URL}/oauth2/${AUTH_SERVER_ID}`;
 
 /**
  *
- * @param {string} jwt The JWT to be validated.
- * @param {string} aud The `aud` value to be validated.
- * @param {Object} config A configuration for the verifier to use. See [Okta documentation](https://github.com/okta/okta-jwt-verifier-js).
- * @returns
+ * @param {Object} options An options object containing the `jwt` to be validated, a `aud` value, and any custom claims to assert.
+ * @param {Object} [headers] The headers from the original `req`.
+ * @returns {Object} The results of the validation as well as the accessToken validated.
  */
-const validateJwt = async (jwt, aud, config = {}) => {
-	try {
-		// Spin up our jwtVerifier
-		const jwtVerifier = new OktaJwtVerifier({ issuer: ISSUER, ...config });
+const validateJwt = async ({ jwt, aud = AUD, assertClaims }, headers) => {
+	let _jwt = jwt;
 
-		return await jwtVerifier.verifyAccessToken(jwt, aud);
+	try {
+		// 1) Determine if a JWT was provided or if it needs to be extracted.
+		if (headers && !jwt) {
+			const { authorization } = headers;
+			const regex = /Bearer (.+)/;
+			const match = regex.exec(authorization);
+
+			_jwt = match?.length === 2 ? match[1] : undefined;
+		}
+
+		if (!_jwt) {
+			throw new Error('No JWT found!');
+		}
+
+		// 2) Spin up our jwtVerifier
+		const jwtVerifier = new OktaJwtVerifier({ issuer: ISSUER, assertClaims });
+
+		// 3) Validate the JWT
+		const accessToken = await jwtVerifier.verifyAccessToken(_jwt, aud);
+
+		return { isValid: true, accessToken };
 	} catch (error) {
-		throw new ApiError({ message: error?.message.toString() });
+		return { isValid: false, error };
 	}
 };
 
