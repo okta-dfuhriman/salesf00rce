@@ -3,10 +3,10 @@ import { Auth, LDS, Link } from '../../common';
 import DropdownCard from '../DropdownCard';
 
 const Header = () => {
-	const { isLoadingProfile, userInfo } = Auth.useAuthState();
+	const { isLoadingUserInfo, userInfo } = Auth.useAuthState();
 
 	const userPanel =
-		isLoadingProfile || !userInfo ? (
+		isLoadingUserInfo || !userInfo ? (
 			<div style={{ width: '8rem', height: '3rem' }}>
 				<LDS.Spinner
 					variant='brand'

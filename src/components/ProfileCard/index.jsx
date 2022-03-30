@@ -2,7 +2,7 @@ import { Auth, LDS, Link } from '../../common';
 import './ProfileCard.css';
 
 const ProfileCard = () => {
-	const { isLoadingProfile, userInfo } = Auth.useAuthState();
+	const { isLoadingUserInfo, userInfo } = Auth.useAuthState();
 
 	const UserAvatar = (
 		<div className='avatar'>
@@ -53,7 +53,7 @@ const ProfileCard = () => {
 	);
 
 	const cardBody =
-		isLoadingProfile || !userInfo ? (
+		isLoadingUserInfo || !userInfo ? (
 			<LDS.Spinner variant='brand' />
 		) : (
 			<>

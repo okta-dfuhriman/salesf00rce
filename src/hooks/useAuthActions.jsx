@@ -1,5 +1,5 @@
 /** @format */
-import { Okta, ApiError } from '../common';
+import { Okta } from '../common';
 import { actions } from '../providers/AuthProvider/AuthReducer';
 
 import { removeNils, toQueryString } from '@okta/okta-auth-js';
@@ -132,10 +132,11 @@ const useAuthActions = () => {
 			try {
 				dispatch({
 					type: actions.user.fetch.start.type,
+					payload: { isLoadingUserProfile: true },
 				});
 
 				const accessToken = oktaAuth.getAccessToken();
-				const url = `${window.location.href}/api/v1/users/${userId}`;
+				const url = `${window.location.origin}/api/v1/users/${userId}`;
 
 				const request = new Request(url);
 
@@ -144,7 +145,9 @@ const useAuthActions = () => {
 				const response = await fetch(request);
 
 				if (!response.ok) {
-					throw new ApiError({ message: await response.json(), statusCode: response?.statusCode });
+					const body = await response.json();
+					console.error(body);
+					throw new Error(JSON.stringify(body));
 				}
 
 				const user = await response.json();
@@ -155,11 +158,16 @@ const useAuthActions = () => {
 					delete user._links;
 					delete user.profile;
 
-					localStorage.setItem('user', JSON.stringify(user));
+					localStorage.setItem('user', JSON.stringify(userProfile));
 
 					dispatch({
 						type: actions.user.fetch.success.type,
-						payload: { user: userProfile, oktaUser: user },
+						payload: {
+							user: userProfile,
+							oktaUser: user,
+							isLoadingUserProfile: false,
+							isStaleUserProfile: false,
+						},
 					});
 
 					return user;
@@ -167,7 +175,10 @@ const useAuthActions = () => {
 			} catch (error) {
 				if (dispatch) {
 					console.log(error);
-					dispatch({ type: actions.user.fetchInfo.error.type, error });
+					dispatch({
+						type: actions.user.fetch.error.type,
+						error: error ?? error?.message.toString(),
+					});
 				} else {
 					throw new Error(error);
 				}
@@ -178,7 +189,7 @@ const useAuthActions = () => {
 			try {
 				const { isAuthenticated } = await silentAuth(dispatch);
 
-				let payload = { isAuthenticated, isLoadingProfile: true };
+				let payload = { isAuthenticated, isLoadingUserInfo: true };
 
 				if (isAuthenticated) {
 					if (dispatch) {
@@ -188,16 +199,18 @@ const useAuthActions = () => {
 						});
 					}
 
-					const userInfo = await oktaAuth.getUser();
+					const user = await oktaAuth.getUser();
 
-					if (userInfo) {
-						if (userInfo.headers) {
-							delete userInfo.headers;
+					if (user) {
+						if (user.headers) {
+							delete user.headers;
 						}
 
-						const picture = userInfo?.picture ?? `${window.location.href}/assets/images/astro.svg`;
+						const picture = user?.picture ?? `${window.location.origin}/assets/images/astro.svg`;
 
-						payload = { ...payload, userInfo: { ...userInfo, picture }, isLoadingProfile: false };
+						const userInfo = { ...user, picture };
+
+						payload = { ...payload, userInfo, isLoadingUserInfo: false };
 
 						localStorage.setItem('userInfo', JSON.stringify(userInfo));
 					}
