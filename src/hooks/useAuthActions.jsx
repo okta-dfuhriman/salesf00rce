@@ -1,7 +1,7 @@
 /** @format */
+import { Okta, ApiError } from '../common';
 import { actions } from '../providers/AuthProvider/AuthReducer';
 
-import { useOktaAuth } from '@okta/okta-react';
 import { removeNils, toQueryString } from '@okta/okta-auth-js';
 
 const GOOGLE_IDP_ID = process.env.REACT_APP_GOOGLE_IDP_ID;
@@ -76,7 +76,7 @@ const generateAuthUrl = async sdk => {
 
 const useAuthActions = () => {
 	try {
-		const { authState, oktaAuth } = useOktaAuth();
+		const { authState, oktaAuth } = Okta.useOktaAuth();
 
 		const silentAuth = async (dispatch, options) => {
 			try {
@@ -128,7 +128,53 @@ const useAuthActions = () => {
 			}
 		};
 
-		const getUser = async dispatch => {
+		const getUser = async (dispatch, userId) => {
+			try {
+				dispatch({
+					type: actions.user.fetch.start.type,
+				});
+
+				const accessToken = oktaAuth.getAccessToken();
+				const url = `${window.location.href}/api/v1/users/${userId}`;
+
+				const request = new Request(url);
+
+				request.headers.append('Authorization', `Bearer ${accessToken}`);
+
+				const response = await fetch(request);
+
+				if (!response.ok) {
+					throw new ApiError({ message: await response.json(), statusCode: response?.statusCode });
+				}
+
+				const user = await response.json();
+
+				if (user) {
+					const userProfile = user.profile;
+
+					delete user._links;
+					delete user.profile;
+
+					localStorage.setItem('user', JSON.stringify(user));
+
+					dispatch({
+						type: actions.user.fetch.success.type,
+						payload: { user: userProfile, oktaUser: user },
+					});
+
+					return user;
+				}
+			} catch (error) {
+				if (dispatch) {
+					console.log(error);
+					dispatch({ type: actions.user.fetchInfo.error.type, error });
+				} else {
+					throw new Error(error);
+				}
+			}
+		};
+
+		const getUserInfo = async dispatch => {
 			try {
 				const { isAuthenticated } = await silentAuth(dispatch);
 
@@ -137,31 +183,33 @@ const useAuthActions = () => {
 				if (isAuthenticated) {
 					if (dispatch) {
 						dispatch({
-							type: actions.user.fetch.start.type,
+							type: actions.user.fetchInfo.start.type,
 							payload,
 						});
 					}
 
-					const user = await oktaAuth.getUser();
+					const userInfo = await oktaAuth.getUser();
 
-					if (user) {
-						if (user.headers) {
-							delete user.headers;
+					if (userInfo) {
+						if (userInfo.headers) {
+							delete userInfo.headers;
 						}
 
-						payload = { ...payload, user, isLoadingProfile: false };
+						const picture = userInfo?.picture ?? `${window.location.href}/assets/images/astro.svg`;
 
-						localStorage.setItem('user', JSON.stringify(user));
+						payload = { ...payload, userInfo: { ...userInfo, picture }, isLoadingProfile: false };
+
+						localStorage.setItem('userInfo', JSON.stringify(userInfo));
 					}
 
 					if (dispatch) {
-						dispatch({ type: actions.user.fetch.success.type, payload });
+						dispatch({ type: actions.user.fetchInfo.success.type, payload });
 					}
 				}
 			} catch (error) {
 				if (dispatch) {
 					console.log(error);
-					dispatch({ type: actions.user.fetch.error.type, error });
+					dispatch({ type: actions.user.fetchInfo.error.type, error });
 				} else {
 					throw new Error(error);
 				}
@@ -262,7 +310,7 @@ const useAuthActions = () => {
 
 					dispatch({ type: actions.login.success.type });
 
-					return await getUser(dispatch);
+					return await getUserInfo(dispatch);
 				}
 
 				if (!authState?.isAuthenticated) {
@@ -339,8 +387,38 @@ const useAuthActions = () => {
 			}
 		};
 
+		const linkUser = async (dispatch, { idp, tokens }) => {
+			try {
+				if (tokens) {
+				} else if (oktaAuth.isLoginRedirect()) {
+					// const { state } = await oktaAuth.parseOAuthResponseFromUrl(oktaAuth);
+
+					const { tokens, state } = await oktaAuth.token.parseFromUrl();
+
+					return;
+				} else {
+					const {
+						oidc: { scopes },
+					} = Okta.config;
+					// signin w/ redirect + idp && user:link scope
+					await oktaAuth.signInWithRedirect({ idp: idpMap[idp], scopes: [...scopes, 'user:link'] });
+
+					return dispatch({ type: actions.user.link.pending.type });
+				}
+				// call /api/v1/users/{{userId}}/identities
+			} catch (error) {
+				if (dispatch) {
+					dispatch({ type: actions.user.link.error.type, error });
+				} else {
+					throw new Error(error);
+				}
+			}
+		};
+
 		return {
 			getUser,
+			getUserInfo,
+			linkUser,
 			login,
 			loginWithModal,
 			logout,

@@ -11,13 +11,14 @@ export const AuthStateContext = createContext();
 const AuthProvider = ({ children }) => {
 	const { oktaAuth } = useOktaAuth();
 	const [state, dispatch] = useReducer(AuthReducer, initialState);
-	const { getUser } = useAuthActions();
+	const { getUserInfo } = useAuthActions();
 
 	useEffect(() => {
-		if (!state?.user) {
-			return getUser(dispatch);
+		if (!state?.userInfo || state?.isStaleUserProfile) {
+			return getUserInfo(dispatch);
 		}
-	}, [oktaAuth, state?.user]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [oktaAuth, state?.userInfo, state?.isStaleUserProfile]);
 
 	// eslint-disable-next-line react/jsx-no-constructed-context-values
 	const contextValues = {

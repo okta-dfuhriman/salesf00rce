@@ -21,6 +21,7 @@ export const initialState = {
 	isLoading: false,
 	isLoadingProfile: false,
 	isLoadingAuthenticators: false,
+	isStaleUserProfile: false,
 	factorsModalIsVisible: false,
 	errors: [],
 	...initialLoginState,
@@ -133,10 +134,21 @@ export const actions = {
 		error: { type: 'LOGOUT_ERROR' },
 	},
 	user: {
+		fetchInfo: {
+			start: { type: 'USER_INFO_FETCH_START' },
+			success: { type: 'USER_INFO_FETCH_SUCCESS' },
+			error: { type: 'USER_INFO_FETCH_ERROR' },
+		},
 		fetch: {
 			start: { type: 'USER_FETCH_START' },
 			success: { type: 'USER_FETCH_SUCCESS' },
 			error: { type: 'USER_FETCH_ERROR' },
+		},
+		link: {
+			pending: { type: 'USER_LINK_PENDING' },
+			start: { type: 'USER_LINK_START' },
+			success: { type: 'USER_LINK_SUCCESS' },
+			error: { type: 'USER_LINK_ERROR' },
 		},
 	},
 };
@@ -166,11 +178,14 @@ export const AuthReducer = (state, action) => {
 			case actions.login.silentAuth.complete.type:
 			case actions.login.silentAuth.success.type:
 			case actions.user.fetch.success.type:
+			case actions.user.fetchInfo.success.type:
 			case actions.login.success.type:
 				return _.merge({}, state, actions.login.success.state, action?.payload);
 			case actions.user.fetch.start.type:
+			case actions.user.fetchInfo.start.type:
 				return _.merge({}, state, action?.payload, actions.user.fetch.start.state);
 			case actions.user.fetch.error.type:
+			case actions.user.fetchInfo.error.type:
 			case actions.login.error.type:
 				console.log('login error:', action);
 				return _.merge({}, state, initialState, action?.payload, {

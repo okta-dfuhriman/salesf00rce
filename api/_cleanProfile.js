@@ -9,7 +9,11 @@ const cleanProfile = async profile => {
 		}
 	}
 
-	return result;
+	const { displayName, nickName, firstName, lastName } = result;
+
+	const name = nickName ?? displayName ?? `${firstName} ${lastName}`;
+
+	return { ...result, name };
 };
 
 export default cleanProfile;
