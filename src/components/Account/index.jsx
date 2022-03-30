@@ -1,10 +1,12 @@
-import { _, LDS } from '../../common';
+import { Auth, LDS, React } from '../../common';
 import AccountCard from './AccountCard';
 
 const Account = props => {
-	const { header, subtitle, provider } = props;
+	const { isLoadingUserProfile } = Auth.useAuthState();
 
-	const buttonLabel = provider === 'email' ? 'Add Email' : 'Connect';
+	const { header, subtitle, type, accounts } = props;
+
+	const buttonLabel = type === 'email' ? 'Add Email' : 'Connect';
 
 	const socialButtons = (
 		<>
@@ -19,9 +21,15 @@ const Account = props => {
 		<div className='slds-m-bottom_xx-large'>
 			<h3 className='slds-text-title_caps slds-m-vertical_small'>{header}</h3>
 			<p className='slds-m-vertical_small slds-text-title tds-color_meteorite'>{subtitle}</p>
-			<AccountCard {...props} />
-			{provider !== 'social' && <LDS.Button title={buttonLabel} label={buttonLabel} />}
-			{provider === 'social' && socialButtons}
+			{isLoadingUserProfile && (
+				<div>
+					<LDS.Spinner containerStyle={{ opacity: 0.33 }} />
+				</div>
+			)}
+			{!isLoadingUserProfile && accounts.map(account => <AccountCard account={account} />)}
+			{/* <AccountCard {...props} /> */}
+			{type !== 'social' && <LDS.Button title={buttonLabel} label={buttonLabel} />}
+			{type === 'social' && socialButtons}
 		</div>
 	);
 };

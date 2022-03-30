@@ -1,4 +1,4 @@
-import { _, LDS, React, useState } from '../../common';
+import { _, Auth, LDS, React, useState } from '../../common';
 
 import SettingsCard from '../../components/SettingsCard';
 import Account from '../../components/Account';
@@ -7,6 +7,8 @@ import AddressForm from '../../components/AddressForm';
 import './styles.css';
 
 const Providers = () => {
+	const { accounts, isLoadingUserProfile } = Auth.useAuthState();
+
 	return (
 		<>
 			<Account
@@ -20,17 +22,28 @@ const Providers = () => {
 						</a>
 					</>
 				}
-				provider='salesforce'
+				type='salesforce'
+				accounts={
+					accounts?.length > 0 ? accounts.filter(({ provider }) => provider === 'salesforce') : []
+				}
 			/>
 			<Account
 				header='Email Accounts'
 				subtitle='Manage your connected email accounts.'
-				provider='email'
+				type='email'
+				accounts={
+					accounts?.length > 0 ? accounts.filter(({ provider }) => provider === 'email') : []
+				}
 			/>
 			<Account
 				header='Social Accounts'
 				subtitle="Log in with your favorite social media accounts. Don't worry-we won't share your data or post anything on your behalf."
-				provider='social'
+				type='social'
+				accounts={
+					accounts?.length > 0
+						? accounts.filter(({ provider }) => provider !== 'email' && provider !== 'salesforce')
+						: []
+				}
 			/>
 		</>
 	);
@@ -66,6 +79,16 @@ const menuItems = [
 
 const Settings = () => {
 	const ref = React.useRef(null);
+
+	const dispatch = Auth.useAuthDispatch();
+	const { isStaleUserProfile, isLoadingUserProfile, user, userInfo } = Auth.useAuthState();
+	const { getUser } = Auth.useAuthActions();
+
+	React.useEffect(() => {
+		if (userInfo?.sub && !isLoadingUserProfile && (isStaleUserProfile || !user)) {
+			getUser(dispatch, userInfo?.sub);
+		}
+	}, [isStaleUserProfile, userInfo?.sub]);
 
 	const [selectedItem, setSelectedItem] = useState('privacy');
 

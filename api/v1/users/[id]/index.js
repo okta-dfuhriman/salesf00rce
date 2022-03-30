@@ -1,4 +1,10 @@
-import { OktaClient, cleanProfile, getLinkedProfiles, validateJwt } from '../../../_common';
+import {
+	OktaClient,
+	cleanProfile,
+	getLinkedProfiles,
+	getOktaUser,
+	validateJwt,
+} from '../../../_common';
 
 const getUser = async (req, res) => {
 	try {
@@ -7,10 +13,7 @@ const getUser = async (req, res) => {
 			headers,
 		} = req;
 
-		// 1) Spin up the OktaClient
-		const client = new OktaClient();
-
-		// 2) Validate the accessToken
+		// 1) Validate the accessToken
 
 		const { isValid, error } = await validateJwt(
 			{
@@ -27,15 +30,17 @@ const getUser = async (req, res) => {
 			}
 		}
 
-		const user = await client.getUser(id);
-
-		if (!user) {
-			throw new Error('Unable to find user!');
-		}
+		// 2) Get the user
+		const user = await getOktaUser(id);
 
 		const userProfile = user.profile;
 
+		// 3) Get linked users
 		const linkedUsers = await getLinkedProfiles(id, userProfile?.unifiedId);
+
+		if (linkedUsers?.length > 0) {
+			userProfile.isPrimary = true;
+		}
 
 		// const _linkedUsers = userProfile?.linkedUsers;
 		// const unifiedId = userProfile?.unifiedId;
@@ -52,10 +57,8 @@ const getUser = async (req, res) => {
 		// 		}
 		// 	}
 		// }
-
-		const profile = { ...(await cleanProfile(user.profile)), linkedUsers };
-
-		return res.json({ ...user, profile });
+		// console.log(linkedUsers);
+		return res.json({ ...user, profile: { ...userProfile, linkedUsers } });
 	} catch (error) {
 		throw new Error(`getUser(): ${error}`);
 	}

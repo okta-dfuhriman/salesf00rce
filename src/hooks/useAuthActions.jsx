@@ -160,11 +160,27 @@ const useAuthActions = () => {
 
 					localStorage.setItem('user', JSON.stringify(userProfile));
 
+					const { login, linkedUsers = [], isPrimary = false, providers = [] } = userProfile;
+
+					linkedUsers.push({
+						id: user.id,
+						login,
+						isPrimary,
+						providers,
+					});
+
+					const accounts = linkedUsers
+						.map(({ id, login, isPrimary = false, providers = [] }) =>
+							providers.map(provider => ({ id, login, isPrimary, provider }))
+						)
+						.flat();
+
 					dispatch({
 						type: actions.user.fetch.success.type,
 						payload: {
 							user: userProfile,
 							oktaUser: user,
+							accounts,
 							isLoadingUserProfile: false,
 							isStaleUserProfile: false,
 						},
