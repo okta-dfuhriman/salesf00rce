@@ -11,7 +11,7 @@ const cleanProfile = async profile => {
 
 	const { displayName, nickName, firstName, lastName } = result;
 
-	const name = nickName ?? displayName ?? `${firstName} ${lastName}`;
+	const name = displayName ?? `${firstName} ${lastName}`;
 
 	return { ...result, name };
 };

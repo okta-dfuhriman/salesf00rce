@@ -1,9 +1,9 @@
-import Utils from './_utils';
-import { ApiError } from '../../../_error';
+import { ApiError, getOktaUser, OktaClient } from './_common';
+
 const LINKED_OBJECT_NAME = process.env.LINKED_OBJECT_NAME;
 
 const getLinkedProfiles = async (id, unifiedId) => {
-	const client = new Utils.OktaClient();
+	const client = new OktaClient();
 	const result = [];
 
 	const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}Of`;
@@ -32,13 +32,16 @@ const getLinkedProfiles = async (id, unifiedId) => {
 		const userId = regex.exec(path)[0] || undefined;
 
 		if (userId) {
-			const { id, profile } = await client.getUser(userId);
+			const user = await getOktaUser(userId, true);
 
-			if (profile?.unifiedId === unifiedId) {
-				result.push({ id, ...(await Utils.cleanProfile(profile)) });
+			console.log(user);
+			if (user?.unifiedId === unifiedId) {
+				result.push(user);
 			}
 		}
 	}
 
 	return result;
 };
+
+export default getLinkedProfiles;
