@@ -422,8 +422,7 @@ const useAuthActions = () => {
 
 		const linkUser = async (dispatch, { idp, tokens }) => {
 			try {
-				if (tokens) {
-				} else if (oktaAuth.isLoginRedirect()) {
+				if (oktaAuth.isLoginRedirect()) {
 					// const { state } = await oktaAuth.parseOAuthResponseFromUrl(oktaAuth);
 
 					const { access_token, state } = await oktaAuth.token.parseFromUrl();
