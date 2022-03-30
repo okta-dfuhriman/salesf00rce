@@ -2,17 +2,14 @@ import { Auth, LDS, Link } from '../../common';
 import './ProfileCard.css';
 
 const ProfileCard = () => {
-	const { isLoadingProfile, user } = Auth.useAuthState();
-
-	const fullName = user?.displayName ?? `${user?.firstName} ${user?.lastName}`;
-	const picture = user?.picture ?? '/assets/images/astro.svg';
+	const { isLoadingProfile, userInfo } = Auth.useAuthState();
 
 	const UserAvatar = (
 		<div className='avatar'>
 			<div style={{ position: 'absolute', top: '-6px' }}>
 				<div className='slds-is-relative slds-m-right_medium user-avatar'>
 					<LDS.Button
-						style={{ backgroundImage: `url(${picture})` }}
+						style={{ backgroundImage: `url(${userInfo?.picture})` }}
 						title='View Profile Picture'
 						variant='base'
 						className='avatar-img avatar-img_expandable'
@@ -44,19 +41,19 @@ const ProfileCard = () => {
 
 	const UserDetails = (
 		<div className='details'>
-			<h1 title={fullName} className='name truncate'>
-				{fullName}
+			<h1 title={userInfo?.name} className='name truncate'>
+				{userInfo?.name}
 			</h1>
-			<div className='company truncate'>{user?.organization ?? 'Unknown Employer'}</div>
-			<div className='location'>{`${user?.city ?? 'Unknown City'}, ${
-				user?.countryCode ?? 'Unknown Country'
+			<div className='company truncate'>{userInfo?.organization ?? 'Unknown Employer'}</div>
+			<div className='location'>{`${userInfo?.city ?? 'Unknown City'}, ${
+				userInfo?.countryCode ?? 'Unknown Country'
 			}`}</div>
 			<div className='social-links'></div>
 		</div>
 	);
 
 	const cardBody =
-		isLoadingProfile || !user ? (
+		isLoadingProfile || !userInfo ? (
 			<LDS.Spinner variant='brand' />
 		) : (
 			<>

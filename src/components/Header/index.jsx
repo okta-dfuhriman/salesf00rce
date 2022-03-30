@@ -3,10 +3,10 @@ import { Auth, LDS, Link } from '../../common';
 import DropdownCard from '../DropdownCard';
 
 const Header = () => {
-	const { isLoadingProfile, user } = Auth.useAuthState();
+	const { isLoadingProfile, userInfo } = Auth.useAuthState();
 
 	const userPanel =
-		isLoadingProfile || !user ? (
+		isLoadingProfile || !userInfo ? (
 			<div style={{ width: '8rem', height: '3rem' }}>
 				<LDS.Spinner
 					variant='brand'
@@ -40,13 +40,9 @@ const Header = () => {
 										className='tds-text-size_3 tds-text_bold slds-text-align_right slds-m-right_small slds-truncate'
 										style={{ color: 'black' }}
 									>
-										{user?.name}
+										{userInfo?.name}
 									</div>
-									<LDS.Avatar
-										imgSrc={user?.picture ?? '/assets/images/astro.svg'}
-										imgAlt={user?.name}
-										size='large'
-									/>
+									<LDS.Avatar imgSrc={userInfo?.picture} imgAlt={userInfo?.name} size='large' />
 								</div>
 							</LDS.Button>
 						</LDS.DropdownTrigger>
