@@ -1,9 +1,7 @@
-// import * as okta from '@okta/okta-sdk-nodejs';
-
-import Utils from '../../../_utils';
+import { OktaClient, mergeProfiles, validateJwt } from '../../../_common';
 
 const LINKED_OBJECT_NAME = process.env.LINKED_OBJECT_NAME;
-const LINK_SCOPES = process.env.LINK_SCOPES;
+// const LINK_SCOPES = process.env.LINK_SCOPES;
 
 const doAuthN = async req => {
 	try {
@@ -20,7 +18,7 @@ const doAuthN = async req => {
 		 *  Will throw error if doesn't pass
 		 */
 		// TODO => handle use case where profile is already linked to another profile and JWT has 'primary_profile' claim already!)
-		const linkedWithResult = await Utils.validateJwt({
+		const linkedWithResult = await validateJwt({
 			jwt: linkWith,
 			// assertClaims: { 'scp.includes': [LINK_SCOPES.split(' ')] },
 		});
@@ -30,7 +28,7 @@ const doAuthN = async req => {
 		}
 
 		// 2) validate 'authorization' JWT => should pass basic validation
-		const { isValid, error } = await Utils.validateJwt({}, headers);
+		const { isValid, error } = await validateJwt({}, headers);
 
 		return { isValid, accessToken: linkedWithResult?.accessToken, error };
 	} catch (error) {
@@ -39,7 +37,7 @@ const doAuthN = async req => {
 };
 module.exports = async (req, res) => {
 	try {
-		const client = new Utils.OktaClient();
+		const client = new OktaClient();
 
 		const {
 			query: { id },
@@ -68,7 +66,7 @@ module.exports = async (req, res) => {
 
 		if (response.status === 204) {
 			// 3) Link success! Now onto the profile merge...
-			return res.send(await Utils.mergeProfiles(id, associatedUserId, associatedLogin, client));
+			return res.send(await mergeProfiles(id, associatedUserId, associatedLogin, client));
 		}
 	} catch (error) {
 		return res

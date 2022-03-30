@@ -1,4 +1,4 @@
-import Utils, { getLinkedProfiles } from '../../../_utils';
+import { OktaClient, cleanProfile, getLinkedProfiles, validateJwt } from '../../../_common';
 
 const getUser = async (req, res) => {
 	try {
@@ -8,11 +8,11 @@ const getUser = async (req, res) => {
 		} = req;
 
 		// 1) Spin up the OktaClient
-		const client = new Utils.OktaClient();
+		const client = new OktaClient();
 
 		// 2) Validate the accessToken
 
-		const { isValid, error } = await Utils.validateJwt(
+		const { isValid, error } = await validateJwt(
 			{
 				assertClaims: { 'scp.includes': ['user:read:self'] },
 			},
@@ -53,7 +53,7 @@ const getUser = async (req, res) => {
 		// 	}
 		// }
 
-		const profile = { ...(await Utils.cleanProfile(user.profile)), linkedUsers };
+		const profile = { ...(await cleanProfile(user.profile)), linkedUsers };
 
 		return res.json({ ...user, profile });
 	} catch (error) {
