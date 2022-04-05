@@ -1,4 +1,4 @@
-import { Auth, LDS, Link } from '../../common';
+import { Auth, LDS, Link, AstroAvatar } from '../../common';
 import './ProfileCard.css';
 
 const ProfileCard = () => {
@@ -13,7 +13,9 @@ const ProfileCard = () => {
 						title='View Profile Picture'
 						variant='base'
 						className='avatar-img avatar-img_expandable'
-					/>
+					>
+						{!userInfo?.picture && <AstroAvatar />}
+					</LDS.Button>
 					<div className='slds-is-absolute cAvatarUploader'>
 						<LDS.Button
 							title='Upload Profile Picture'

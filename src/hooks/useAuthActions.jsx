@@ -1,14 +1,19 @@
 /** @format */
-import { Okta } from '../common';
+import { ApiError, Okta } from '../common';
 import { actions } from '../providers/AuthProvider/AuthReducer';
 
-import { removeNils, toQueryString } from '@okta/okta-auth-js';
+import {
+	getOAuthBaseUrl,
+	removeNils,
+	removeTrailingSlash,
+	toQueryString,
+} from '@okta/okta-auth-js';
 
-const GOOGLE_IDP_ID = process.env.REACT_APP_GOOGLE_IDP_ID;
-const LINKEDIN_IDP_ID = process.env.REACT_APP_LINKEDIN_IDP_ID;
-const APPLE_IDP_ID = process.env.REACT_APP_APPLE_IDP_ID;
-const FACEBOOK_IDP_ID = process.env.REACT_APP_FACEBOOK_IDP_ID;
-const SALESFORCE_IDP_ID = process.env.REACT_APP_SALESFORCE_IDP_ID;
+const GOOGLE_IDP_ID = '0oa3cdpdvdd3BHqDA1d7';
+const LINKEDIN_IDP_ID = '0oa3cdljzgEyGBMez1d7';
+const APPLE_IDP_ID = '';
+const FACEBOOK_IDP_ID = '0oa3cdkzv0cGPFifd1d7';
+const SALESFORCE_IDP_ID = '0oa3cdq1662ouS1uG1d7';
 
 const idpMap = {
 	google: GOOGLE_IDP_ID,
@@ -16,6 +21,10 @@ const idpMap = {
 	apple: APPLE_IDP_ID,
 	facebook: FACEBOOK_IDP_ID,
 	salesforce: SALESFORCE_IDP_ID,
+	[GOOGLE_IDP_ID]: 'google',
+	[LINKEDIN_IDP_ID]: 'linkedin',
+	[FACEBOOK_IDP_ID]: 'facebook',
+	[SALESFORCE_IDP_ID]: 'salesforce',
 };
 
 const buildAuthorizeParams = tokenParams => {
@@ -56,17 +65,19 @@ const buildAuthorizeParams = tokenParams => {
 	return toQueryString(params);
 };
 
-const generateAuthUrl = async sdk => {
+const generateAuthUrl = async (sdk, options) => {
 	try {
-		const tokenParams = await sdk.token.prepareTokenParams();
-		const { issuer, authorizeUrl } = sdk.options || {};
+		const tokenParams = await sdk.token.prepareTokenParams(options);
+
+		const baseUrl = getOAuthBaseUrl(sdk);
+		const authorizeUrl =
+			removeTrailingSlash(options?.authorizeUrl) ||
+			sdk.options.authorizeUrl ||
+			baseUrl + 'v1/authorize';
 
 		// Use the query params to build the authorize url
 
-		// Get authorizeUrl and issuer
-		const url = authorizeUrl ?? `${issuer}/v1/authorize`;
-
-		const authUrl = url + buildAuthorizeParams(tokenParams);
+		const authUrl = authorizeUrl + buildAuthorizeParams(tokenParams);
 
 		return { authUrl, tokenParams };
 	} catch (error) {
@@ -137,8 +148,12 @@ const useAuthActions = () => {
 
 				let user = _user;
 
+				const accessToken = oktaAuth.getAccessToken();
+				const {
+					payload: { uid },
+				} = oktaAuth.token.decode(accessToken);
+
 				if (!user && userId) {
-					const accessToken = oktaAuth.getAccessToken();
 					const url = `${window.location.origin}/api/v1/users/${userId}`;
 
 					const request = new Request(url);
@@ -157,34 +172,17 @@ const useAuthActions = () => {
 				}
 
 				if (user) {
-					const userProfile = user.profile;
+					const userProfile = { id: user.id, ...user.profile };
 
-					delete user._links;
 					delete user.profile;
 
 					localStorage.setItem('user', JSON.stringify(userProfile));
-
-					const { login, linkedUsers = [], isPrimary = false, providers = [] } = userProfile;
-
-					linkedUsers.push({
-						id: user.id,
-						login,
-						isPrimary,
-						providers,
-					});
-
-					const accounts = linkedUsers
-						.map(({ id, login, isPrimary = false, providers = [] }) =>
-							providers.map(provider => ({ id, login, isPrimary, provider }))
-						)
-						.flat();
 
 					dispatch({
 						type: actions.user.fetch.success.type,
 						payload: {
 							user: userProfile,
 							oktaUser: user,
-							accounts,
 							isLoadingUserProfile: false,
 							isStaleUserProfile: false,
 						},
@@ -197,7 +195,7 @@ const useAuthActions = () => {
 					console.log(error);
 					dispatch({
 						type: actions.user.fetch.error.type,
-						error: error ?? error?.message.toString(),
+						error,
 					});
 				} else {
 					throw new Error(error);
@@ -219,16 +217,16 @@ const useAuthActions = () => {
 						});
 					}
 
-					const user = await oktaAuth.getUser();
+					const userInfo = await oktaAuth.getUser();
 
-					if (user) {
-						if (user.headers) {
-							delete user.headers;
+					if (userInfo) {
+						if (userInfo.headers) {
+							delete userInfo.headers;
 						}
 
-						const picture = user?.picture ?? `${window.location.origin}/assets/images/astro.svg`;
+						// const picture = user?.picture ?? process.env.REACT_APP_ASTRO;
 
-						const userInfo = { ...user, picture };
+						// const userInfo = { ...user, picture };
 
 						payload = { ...payload, userInfo, isLoadingUserInfo: false };
 
@@ -251,17 +249,11 @@ const useAuthActions = () => {
 
 		const loginWithModal = async (dispatch, options) => {
 			try {
-				const { loginHint } = options || {};
-
-				if (loginHint) {
-					console.debug('loginHint:', loginHint);
-				}
-
 				console.debug('generating URL...');
 
 				dispatch({ type: actions.login.start.withModal.type });
 
-				const { authUrl, tokenParams } = await generateAuthUrl(oktaAuth);
+				const { authUrl, tokenParams } = await generateAuthUrl(oktaAuth, options);
 
 				return dispatch({ type: actions.login.pending.type, payload: { authUrl, tokenParams } });
 			} catch (error) {
@@ -420,38 +412,50 @@ const useAuthActions = () => {
 			}
 		};
 
-		const linkUser = async (dispatch, { idp, tokens }) => {
+		const linkUser = async (dispatch, idp, isModal = false) => {
 			try {
+				// 1) Update the redirect_uri. This will need to be restored after!
+				const LINK_REDIRECT_URI = `${window.location.origin}/identities/callback`;
+
+				oktaAuth.options.redirectUri = LINK_REDIRECT_URI;
+				console.log('=== CURRENT REDIRECT_URI ===');
+				console.log(oktaAuth.options.redirectUri);
+
 				if (oktaAuth.isLoginRedirect()) {
 					// const { state } = await oktaAuth.parseOAuthResponseFromUrl(oktaAuth);
+					dispatch({
+						type: actions.user.link.pending.type,
+						payload: {
+							isLoadingLinkProfile: true,
+						},
+					});
 
-					const { access_token, state } = await oktaAuth.token.parseFromUrl();
+					const primaryAccessToken = oktaAuth.getAccessToken();
 
-					const originalUri = await oktaAuth.getOriginalUri(state);
+					const {
+						payload: { uid },
+					} = await oktaAuth.token.decode(primaryAccessToken);
 
-					oktaAuth.removeOriginalUri(state);
+					console.log('=== primaryAccessToken ===');
+					console.log(primaryAccessToken);
 
-					const { restoreOriginalUri } = oktaAuth.options;
+					await oktaAuth.handleLoginRedirect();
 
-					if (restoreOriginalUri) {
-						await restoreOriginalUri(oktaAuth, originalUri);
-					} else if (originalUri) {
-						window.location.replace(originalUri);
-					}
-
-					const accessToken = oktaAuth.getAccessToken();
+					const linkAccessToken = oktaAuth.getAccessToken();
+					console.log('=== linkAccessToken ===');
+					console.log(linkAccessToken);
 
 					const options = {
 						method: 'post',
 						headers: {
-							Authorization: `Bearer ${accessToken}`,
+							Authorization: `Bearer ${primaryAccessToken}`,
 						},
-						body: {
-							linkWith: access_token,
-						},
+						body: JSON.stringify({
+							linkWith: linkAccessToken,
+						}),
 					};
 
-					const url = `api/v1/users/${accessToken?.uid}/identities`;
+					const url = `${window.location.origin}/api/v1/users/${uid}/identities`;
 
 					const response = await fetch(url, options);
 
@@ -459,30 +463,111 @@ const useAuthActions = () => {
 						throw new Error(await response.json());
 					}
 
-					const user = await response.json();
+					await oktaAuth.tokenManager.renew('access_token');
 
-					if (user) {
-						delete user._links;
+					dispatch({
+						type: actions.user.link.success.type,
+						payload: {
+							isLoadingLinkProfile: false,
+							isStaleUserProfile: true,
+						},
+					});
+					// const user = await response.json();
 
-						dispatch({ type: actions.user.link.success.type });
+					// if (user) {
+					// 	const userProfile = user.profile;
 
-						await getUser(dispatch, null, user);
-					}
+					// 	delete user._links;
+					// 	delete user.profile;
+
+					// 	localStorage.setItem('user', JSON.stringify(userProfile));
+
+					// 	dispatch({
+					// 		type: actions.user.link.success.type,
+					// 		payload: {
+					// 			isLoadingLinkProfile: false,
+					// 			isLoadingUserProfile: false,
+					// 			user: userProfile,
+					// 			oktaUser: user,
+					// 			isStaleUserProfile: false,
+					// 		},
+					// 	});
+
+					// 	await getUser(dispatch, null, user);
+					// }
+
+					// restore the redirect_uri
+					oktaAuth.options.redirectUri = `${window.location.origin}/login/callback`;
+					console.log('=== CURRENT REDIRECT_URI ===');
+					console.log(oktaAuth.options.redirectUri);
 
 					return;
-				} else {
-					const {
-						oidc: { scopes },
-					} = Okta.config;
-					// signin w/ redirect + idp && user:link scope
-					await oktaAuth.signInWithRedirect({ idp: idpMap[idp], scopes: [...scopes, 'user:link'] });
-
-					return dispatch({ type: actions.user.link.pending.type });
 				}
+				// else if (isModal) {
+				// 	const { authUrl, tokenParams } = await generateAuthUrl(oktaAuth, {
+				// 		idp: idpMap[idp],
+				// 		prompt: 'login',
+				// 		display: 'iframe',
+				// 	});
+
+				// 	return dispatch({
+				// 		type: actions.user.link.start.type,
+				// 		payload: { authUrl, tokenParams },
+				// 	});
+				else {
+					const scopes = oktaAuth.options.scopes;
+
+					dispatch({
+						type: actions.user.link.start.type,
+						payload: { isLoadingLinkProfile: true },
+					});
+
+					// Ensures we reroute to the /settings page where we started.
+					await oktaAuth.setOriginalUri(window.location.href);
+
+					await oktaAuth.signInWithRedirect({
+						idp: idpMap[idp],
+						prompt: 'login',
+						scopes: [...scopes, 'user:link'],
+					});
+				}
+
 				// call /api/v1/users/{{userId}}/identities
 			} catch (error) {
 				if (dispatch) {
 					dispatch({ type: actions.user.link.error.type, error });
+				} else {
+					throw new Error(error);
+				}
+			}
+		};
+
+		const unlinkUser = async (dispatch, primaryId, associatedId) => {
+			try {
+				dispatch({ type: actions.user.unlink.start.type });
+
+				const url = `${window.location.origin}/api/v1/users/${associatedId}identities`;
+				const options = {
+					method: 'delete',
+					headers: {
+						authorization: `Bearer ${oktaAuth.getAccessToken()}`,
+					},
+				};
+
+				const response = await fetch(url, options);
+
+				if (response.statusCode !== 204) {
+					throw new ApiError({
+						statusCode: response.statusCode,
+						message: `Unable to unlink user ${associatedId} from ${primaryId}`,
+						json: await response.json(),
+					});
+				}
+
+				return dispatch({ type: actions.user.unlink.success.type });
+			} catch (error) {
+				if (dispatch) {
+					dispatch({ type: actions.user.unlink.error.type, error });
 				} else {
 					throw new Error(error);
 				}
@@ -499,6 +584,7 @@ const useAuthActions = () => {
 			silentAuth,
 			toggleEmailAuth,
 			toggleSignUp,
+			unlinkUser,
 		};
 	} catch (error) {
 		// console.error(`init error [${error}]`);

@@ -9,16 +9,45 @@ import AuthDispatchContext from './AuthDispatcher';
 export const AuthStateContext = createContext();
 
 const AuthProvider = ({ children }) => {
-	const { oktaAuth } = useOktaAuth();
+	const { authState, oktaAuth } = useOktaAuth();
 	const [state, dispatch] = useReducer(AuthReducer, initialState);
-	const { getUserInfo } = useAuthActions();
+	const { getUser, getUserInfo } = useAuthActions();
 
 	useEffect(() => {
-		if (!state?.userInfo || state?.isStaleUserProfile) {
+		if (
+			!oktaAuth.isLoginRedirect() &&
+			!state?.isLoadingLinkProfile &&
+			!state?.isLoadingUserProfile &&
+			(!state?.userInfo || state?.isStaleUserProfile)
+		) {
 			return getUserInfo(dispatch);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [oktaAuth, state?.userInfo, state?.isStaleUserProfile]);
+	}, [
+		state?.userInfo,
+		state?.isLoadingUserProfile,
+		state?.isLoadingLinkProfile,
+		state?.isStaleUserProfile,
+	]);
+
+	useEffect(() => {
+		if (
+			state?.isAuthenticated &&
+			!state?.isLoadingUserProfile &&
+			state?.userInfo?.sub &&
+			(state?.isStaleUserProfile || !state?.user)
+		) {
+			return getUser(dispatch, state.userInfo.sub);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [
+		oktaAuth.isLoginRedirect,
+		state?.isAuthenticated,
+		state?.isStaleUserProfile,
+		state?.isLoadingUserProfile,
+		state?.isLoadingLinkProfile,
+		state?.userInfo?.sub,
+	]);
 
 	// eslint-disable-next-line react/jsx-no-constructed-context-values
 	const contextValues = {

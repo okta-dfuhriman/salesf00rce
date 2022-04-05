@@ -1,4 +1,13 @@
-import { Auth, LDS } from '../../../common';
+import {
+	Auth,
+	LDS,
+	AppleIcon,
+	EmailIcon,
+	FacebookIcon,
+	GoogleIcon,
+	LinkedInIcon,
+	SalesforceIcon,
+} from '../../../common';
 
 const AuthButtons = () => {
 	const dispatch = Auth.useAuthDispatch();
@@ -18,11 +27,7 @@ const AuthButtons = () => {
 					onClick={() => handleClick('salesforce')}
 					type='button'
 				>
-					<img
-						alt='Salesforce'
-						className='slds-button__icon slds-button__icon_large'
-						src='assets/icons/salesforce.svg'
-					/>
+					<SalesforceIcon className='slds-button__icon slds-button__icon_large' />
 					<span>Salesforce</span>
 				</button>
 			</div>
@@ -39,11 +44,7 @@ const AuthButtons = () => {
 						onClick={() => toggleEmailAuth(dispatch, { isSignUp, isEmailAuth })}
 						type='button'
 					>
-						<img
-							alt='Email'
-							className='slds-button__icon slds-button__icon_large'
-							src='assets/images/email.svg'
-						/>
+						<EmailIcon className='slds-button__icon slds-button__icon_large' />
 					</button>
 				</LDS.Tooltip>
 				<LDS.Tooltip align='top' content='Google'>
@@ -53,11 +54,7 @@ const AuthButtons = () => {
 						onClick={() => handleClick('google')}
 						type='button'
 					>
-						<img
-							alt='Google'
-							className='slds-button__icon slds-button__icon_large'
-							src='assets/images/google.svg'
-						/>
+						<GoogleIcon className='slds-button__icon slds-button__icon_large' />
 					</button>
 				</LDS.Tooltip>
 				<LDS.Tooltip align='top' content='LinkedIn'>
@@ -67,11 +64,7 @@ const AuthButtons = () => {
 						onClick={() => handleClick('linkedin')}
 						type='button'
 					>
-						<img
-							alt='LinkedIn'
-							className='slds-button__icon slds-button__icon_large'
-							src='assets/images/linkedin.svg'
-						/>
+						<LinkedInIcon className='slds-button__icon slds-button__icon_large' />
 					</button>
 				</LDS.Tooltip>
 				<LDS.Tooltip align='top' content='Apple'>
@@ -82,11 +75,7 @@ const AuthButtons = () => {
 						type='button'
 						disabled
 					>
-						<img
-							alt='Apple'
-							className='slds-button__icon slds-button__icon_large'
-							src='assets/images/apple.svg'
-						/>
+						<AppleIcon height={'1.5rem'} width={'1.5rem'} />
 					</button>
 				</LDS.Tooltip>
 				<LDS.Tooltip align='top' content='Facebook'>
@@ -96,11 +85,7 @@ const AuthButtons = () => {
 						onClick={() => handleClick('facebook')}
 						type='button'
 					>
-						<img
-							alt='Facebook'
-							className='slds-button__icon slds-button__icon_large'
-							src='assets/images/facebook.svg'
-						/>
+						<FacebookIcon className='slds-button__icon slds-button__icon_large' />
 					</button>
 				</LDS.Tooltip>
 			</div>

@@ -1,25 +1,14 @@
-import {
-	OktaClient,
-	cleanProfile,
-	getLinkedProfiles,
-	getOktaUser,
-	validateJwt,
-} from '../../../_common';
+import { getUnifiedProfile, validateJwt } from '../../../_common';
 
 const getUser = async (req, res) => {
 	try {
-		const {
-			query: { id },
-			headers,
-		} = req;
-
 		// 1) Validate the accessToken
 
-		const { isValid, error } = await validateJwt(
+		const { isValid, error, accessToken } = await validateJwt(
 			{
 				assertClaims: { 'scp.includes': ['user:read:self'] },
 			},
-			headers
+			req
 		);
 
 		if (!isValid) {
@@ -30,35 +19,11 @@ const getUser = async (req, res) => {
 			}
 		}
 
-		// 2) Get the user
-		const user = await getOktaUser(id);
-
-		const userProfile = user.profile;
-
-		// 3) Get linked users
-		const linkedUsers = await getLinkedProfiles(id, userProfile?.unifiedId);
-
-		if (linkedUsers?.length > 0) {
-			userProfile.isPrimary = true;
-		}
-
-		// const _linkedUsers = userProfile?.linkedUsers;
-		// const unifiedId = userProfile?.unifiedId;
-
-		// const linkedUsers = [];
-
-		// if (Array.isArray(_linkedUsers) && _linkedUsers.length > 0) {
-		// 	// Loop through linked users to fetch profiles.
-		// 	for (let i = 0; i < _linkedUsers.length; i++) {
-		// 		const { id, profile } = await client.getUser(_linkedUsers[i]);
-
-		// 		if (profile?.unifiedId === unifiedId) {
-		// 			linkedUsers.push({ id, ...(await Utils.cleanProfile(profile)) });
-		// 		}
-		// 	}
-		// }
-		// console.log(linkedUsers);
-		return res.json({ ...user, profile: { ...userProfile, linkedUsers } });
+		const {
+			claims: { sub },
+		} = accessToken;
+		// Return the unified profile
+		return res.json(await getUnifiedProfile(sub));
 	} catch (error) {
 		throw new Error(`getUser(): ${error}`);
 	}

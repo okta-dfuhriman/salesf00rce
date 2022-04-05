@@ -1,4 +1,4 @@
-import { Auth, LDS } from '../../../common';
+import { Auth, LDS, AstroLogin } from '../../../common';
 
 const SignUpCard = () => {
 	const dispatch = Auth.useAuthDispatch();
@@ -7,7 +7,7 @@ const SignUpCard = () => {
 
 	return (
 		<div className='slds-card tbid-card_white tds-color_midnight' id='learn-more-v2-card'>
-			<img alt='astro-login' className='astro-login' src='assets/images/astro-login.svg' />
+			<AstroLogin alt='astro-login' className='astro-login' />
 			<table style={{ width: '80%', marginLeft: '20%' }}>
 				<tbody>
 					<tr>

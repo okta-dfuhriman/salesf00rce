@@ -1,9 +1,30 @@
-import { LDS } from '../../../common';
+import {
+	LDS,
+	React,
+	AppleIconRound,
+	EmailIconRound,
+	FacebookIconRound,
+	GoogleIconRound,
+	LinkedInIconRound,
+	SalesforceIconRound,
+} from '../../../common';
+
+const provider2IdpMap = {
+	google: 'Google',
+	linkedin: 'LinkedIn',
+	apple: 'Apple',
+	salesforce: 'Salesforce',
+	facebook: 'Facebook',
+};
 
 const AccountCardBody = ({ username, provider }) => (
 	<>
 		<div className='tds-line-height_small'>
-			<strong className='break-word'>{username}</strong>
+			<strong className='break-word'>
+				{provider === 'email'
+					? username
+					: `Connected to ${provider2IdpMap[provider]} as ${username}`}
+			</strong>
 		</div>
 		{provider === 'salesforce' && (
 			<dl className='slds-dl_horizontal tds-text-size_4'>
@@ -19,8 +40,29 @@ const AccountCardBody = ({ username, provider }) => (
 );
 
 const AccountCard = props => {
-	const { account } = props;
-	const { id, provider, isPrimary, login } = account;
+	const { account, onDisconnect } = props;
+	const { id, provider, login } = account;
+
+	const isLoggedIn = true;
+
+	let providerIcon;
+
+	switch (provider) {
+		case 'apple':
+			providerIcon = <AppleIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			break;
+		case 'facebook':
+			providerIcon = <FacebookIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			break;
+		case 'google':
+			providerIcon = <GoogleIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			break;
+		case 'linkedin':
+			providerIcon = <LinkedInIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			break;
+		default:
+			providerIcon = <EmailIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+	}
 
 	return (
 		<div
@@ -36,19 +78,18 @@ const AccountCard = props => {
 					}
 				>
 					<div className='slds-media__figure'>
-						<span className='slds-icon__container'>
-							<img
-								src={`/assets/icons/custom/${provider}-round.svg`}
-								alt=''
-								className='slds-icon tds-icon-social slds-icon_large'
-							/>
-						</span>
+						<span className='slds-icon__container'>{providerIcon}</span>
 					</div>
 					<div className='slds-media__body'>
 						<AccountCardBody username={login} provider={provider} />
 					</div>
 					<div className='slds-no-flex'>
-						<LDS.Button disabled={isPrimary} label='Disconnect' />
+						<LDS.Button
+							disabled={isLoggedIn}
+							label='Disconnect'
+							variant={isLoggedIn ? 'brand' : 'destructive'}
+							onClick={() => onDisconnect(id)}
+						/>
 					</div>
 				</div>
 			</LDS.IconSettings>

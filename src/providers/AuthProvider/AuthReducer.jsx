@@ -21,6 +21,7 @@ export const initialState = {
 	isLoading: false,
 	isLoadingUserInfo: false,
 	isLoadingUserProfile: false,
+	isLoadingLinkProfile: false,
 	isLoadingAuthenticators: false,
 	isStaleUserProfile: false,
 	factorsModalIsVisible: false,
@@ -147,9 +148,27 @@ export const actions = {
 		},
 		link: {
 			pending: { type: 'USER_LINK_PENDING' },
-			start: { type: 'USER_LINK_START' },
+			start: {
+				type: 'USER_LINK_START',
+				state: {
+					isLoadingLogin: true,
+				},
+			},
 			success: { type: 'USER_LINK_SUCCESS' },
 			error: { type: 'USER_LINK_ERROR' },
+		},
+		unlink: {
+			pending: { type: 'USER_UNLINK_PENDING' },
+			start: {
+				type: 'USER_UNLINK_START',
+				state: {
+					isLoadingLogin: true,
+					isLoadingUserInfo: true,
+					isLoadingUserProfile: true,
+				},
+			},
+			success: { type: 'USER_UNLINK_SUCCESS', state: { isStaleUserProfile: true } },
+			error: { type: 'USER_UNLINK_ERROR' },
 		},
 	},
 };
@@ -160,8 +179,16 @@ export const AuthReducer = (state, action) => {
 		console.log(JSON.stringify(action, null, 2));
 		switch (action?.type) {
 			case actions.recovery.start.type:
+			case actions.user.link.pending.type:
+			case actions.user.link.success.type:
 			case actions.recovery.success.type:
 				return _.merge({}, state, action?.payload);
+			case actions.user.unlink.success.type:
+				return _.merge({}, state, actions.user.unlink.success.state, action?.payload);
+			case actions.user.unlink.start.type:
+				return _.merge({}, state, actions.user.unlink.start.state, action?.payload);
+			case actions.user.link.start.type:
+				return _.merge({}, state, actions.user.link.start.state, action?.payload);
 			case actions.login.pending.type:
 				return _.merge({}, state, actions.login.pending?.state, action?.payload);
 			case actions.login.init.withEmail.type:
@@ -187,6 +214,8 @@ export const AuthReducer = (state, action) => {
 				return _.merge({}, state, action?.payload, actions.user.fetch.start.state);
 			case actions.user.fetch.error.type:
 			case actions.user.fetchInfo.error.type:
+			case actions.user.link.error.type:
+			case actions.user.unlink.error.type:
 			case actions.login.error.type:
 				console.log('login error:', action);
 				return _.merge({}, state, initialState, action?.payload, {

@@ -1,16 +1,20 @@
 import { cleanProfile, getIdps, OktaClient } from './_common';
 
-const getOktaUser = async (id, truncated = false) => {
-	const client = new OktaClient();
-
+const getOktaUser = async (id, client = new OktaClient(), truncated = false) => {
 	const user = await client.getUser(id);
+
+	const {
+		credentials: {
+			provider: { type: providerType },
+		},
+	} = user;
 
 	if (!user) {
 		throw new Error('Unable to find user!');
 	}
-	const providers = await getIdps(id);
+	const providers = await getIdps(id, client);
 
-	if (user.credentials?.provider?.type === 'OKTA') {
+	if (providerType === 'OKTA') {
 		providers.push('email');
 	}
 

@@ -1,4 +1,4 @@
-import { Auth, Okta, LDS, React, config, useEffect } from './common';
+import { Auth, Okta, LDS, React, useEffect } from './common';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 import './styles/App.css';
@@ -13,10 +13,9 @@ import RequireAuth from './components/RequireAuth';
 import Settings from './pages/Settings';
 import SignIn from './pages/SignIn';
 import UserLinkCallback from './pages/UserLinkCallback';
-import Demo from './pages/Demo';
 
 // const oktaAuth = new Okta.Auth(config.authConfig.oidc);
-const oktaAuth = new Okta.Auth(config.authConfig.oidc);
+const oktaAuth = new Okta.Auth(Okta.config.oidc);
 
 oktaAuth.start();
 
@@ -49,15 +48,13 @@ const App = () => {
 			<Okta.Security
 				oktaAuth={oktaAuth}
 				restoreOriginalUri={restoreOriginalUri}
-				onAuthRequired={customAuthHandler}
+				// onAuthRequired={customAuthHandler}
 			>
 				<Auth.Provider>
 					<LDS.IconSettings iconPath='/assets/icons'>
 						{showHeader && <Header />}
-						{/* <AuthModal /> */}
 						<Routes>
 							<Route path='/signin' element={<SignIn />} />
-							<Route path='/demo' element={<Demo />} />
 							<Route path='/login/callback' element={<AppLoginCallback />} />
 							<Route path='/identities/callback' element={<UserLinkCallback />} />
 							<Route path='' element={<RequireAuth />}>

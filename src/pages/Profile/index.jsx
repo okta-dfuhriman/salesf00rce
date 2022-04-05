@@ -1,13 +1,11 @@
 import ProfileCard from '../../components/ProfileCard';
+import { aridDunes } from '../../common';
 import './styles.css';
 
 const Profile = () => {
 	return (
 		<div className='root'>
-			<div
-				className='banner'
-				style={{ backgroundImage: "url('/assets/images/arid-dunes.png')" }}
-			></div>
+			<div className='banner' style={{ backgroundImage: `url(${aridDunes})` }}></div>
 			<div className='container'>
 				<div className='desktop'>
 					<div className='left'>

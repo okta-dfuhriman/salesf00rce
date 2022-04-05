@@ -1,4 +1,4 @@
-import { Auth, LDS, Link } from '../../common';
+import { Auth, LDS, Link, TrailblazerLogo } from '../../common';
 
 import DropdownCard from '../DropdownCard';
 
@@ -42,7 +42,11 @@ const Header = () => {
 									>
 										{userInfo?.name}
 									</div>
-									<LDS.Avatar imgSrc={userInfo?.picture} imgAlt={userInfo?.name} size='large' />
+									<LDS.Avatar
+										imgSrc={userInfo?.picture ?? 'assets/images/astro.svg'}
+										imgAlt={userInfo?.name}
+										size='large'
+									/>
 								</div>
 							</LDS.Button>
 						</LDS.DropdownTrigger>
@@ -64,7 +68,7 @@ const Header = () => {
 			<div className='slds-grid slds-container_x-large slds-container_center slds-p-horizontal_small'>
 				<div className='slds-p-vertical_small slds-p-horizontal_medium slds-grid slds-grid_align-spread slds-grow slds-grid_vertical-align-center'>
 					<Link to='/'>
-						<img alt='Trailblazer.me' src='/assets/images/trailblazer-me.svg' />
+						<TrailblazerLogo />
 					</Link>
 				</div>
 				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>

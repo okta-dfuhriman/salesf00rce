@@ -1,11 +1,11 @@
 import { ApiError, getOktaUser, OktaClient } from './_common';
 
-const LINKED_OBJECT_NAME = process.env.LINKED_OBJECT_NAME;
+const LINKED_OBJECT_NAME = 'primaryUser';
 
-const getLinkedProfiles = async (id, unifiedId) => {
-	const client = new OktaClient();
+const getLinkedProfiles = async ({ id, unifiedId }, client = new OktaClient()) => {
 	const result = [];
 
+	// 1) Check for linked objects
 	const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}Of`;
 
 	const response = await client.fetch({ url });
@@ -16,25 +16,24 @@ const getLinkedProfiles = async (id, unifiedId) => {
 
 	const body = await response.json();
 
+	// 2) Iterate through response to fetch Okta userIds.
 	for (let i = 0; i < body.length; i++) {
-		const link = body[i];
-
-		const regex = /(?<=users\/).*/;
-
 		const {
 			_links: {
 				self: { href },
 			},
-		} = link;
+		} = body[i];
+
+		const regex = /(?<=users\/).*/;
 
 		const path = new URL(href).pathname;
 
 		const userId = regex.exec(path)[0] || undefined;
 
+		// 3) If a userId exists, get the user.
 		if (userId) {
-			const user = await getOktaUser(userId, true);
+			const user = await getOktaUser(userId, client, true);
 
-			console.log(user);
 			if (user?.unifiedId === unifiedId) {
 				result.push(user);
 			}
