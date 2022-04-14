@@ -1,4 +1,4 @@
-export const countryList = [
+const countryList = [
 	{
 		id: '0',
 		label: 'United States of America',
@@ -881,7 +881,7 @@ export const countryList = [
 	},
 ];
 
-export const statesList = [
+const statesList = [
 	{ id: '0', label: 'Alabama' },
 	{ id: '1', label: 'Alaska' },
 	{ id: '2', label: 'American Samoa' },
@@ -942,3 +942,6 @@ export const statesList = [
 	{ id: '57', label: 'Wisconsin' },
 	{ id: '58', label: 'Wyoming' },
 ];
+
+export const states = statesList.map(state => ({ ...state, disabled: false }));
+export const countries = countryList.map(country => ({ ...country, disabled: false }));
