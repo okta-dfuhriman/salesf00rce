@@ -1,4 +1,4 @@
-import { cleanProfile, getIdps, OktaClient } from './_common';
+import { getIdps, OktaClient } from './_common';
 
 const getOktaUser = async (id, client = new OktaClient(), truncated = false) => {
 	const user = await client.getUser(id);
@@ -30,7 +30,7 @@ const getOktaUser = async (id, client = new OktaClient(), truncated = false) => 
 		provider,
 	}));
 
-	const profile = { ...(await cleanProfile(user.profile)) };
+	const profile = { ...(await client.cleanProfile(user.profile)) };
 
 	if (truncated) {
 		return { id, ...profile, credentials };

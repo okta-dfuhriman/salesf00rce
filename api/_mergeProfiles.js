@@ -1,11 +1,6 @@
 import * as _ from 'lodash';
 import { ulid as ULID } from 'ulid';
 
-import { ApiError } from './_error';
-import cleanProfile from './_cleanProfile';
-import { getLinkedProfiles } from './_common';
-import getUnifiedProfile from './_getUnifiedProfile';
-
 /**
  *
  * @param {*} id Okta userId for the primary user.
