@@ -9,6 +9,8 @@ import './styles.css';
 const Providers = () => {
 	const { user } = Auth.useAuthState();
 
+	const { credentials = [] } = user || {};
+
 	return (
 		<>
 			<Account
@@ -23,9 +25,11 @@ const Providers = () => {
 					</>
 				}
 				type='salesforce'
-				accounts={
-					user?.accounts?.length > 0
-						? user?.accounts.filter(({ provider }) => provider === 'salesforce')
+				credentials={
+					credentials?.length > 0
+						? credentials.filter(
+								({ provider: { name: providerName } }) => providerName === 'salesforce'
+						  )
 						: []
 				}
 			/>
@@ -33,9 +37,9 @@ const Providers = () => {
 				header='Email Accounts'
 				subtitle='Manage your connected email accounts.'
 				type='email'
-				accounts={
-					user?.accounts?.length > 0
-						? user?.accounts.filter(({ provider }) => provider === 'email')
+				credentials={
+					credentials?.length > 0
+						? credentials.filter(({ provider: { name: providerName } }) => providerName === 'email')
 						: []
 				}
 			/>
@@ -43,10 +47,11 @@ const Providers = () => {
 				header='Social Accounts'
 				subtitle="Log in with your favorite social media accounts. Don't worry-we won't share your data or post anything on your behalf."
 				type='social'
-				accounts={
-					user?.accounts?.length > 0
-						? user?.accounts.filter(
-								({ provider }) => provider !== 'email' && provider !== 'salesforce'
+				credentials={
+					credentials?.length > 0
+						? credentials.filter(
+								({ provider: { name: providerName } }) =>
+									providerName !== 'email' && providerName !== 'salesforce'
 						  )
 						: []
 				}

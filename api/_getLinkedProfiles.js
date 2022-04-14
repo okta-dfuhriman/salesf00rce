@@ -2,8 +2,9 @@ import { ApiError, getOktaUser, OktaClient } from './_common';
 
 const LINKED_OBJECT_NAME = 'primaryUser';
 
-const getLinkedProfiles = async ({ id, unifiedId }, client = new OktaClient()) => {
-	const result = [];
+const getLinkedProfiles = async ({ primaryId: id, unifiedId }, client = new OktaClient()) => {
+	const linkedUsers = [];
+	let linkedCredentials = [];
 
 	// 1) Check for linked objects
 	const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}Of`;
@@ -34,13 +35,17 @@ const getLinkedProfiles = async ({ id, unifiedId }, client = new OktaClient()) =
 		if (userId) {
 			const user = await getOktaUser(userId, client, true);
 
+			linkedCredentials = [...linkedCredentials, ...user?.credentials];
+
+			delete user.credentials;
+
 			if (user?.unifiedId === unifiedId) {
-				result.push(user);
+				linkedUsers.push(user);
 			}
 		}
 	}
 
-	return result;
+	return { linkedUsers, linkedCredentials };
 };
 
 export default getLinkedProfiles;

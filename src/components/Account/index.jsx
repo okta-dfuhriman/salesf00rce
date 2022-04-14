@@ -9,7 +9,7 @@ const Account = props => {
 	const handleAdd = provider => linkUser(dispatch, provider);
 	const handleDisconnect = accountId => unlinkUser(dispatch, user.id, accountId);
 
-	const { header, subtitle, type, accounts } = props;
+	const { header, subtitle, type, credentials = [] } = props;
 
 	const buttonLabel = type === 'email' ? 'Add Email' : 'Connect';
 
@@ -33,10 +33,10 @@ const Account = props => {
 			)}
 			{!isLoadingUserProfile &&
 				!isLoadingLinkProfile &&
-				accounts.map(account => (
+				credentials.map(credential => (
 					<AccountCard
-						key={`${account?.provider}-${account?.id}`}
-						account={account}
+						key={`${credential?.provider}-${credential?.id}`}
+						credential={credential}
 						onDisconnect={handleDisconnect}
 					/>
 				))}

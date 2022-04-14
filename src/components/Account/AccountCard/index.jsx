@@ -17,19 +17,19 @@ const provider2IdpMap = {
 	facebook: 'Facebook',
 };
 
-const AccountCardBody = ({ username, provider }) => (
+const AccountCardBody = ({ login, providerName }) => (
 	<>
 		<div className='tds-line-height_small'>
 			<strong className='break-word'>
-				{provider === 'email'
-					? username
-					: `Connected to ${provider2IdpMap[provider]} as ${username}`}
+				{providerName === 'email'
+					? login
+					: `Connected to ${provider2IdpMap[providerName]} as ${login}`}
 			</strong>
 		</div>
-		{provider === 'salesforce' && (
+		{providerName === 'salesforce' && (
 			<dl className='slds-dl_horizontal tds-text-size_4'>
 				<dt className='slds-dl_horizontal__label'>Email:</dt>
-				<dd className='slds-dl_horizontal__detail'>{username}</dd>
+				<dd className='slds-dl_horizontal__detail'>{login}</dd>
 				<dt className='slds-dl_horizontal__label'>Type:</dt>
 				<dd className='slds-dl_horizontal__detail'>Developer Edition</dd>
 				<dt className='slds-dl_horizontal__label'>Active user:</dt>
@@ -40,14 +40,21 @@ const AccountCardBody = ({ username, provider }) => (
 );
 
 const AccountCard = props => {
-	const { account, onDisconnect } = props;
-	const { id, provider, login } = account;
+	const { credential, onDisconnect } = props;
+	const {
+		id: userId,
+		provider: { name: providerName },
+		login,
+		isLoggedIn,
+	} = credential;
 
-	const isLoggedIn = true;
+	if (providerName === 'password') {
+		return null;
+	}
 
 	let providerIcon;
 
-	switch (provider) {
+	switch (providerName) {
 		case 'apple':
 			providerIcon = <AppleIconRound className='slds-icon tds-icon-social slds-icon_large' />;
 			break;
@@ -67,12 +74,12 @@ const AccountCard = props => {
 	return (
 		<div
 			className='slds-p-around_medium slds-m-vertical_small action-item'
-			id={`${provider}-${id}`}
+			id={`${providerName}-${userId}`}
 		>
 			<LDS.IconSettings iconPath='/assets/icons'>
 				<div
 					className={
-						provider === 'salesforce'
+						providerName === 'salesforce'
 							? 'slds-media slds-media_top tds-media slds-grid_vertical-align-top'
 							: 'slds-media slds-media_center slds-grid_vertical-align-center'
 					}
@@ -81,14 +88,14 @@ const AccountCard = props => {
 						<span className='slds-icon__container'>{providerIcon}</span>
 					</div>
 					<div className='slds-media__body'>
-						<AccountCardBody username={login} provider={provider} />
+						<AccountCardBody login={login} providerName={providerName} />
 					</div>
 					<div className='slds-no-flex'>
 						<LDS.Button
 							disabled={isLoggedIn}
 							label='Disconnect'
 							variant={isLoggedIn ? 'brand' : 'destructive'}
-							onClick={() => onDisconnect(id)}
+							onClick={() => onDisconnect(userId)}
 						/>
 					</div>
 				</div>

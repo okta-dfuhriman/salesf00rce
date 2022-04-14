@@ -30,21 +30,6 @@ export const initialState = {
 };
 
 export const actions = {
-	authenticators: {
-		enroll: {
-			cancel: {
-				type: 'AUTHENTICATORS_ENROLL_CANCEL',
-			},
-			error: { type: 'AUTHENTICATORS_ENROLL_ERROR' },
-			start: { type: 'AUTHENTICATORS_ENROLL_START' },
-			success: { type: 'AUTHENTICATORS_ENROLL_SUCCESS' },
-		},
-		fetch: {
-			error: { type: 'AUTHENTICATORS_FETCH_ERROR' },
-			start: { type: 'AUTHENTICATORS_FETCH_START' },
-			success: { type: 'AUTHENTICATORS_FETCH_SUCCESS' },
-		},
-	},
 	login: {
 		cancel: { type: 'LOGIN_CANCEL' },
 		error: { type: 'LOGIN_ERROR' },
@@ -102,7 +87,7 @@ export const actions = {
 					isLoadingLogin: true,
 				},
 			},
-			withRedirect: { type: 'LOGIN_START_WITH_REDIRECT' },
+			withRedirect: { type: 'LOGIN_WITH_REDIRECT_STARTED' },
 		},
 		success: { type: 'LOGIN_SUCCESS', state: { ...initialLoginState } },
 		silentAuth: {

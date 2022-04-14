@@ -150,8 +150,13 @@ const useAuthActions = () => {
 
 				const accessToken = oktaAuth.getAccessToken();
 				const {
-					payload: { uid },
+					payload: { uid: loggedInUserId },
 				} = oktaAuth.token.decode(accessToken);
+
+				const idToken = oktaAuth.getIdToken();
+				const {
+					payload: { idp },
+				} = oktaAuth.token.decode(idToken);
 
 				if (!user && userId) {
 					const url = `${window.location.origin}/api/v1/users/${userId}`;
@@ -172,17 +177,26 @@ const useAuthActions = () => {
 				}
 
 				if (user) {
-					const userProfile = { id: user.id, ...user.profile };
+					// set active credential
+					const { credentials = [] } = user;
 
-					delete user.profile;
+					const _credentials = credentials.map(credential => {
+						const {
+							id,
+							provider: { id: idpId },
+						} = credential;
 
-					localStorage.setItem('user', JSON.stringify(userProfile));
+						return { ...credential, isLoggedIn: id === loggedInUserId && idpId === idp };
+					});
+
+					user = { ...user, credentials: _credentials };
+
+					localStorage.setItem('user', JSON.stringify(user));
 
 					dispatch({
 						type: actions.user.fetch.success.type,
 						payload: {
-							user: userProfile,
-							oktaUser: user,
+							user: user,
 							isLoadingUserProfile: false,
 							isStaleUserProfile: false,
 						},

@@ -19,7 +19,9 @@ const getIdps = async (id, client) => {
 		const providers = [];
 
 		for (let i = 0; i < idps.length; i++) {
-			providers.push(idps[i]?.name?.toLowerCase());
+			const { id: idpId, name } = idps[i];
+
+			providers.push({ id: idpId, name: name?.toLowerCase() });
 		}
 
 		return providers;
