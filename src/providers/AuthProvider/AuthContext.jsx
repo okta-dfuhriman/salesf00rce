@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @format */
 
 import { createContext, useEffect, useReducer, PropTypes } from '../../common';
@@ -22,7 +23,6 @@ const AuthProvider = ({ children }) => {
 		) {
 			return getUserInfo(dispatch);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		state?.userInfo,
 		state?.isLoadingUserProfile,
@@ -39,7 +39,6 @@ const AuthProvider = ({ children }) => {
 		) {
 			return getUser(dispatch, state.userInfo.sub);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		oktaAuth.isLoginRedirect,
 		state?.isAuthenticated,
@@ -55,6 +54,15 @@ const AuthProvider = ({ children }) => {
 		...state,
 		actions,
 	};
+
+	useEffect(() => {
+		oktaAuth.tokenManager.on('renewed', (key, newToken, oldToken) => {
+			console.info('Token with key', key, 'has been renewed');
+			console.info('New token:', newToken);
+		});
+
+		return () => oktaAuth.tokenManager.off('renewed');
+	}, []);
 
 	return (
 		<AuthStateContext.Provider value={contextValues}>
