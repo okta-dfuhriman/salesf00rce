@@ -6,6 +6,7 @@ const ORG_URL = process.env.REACT_APP_OKTA_URL;
 const CLIENT_ID = process.env.CLIENT_ID_USER_SERVICE;
 const SCOPES = process.env.SCOPES_USER_SERVICE.split(' ');
 const KEY = process.env.PRIVATE_KEY_USER_SERVICE;
+const LINKED_OBJECT_NAME = 'primaryUser';
 
 export default class OktaClient extends Client {
 	constructor(config) {
@@ -27,6 +28,72 @@ export default class OktaClient extends Client {
 		};
 
 		return await this.http.http(`${baseUrl ?? this.baseUrl}/${url}`, _options);
+	}
+
+	/**
+	 *
+	 * Fetches the sub/child accounts for a given identifier, which is assumed to be a primary/parent `userId`
+	 *
+	 * @param {string} id The primary/parent user identifier.
+	 * @returns
+	 */
+	async getAssociatedAccounts(id) {
+		const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}Of`;
+
+		const response = await this.fetch({ url });
+
+		if (!response.ok) {
+			throw new ApiError({ statusCode: response?.statusCode, message: await response.json() });
+		}
+
+		return await this.parseLinkedObjects(await response.json());
+	}
+
+	async parseLinkedObjects(data) {
+		const users = [];
+
+		for (let i = 0; i < data.length; i++) {
+			const {
+				_links: {
+					self: { href },
+				},
+			} = data[i];
+
+			const regex = /(?<=users\/).*/;
+
+			const path = new URL(href).pathname;
+
+			users.push(regex.exec(path)[0] || undefined);
+		}
+		return users;
+	}
+
+	/**
+	 *
+	 * Fetches the parent account for a given identifier, which is assumed to be a sub/child `userId`.
+	 *
+	 * @param {string} id The sub/child user identifier.
+	 * @returns A single `userId` for the parent account (if there is one).
+	 */
+	async getParentAccount(id) {
+		const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}`;
+
+		const response = await this.fetch({ url });
+
+		if (!response.ok) {
+			throw new ApiError({ statusCode: response?.statusCode, message: await response.json() });
+		}
+
+		const result = await this.parseLinkedObjects(await response.json());
+
+		if (result.length > 1) {
+			throw new ApiError({
+				statusCode: 500,
+				message: `${result.length} results returned. Only one parent account is permitted!`,
+			});
+		}
+
+		return result[0];
 	}
 
 	async getIdps(id) {

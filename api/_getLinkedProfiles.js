@@ -1,47 +1,25 @@
-import { ApiError, getOktaUser, OktaClient } from './_common';
-
-const LINKED_OBJECT_NAME = 'primaryUser';
+import { getOktaUser, OktaClient } from './_common';
 
 const getLinkedProfiles = async ({ primaryId: id, unifiedId }, client = new OktaClient()) => {
 	const linkedUsers = [];
 	let linkedCredentials = [];
 
-	// 1) Check for linked objects
-	const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}Of`;
+	// 1) Check for linked users
+	const linkedUserIds = await client.getAssociatedAccounts(id);
 
-	const response = await client.fetch({ url });
+	// 2) Iterate through response to fetch Okta users.
 
-	if (!response.ok) {
-		throw new ApiError({ statusCode: response?.statusCode, message: await response.json() });
-	}
+	for (let i = 0; i < linkedUserIds.length; i++) {
+		const userId = linkedUserIds[i];
 
-	const body = await response.json();
+		const user = await getOktaUser(userId, client, true);
 
-	// 2) Iterate through response to fetch Okta userIds.
-	for (let i = 0; i < body.length; i++) {
-		const {
-			_links: {
-				self: { href },
-			},
-		} = body[i];
+		linkedCredentials = [...linkedCredentials, ...user?.credentials];
 
-		const regex = /(?<=users\/).*/;
+		delete user.credentials;
 
-		const path = new URL(href).pathname;
-
-		const userId = regex.exec(path)[0] || undefined;
-
-		// 3) If a userId exists, get the user.
-		if (userId) {
-			const user = await getOktaUser(userId, client, true);
-
-			linkedCredentials = [...linkedCredentials, ...user?.credentials];
-
-			delete user.credentials;
-
-			if (user?.unifiedId === unifiedId) {
-				linkedUsers.push(user);
-			}
+		if (user?.unifiedId === unifiedId) {
+			linkedUsers.push(user);
 		}
 	}
 
