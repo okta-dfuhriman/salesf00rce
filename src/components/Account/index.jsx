@@ -11,15 +11,6 @@ const Account = props => {
 
 	const { header, subtitle, type, credentials = [] } = props;
 
-	const socialButtons = (
-		<>
-			<LDS.Button title='Facebook' label='Connect Facebook' onClick={() => handleAdd('facebook')} />
-			<LDS.Button title='Google' label='Connect Google' onClick={() => handleAdd('google')} />
-			<LDS.Button title='LinkedIn' label='Connect LinkedIn' onClick={() => handleAdd('linkedin')} />
-			<LDS.Button title='Apple' label='Connect Apple' disabled />
-		</>
-	);
-
 	const buildButtons = type => {
 		let buttonLabel = 'Connect';
 		let buttons = [];
