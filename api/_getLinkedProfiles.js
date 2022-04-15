@@ -1,6 +1,6 @@
 import { getOktaUser, OktaClient } from './_common';
 
-const getLinkedProfiles = async ({ primaryId: id, unifiedId }, client = new OktaClient()) => {
+const getLinkedProfiles = async ({ id, unifiedId }, client = new OktaClient()) => {
 	const linkedUsers = [];
 	let linkedCredentials = [];
 

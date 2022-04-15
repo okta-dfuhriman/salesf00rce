@@ -1,18 +1,26 @@
 import { getLinkedProfiles, getOktaUser } from './_common';
 
-const getUnifiedProfile = async sub => {
-	// 1) Get the Okta user
+const getUnifiedProfile = async accessToken => {
+	const {
+		claims: { sub },
+	} = accessToken;
+
+	// 2) Get the Okta user
 	const user = await getOktaUser(sub);
 
-	const { id: primaryId, profile: primaryProfile, credentials: primaryCredentials } = user;
+	const {
+		id,
+		profile: { unifiedId },
+		credentials,
+	} = user;
 
-	// 2) Get linked users
+	// 3) Get linked users
 	const { linkedUsers, linkedCredentials } = await getLinkedProfiles({
-		primaryId,
-		unifiedId: primaryProfile?.unifiedId,
+		id,
+		unifiedId,
 	});
 
-	return { ...user, linkedUsers, credentials: [...primaryCredentials, ...linkedCredentials] };
+	return { ...user, linkedUsers, credentials: [...credentials, ...linkedCredentials] };
 };
 
 export default getUnifiedProfile;

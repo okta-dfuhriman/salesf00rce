@@ -446,6 +446,7 @@ const useAuthActions = () => {
 
 					const primaryAccessToken = oktaAuth.getAccessToken();
 
+					// The `sub` claim will always be the subject of the accessToken. The `uid` will represent that user that is actually logged in.
 					const {
 						payload: { uid },
 					} = await oktaAuth.token.decode(primaryAccessToken);
@@ -477,7 +478,7 @@ const useAuthActions = () => {
 						throw new Error(await response.json());
 					}
 
-					await oktaAuth.tokenManager.renew('access_token');
+					await oktaAuth.tokenManager.renew('accessToken');
 
 					dispatch({
 						type: actions.user.link.success.type,
@@ -486,29 +487,6 @@ const useAuthActions = () => {
 							isStaleUserProfile: true,
 						},
 					});
-					// const user = await response.json();
-
-					// if (user) {
-					// 	const userProfile = user.profile;
-
-					// 	delete user._links;
-					// 	delete user.profile;
-
-					// 	localStorage.setItem('user', JSON.stringify(userProfile));
-
-					// 	dispatch({
-					// 		type: actions.user.link.success.type,
-					// 		payload: {
-					// 			isLoadingLinkProfile: false,
-					// 			isLoadingUserProfile: false,
-					// 			user: userProfile,
-					// 			oktaUser: user,
-					// 			isStaleUserProfile: false,
-					// 		},
-					// 	});
-
-					// 	await getUser(dispatch, null, user);
-					// }
 
 					// restore the redirect_uri
 					oktaAuth.options.redirectUri = `${window.location.origin}/login/callback`;

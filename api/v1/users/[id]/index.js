@@ -19,11 +19,8 @@ const getUser = async (req, res) => {
 			}
 		}
 
-		const {
-			claims: { sub },
-		} = accessToken;
 		// Return the unified profile
-		return res.json(await getUnifiedProfile(sub));
+		return res.json(await getUnifiedProfile(accessToken));
 	} catch (error) {
 		throw new Error(`getUser(): ${error}`);
 	}

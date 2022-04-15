@@ -35,7 +35,7 @@ const Account = props => {
 				!isLoadingLinkProfile &&
 				credentials.map(credential => (
 					<AccountCard
-						key={`${credential?.provider}-${credential?.id}`}
+						key={`${credential?.provider?.name}-${credential?.id}`}
 						credential={credential}
 						onDisconnect={handleDisconnect}
 					/>

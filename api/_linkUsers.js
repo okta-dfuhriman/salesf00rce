@@ -40,14 +40,17 @@ const doAuthN = async (req, linkWith) => {
 const linkUsers = async (req, res, client) => {
 	try {
 		const {
-			query: { id },
+			query: { id: uid },
 			body,
 		} = req || {};
 		// 1) Validate both JWTs
 
 		const { linkWith } = JSON.parse(body);
 
-		const { isValid, linkWithAccessToken, error } = await doAuthN(req, linkWith);
+		const { isValid, linkWithAccessToken, primaryAccessToken, error } = await doAuthN(
+			req,
+			linkWith
+		);
 
 		if (!isValid) {
 			if (error) {
@@ -57,20 +60,29 @@ const linkUsers = async (req, res, client) => {
 			}
 		}
 
+		// TODO account for scenario where associatedUid !== associatedSub
 		const {
-			claims: { uid: associatedUserId, sub: associatedLogin },
+			claims: { uid: associatedUid, sub: associatedSub },
 		} = linkWithAccessToken;
+
+		const {
+			claims: { sub: primarySub },
+		} = primaryAccessToken;
 
 		// 2) Link objects
 
-		const url = `/api/v1/users/${associatedUserId}/linkedObjects/${LINKED_OBJECT_NAME}/${id}`;
+		const id = primarySub || uid;
+
+		// If a `primaryId` is present, the new associated account should be linked to it, not the logged in user's Id.
+
+		const url = `/api/v1/users/${associatedUid}/linkedObjects/${LINKED_OBJECT_NAME}/${id}`;
 
 		const response = await client.fetch({ url, options: { method: 'put' } });
 
 		if (response.status === 204) {
 			// 3) Link success! Now onto the profile merge...
 
-			await mergeProfiles({ id, associatedUserId, associatedLogin }, client);
+			await mergeProfiles({ primaryId: id, associatedUid }, client);
 
 			res.status(204).send();
 		}
