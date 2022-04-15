@@ -11,8 +11,6 @@ const Account = props => {
 
 	const { header, subtitle, type, credentials = [] } = props;
 
-	const buttonLabel = type === 'email' ? 'Add Email' : 'Connect';
-
 	const socialButtons = (
 		<>
 			<LDS.Button title='Facebook' label='Connect Facebook' onClick={() => handleAdd('facebook')} />
@@ -21,6 +19,49 @@ const Account = props => {
 			<LDS.Button title='Apple' label='Connect Apple' disabled />
 		</>
 	);
+
+	const buildButtons = type => {
+		let buttonLabel = 'Connect';
+		let buttons = [];
+
+		switch (type) {
+			case 'email':
+				buttonLabel = 'Add Email';
+				buttons = [
+					<LDS.Button title={buttonLabel} label={buttonLabel} onClick={() => handleAdd('email')} />,
+				];
+				break;
+			case 'social':
+				buttons = [
+					<LDS.Button
+						title='Facebook'
+						label='Connect Facebook'
+						onClick={() => handleAdd('facebook')}
+					/>,
+					<LDS.Button title='Google' label='Connect Google' onClick={() => handleAdd('google')} />,
+					<LDS.Button
+						title='LinkedIn'
+						label='Connect LinkedIn'
+						onClick={() => handleAdd('linkedin')}
+					/>,
+					<LDS.Button title='Apple' label='Connect Apple' disabled />,
+				];
+				break;
+			case 'salesforce':
+				buttons = [
+					<LDS.Button
+						title={buttonLabel}
+						label={buttonLabel}
+						onClick={() => handleAdd('salesforce')}
+					/>,
+				];
+				break;
+			default:
+				buttons = [<LDS.Button title={buttonLabel} label={buttonLabel} disabled />];
+		}
+
+		return buttons;
+	};
 
 	return (
 		<div className='slds-m-bottom_xx-large'>
@@ -40,9 +81,7 @@ const Account = props => {
 						onDisconnect={handleDisconnect}
 					/>
 				))}
-			{/* <AccountCard {...props} /> */}
-			{type !== 'social' && <LDS.Button title={buttonLabel} label={buttonLabel} />}
-			{type === 'social' && socialButtons}
+			{buildButtons(type)}
 		</div>
 	);
 };

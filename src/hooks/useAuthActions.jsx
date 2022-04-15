@@ -432,8 +432,6 @@ const useAuthActions = () => {
 				const LINK_REDIRECT_URI = `${window.location.origin}/identities/callback`;
 
 				oktaAuth.options.redirectUri = LINK_REDIRECT_URI;
-				console.log('=== CURRENT REDIRECT_URI ===');
-				console.log(oktaAuth.options.redirectUri);
 
 				if (oktaAuth.isLoginRedirect()) {
 					// const { state } = await oktaAuth.parseOAuthResponseFromUrl(oktaAuth);
@@ -517,11 +515,20 @@ const useAuthActions = () => {
 					// Ensures we reroute to the /settings page where we started.
 					await oktaAuth.setOriginalUri(window.location.href);
 
-					await oktaAuth.signInWithRedirect({
+					const options = {
 						idp: idpMap[idp],
 						prompt: 'login',
 						scopes: [...scopes, 'user:link'],
-					});
+					};
+
+					if (idp === 'email' || idp === 'password') {
+						delete options.idp;
+
+						options['loginHint'] = 'email';
+					}
+					console.log(options);
+
+					await oktaAuth.signInWithRedirect(options);
 				}
 
 				// call /api/v1/users/{{userId}}/identities
