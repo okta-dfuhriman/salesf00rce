@@ -1,5 +1,5 @@
 import OktaJwtVerifier from '@okta/jwt-verifier';
-import { equal } from 'assert';
+import { JwtVerifier, OktaClient } from './_common';
 
 const ORG_URL = process.env.REACT_APP_OKTA_URL;
 const AUTH_SERVER_ID = process.env.REACT_APP_AUTH_SERVER_ID;
@@ -7,12 +7,25 @@ const ISSUER = `${ORG_URL}/oauth2/${AUTH_SERVER_ID}`;
 
 /**
  *
- * @param {Object} options An options object containing the `jwt` to be validated, a `aud` value, and any custom claims to assert.
+ * @param {Object} options An options object containing any of the following: idToken, accessToken, an `aud` value, and any custom claims to assert (in an `assertClaims` object).
  * @param {Object} [req] The original `req` object. Used to perform additional validation.
+ * @param {Object} [client] An instance of OktaClient. Used to validate parent/child relationship (if necessary).
  * @returns {Object} The results of the validation as well as the accessToken validated.
  */
-const validateJwt = async ({ jwt, aud = 'salesf00rce', assertClaims }, req) => {
-	let _jwt = jwt;
+const validateJwt = async (
+	{
+		idToken,
+		accessToken,
+		aud = 'salesf00rce',
+		assertClaims = { 'scp.includes': ['user:read:self'] },
+	},
+	req,
+	client = new OktaClient()
+) => {
+	let _accessTokenString = accessToken;
+	let _idTokenString = idToken;
+	let _accessToken;
+	let _idToken;
 
 	try {
 		const {
@@ -20,41 +33,52 @@ const validateJwt = async ({ jwt, aud = 'salesf00rce', assertClaims }, req) => {
 			headers: { authorization },
 		} = req || {};
 
-		// 1) Determine if a JWT was provided or if it needs to be extracted.
-		if (authorization && !jwt) {
+		// 1) If there is an idToken, validate it.
+		if (_idTokenString) {
+			// Spin up a validator
+			const customJwtVerifier = new JwtVerifier();
+
+			_idToken = await customJwtVerifier.verifyIdToken(_idTokenString);
+		}
+
+		// 2) If there is not an accessToken extract from `req`.
+		if (!_accessTokenString && authorization) {
 			const regex = /Bearer (.+)/;
 			const match = regex.exec(authorization);
 
-			_jwt = match?.length === 2 ? match[1] : undefined;
+			_accessTokenString = match?.length === 2 ? match[1] : undefined;
 		}
 
-		if (!_jwt) {
+		if (!_accessTokenString && !_idTokenString) {
 			throw new Error('No JWT found!');
 		}
 
-		// 2) Spin up our jwtVerifier
-		const jwtVerifier = new OktaJwtVerifier({ issuer: ISSUER, assertClaims });
+		// 3) If there is an accessToken, validate it
+		if (_accessTokenString) {
+			// i) Spin up our jwtVerifier
+			const jwtVerifier = new OktaJwtVerifier({ issuer: ISSUER, assertClaims });
 
-		// 3) Validate the JWT
-		const accessToken = await jwtVerifier.verifyAccessToken(_jwt, aud);
+			// ii) Do the initial JWT validation
+			_accessToken = await jwtVerifier.verifyAccessToken(_accessTokenString, aud);
 
-		const {
-			claims: { scp, uid },
-		} = accessToken;
+			const {
+				claims: { scp, sub, uid },
+			} = _accessToken;
 
-		// 4) Do resource Id permission check for normal getUser.
-		// if (
-		// 	!scp?.includes('user:link') &&
-		// 	(scp?.includes('user:read:self') || scp?.includes('user:update:self'))
-		// ) {
-		// 	equal(
-		// 		id,
-		// 		uid,
-		// 		'When `self` scope is included, the resource must be the subject of the access token.'
-		// 	);
-		// }
+			// iii) JWT is valid, but does the user have permission to act on the resource?
+			if (!scp.includes('user:link') && ![sub, uid].includes(id)) {
+				// the resource id does not equal either the parent account nor the logged in user
+				// we need to determine if the resource is associated to the parent account
+				const associatedAccounts = await client.getAssociatedAccounts(sub);
 
-		return { isValid: true, accessToken };
+				if (!associatedAccounts.includes(id)) {
+					// the resource is not related to the parent account ==> 401
+					throw new Error('Accounts not associated!');
+				}
+			}
+		}
+
+		return { isValid: true, accessToken: _accessToken, idToken: _idToken };
 	} catch (error) {
 		return { isValid: false, error };
 	}
