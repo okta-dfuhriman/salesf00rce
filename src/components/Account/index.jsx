@@ -7,7 +7,7 @@ const Account = props => {
 	const { linkUser, unlinkUser } = Auth.useAuthActions();
 
 	const handleAdd = provider => linkUser(dispatch, provider);
-	const handleDisconnect = accountId => unlinkUser(dispatch, user.id, accountId);
+	const handleDisconnect = credential => unlinkUser(dispatch, credential);
 
 	const { header, subtitle, type, credentials = [] } = props;
 
@@ -69,7 +69,7 @@ const Account = props => {
 					<AccountCard
 						key={`${credential?.provider?.name}-${credential?.id}`}
 						credential={credential}
-						onDisconnect={handleDisconnect}
+						onDisconnect={() => handleDisconnect(credential)}
 					/>
 				))}
 			{buildButtons(type)}

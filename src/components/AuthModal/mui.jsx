@@ -37,7 +37,7 @@ const MuiAuthDialog = props => {
 	const { onClose } = props;
 	const dispatch = Auth.useAuthDispatch();
 	const { login } = Auth.useAuthActions();
-	const { actions, authUrl, isVisibleAuthModal, isLoadingLogin, isVisibleAuthIframe, tokenParams } =
+	const { authUrl, isVisibleAuthModal, isLoadingLogin, isVisibleAuthIframe, tokenParams } =
 		Auth.useAuthState();
 
 	const theme = useTheme();
@@ -47,7 +47,7 @@ const MuiAuthDialog = props => {
 	const modalHeight = '650px';
 
 	const onCancel = () => {
-		dispatch({ type: actions.login.cancel.type });
+		dispatch({ type: 'LOGIN_CANCELLED' });
 		return onClose();
 	};
 
@@ -70,7 +70,7 @@ const MuiAuthDialog = props => {
 
 				if (!isAllowed) {
 					return dispatch({
-						type: actions.login.error.type,
+						type: 'LOGIN_ERROR',
 						payload: { isVisibleAuthIframe: false, isVisibleAuthModal: false },
 						error: `'origin' [${origin}] not allowed`,
 					});
@@ -79,14 +79,14 @@ const MuiAuthDialog = props => {
 
 			if (data?.type === 'onload' && data?.result === 'success') {
 				return dispatch({
-					type: actions.login.pending.type,
+					type: 'LOGIN_PENDING',
 					payload: { isVisibleAuthIframe: true, isVisibleAuthModal: true, isLoadingLogin: false },
 				});
 			}
 
 			if (data?.code) {
 				dispatch({
-					type: actions.login.pending.type,
+					type: 'LOGIN_PENDING',
 					payload: {
 						tokenParams: {
 							...tokenParams,

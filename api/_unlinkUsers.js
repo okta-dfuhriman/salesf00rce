@@ -1,47 +1,63 @@
-const LINKED_OBJECT_NAME = 'primaryUser';
+import { validateJwt, ErrorResponse } from './_common';
 
 const unlinkUsers = async (req, res, client) => {
 	try {
 		const {
-			query: { id: associatedUserId },
+			query: { id, idpId },
 			// headers,
 		} = req || {};
-		// TODO 1) Validate JWT
 
-		// if (!isValid) {
-		// 	if (error) {
-		// 		throw error;
-		// 	} else {
-		// 		return res.status(401).json('Unauthorized');
-		// 	}
-		// }
+		if (idpId) {
+			return new ErrorResponse(
+				{ statusCode: 501, errorSummary: 'Unlinking a Social Idp is not currently supported' },
+				res
+			);
+		}
+
+		// 1) Validate JWT
+
+		// JWT validation logic TODO?
+		// uid !== id ==> cannot unlink an account from itself
+
+		const { isValid, error, accessToken } = await validateJwt(
+			{
+				assertClaims: { 'scp.includes': ['user:read:self', 'user:update:self'] },
+			},
+			req,
+			client
+		);
+
+		if (!isValid) {
+			if (error) {
+				throw error;
+			} else {
+				return new ErrorResponse(401, res);
+			}
+		}
 
 		// 2) Unlink objects
+		const {
+			claims: { sub, uid },
+		} = accessToken;
 
-		const url = `/api/v1/users/${associatedUserId}/linkedObjects/${LINKED_OBJECT_NAME}`;
+		const associatedUserId = id === sub ? uid : id;
 
-		const response = await client.fetch({ url, options: { method: 'delete' } });
+		await client.unlinkAssociatedAccount(associatedUserId);
 
-		if (response.status === 204) {
-			// 3) Unlink success! Now onto the profile un-merge...
-			// TODO should we really be putting a 'linkedUsers' array on the primary profile?
+		// No error thrown so unlink is success! Now onto the profile un-merge...
 
-			// 4) Remove unifiedId from profile.
-			const user = await client.getUser(associatedUserId);
+		// 3) Remove unifiedId meta from profile.
+		const user = await client.getUser(associatedUserId);
 
-			user.profile.unifiedId = '';
-			user.profile.isUnifiedProfile = false;
+		user.profile.unifiedId = '';
+		user.profile.isUnifiedProfile = false;
 
-			await user.update();
+		await user.update();
 
-			return res.status(204).send();
-		}
+		return res.status(204).send();
 	} catch (error) {
 		console.error(error);
-		return res.status(error?.statusCode ?? 500).json({
-			code: error?.code,
-			message: error?.message,
-		});
+		return new ErrorResponse(error, res);
 	}
 };
 

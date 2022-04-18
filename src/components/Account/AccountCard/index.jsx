@@ -92,7 +92,7 @@ const AccountCard = props => {
 					</div>
 					<div className='slds-no-flex'>
 						<LDS.Button
-							disabled={isLoggedIn}
+							disabled={isLoggedIn && providerName !== 'email'}
 							label='Disconnect'
 							variant={isLoggedIn ? 'brand' : 'destructive'}
 							onClick={() => onDisconnect(userId)}

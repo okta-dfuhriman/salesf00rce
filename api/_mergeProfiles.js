@@ -9,13 +9,13 @@ import { ulid as ULID } from 'ulid';
  * @param {*} client Instance of Okta Node SDK.
  * @returns {Object} The primary user.
  */
-const mergeProfiles = async ({ primaryId, associatedUid }, client) => {
+const mergeProfiles = async ({ primaryId, associatedSub }, client) => {
 	// 1) generate a ULID to be used for the unifiedId. This will be persisted across all profiles.
 	const ulid = ULID();
 
 	// 2) Fetch the primaryUser & associatedUser & stage the profile changes.
 	const primaryUser = await client.getUser(primaryId);
-	const associatedUser = await client.getUser(associatedUid);
+	const associatedUser = await client.getUser(associatedSub);
 
 	const {
 		profile: { unifiedId },

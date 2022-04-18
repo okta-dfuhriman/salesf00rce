@@ -1,6 +1,6 @@
-import { OktaClient, linkUsers, unlinkUsers } from '../../../_common';
+import { OktaClient, linkUsers, unlinkUsers } from '../../../../_common';
 
-module.exports = async (req, res) => {
+const handler = async (req, res) => {
 	try {
 		const client = new OktaClient();
 
@@ -21,3 +21,7 @@ module.exports = async (req, res) => {
 		});
 	}
 };
+
+module.exports = (req, res) => handler(req, res);
+
+export default handler;

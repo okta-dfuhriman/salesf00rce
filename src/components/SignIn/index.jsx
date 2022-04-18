@@ -7,7 +7,7 @@ const SignInForm = () => {
 
 	const toggleRecovery = () =>
 		dispatch({
-			type: actions.login.init.recovery.type,
+			type: 'LOGIN_INIT_RECOVERY'.type,
 			payload: { isRecovery: !isRecovery },
 		});
 

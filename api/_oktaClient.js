@@ -30,25 +30,6 @@ export default class OktaClient extends Client {
 		return await this.http.http(`${baseUrl ?? this.baseUrl}/${url}`, _options);
 	}
 
-	/**
-	 *
-	 * Fetches the sub/child accounts for a given identifier, which is assumed to be a primary/parent `userId`
-	 *
-	 * @param {string} id The primary/parent user identifier.
-	 * @returns
-	 */
-	async getAssociatedAccounts(id) {
-		const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}Of`;
-
-		const response = await this.fetch({ url });
-
-		if (!response.ok) {
-			throw new ApiError({ statusCode: response?.statusCode, message: await response.json() });
-		}
-
-		return await this.parseLinkedObjects(await response.json());
-	}
-
 	async parseLinkedObjects(data) {
 		const users = [];
 
@@ -66,6 +47,25 @@ export default class OktaClient extends Client {
 			users.push(regex.exec(path)[0] || undefined);
 		}
 		return users;
+	}
+
+	/**
+	 *
+	 * Fetches the sub/child accounts for a given identifier, which is assumed to be a primary/parent `userId`
+	 *
+	 * @param {string} id The primary/parent user identifier.
+	 * @returns An array of userIds
+	 */
+	async getAssociatedAccounts(id) {
+		const url = `api/v1/users/${id}/linkedObjects/${LINKED_OBJECT_NAME}Of`;
+
+		const response = await this.fetch({ url });
+
+		if (!response.ok) {
+			throw new ApiError({ statusCode: response?.statusCode, message: await response.json() });
+		}
+
+		return await this.parseLinkedObjects(await response.json());
 	}
 
 	/**
@@ -94,6 +94,18 @@ export default class OktaClient extends Client {
 		}
 
 		return result[0];
+	}
+
+	async unlinkAssociatedAccount(associatedUserId) {
+		const url = `/api/v1/users/${associatedUserId}/linkedObjects/${LINKED_OBJECT_NAME}`;
+
+		const response = await this.fetch({ url, options: { method: 'delete' } });
+
+		if (response.status !== 204) {
+			throw new ApiError({ statusCode: response.status, message: (await response.json()) || '' });
+		}
+
+		return;
 	}
 
 	async getIdps(id) {
