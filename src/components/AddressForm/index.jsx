@@ -1,5 +1,5 @@
 import { LDS } from '../../common';
-import { countryList, statesList } from './data';
+import { countries, states } from './data';
 
 const InputIcon = ({ ispublic }) => {
 	const name = ispublic ? 'world' : 'lock';
@@ -33,7 +33,7 @@ const AddressForm = () => (
 							id='state'
 							labels={{ label: 'State / Territory' }}
 							className='address-cell'
-							options={statesList}
+							options={states}
 							defaultValue='California'
 							value='California'
 							variant='readonly'
@@ -61,7 +61,7 @@ const AddressForm = () => (
 							id='country'
 							labels={{ label: 'Country' }}
 							className='address-cell'
-							options={countryList}
+							options={countries}
 							defaultValue='United States of America'
 							value='United States of America'
 							variant='readonly'

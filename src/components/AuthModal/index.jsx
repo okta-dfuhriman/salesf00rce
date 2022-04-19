@@ -17,7 +17,7 @@ const AuthModal = ({ onClose }) => {
 	const modalHeight = '650px';
 
 	const onCancel = () => {
-		dispatch({ type: actions.login.cancel.type });
+		dispatch({ type: 'LOGIN_CANCELLED' });
 		return onClose ? onClose() : () => {};
 	};
 
@@ -40,7 +40,7 @@ const AuthModal = ({ onClose }) => {
 
 				if (!isAllowed) {
 					return dispatch({
-						type: actions.login.error.type,
+						type: 'LOGIN_ERROR',
 						payload: { isVisibleIframe: false, isVisibleAuthModal: false },
 						error: `'origin [${origin}] not allowed`,
 					});

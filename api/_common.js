@@ -1,10 +1,11 @@
 export { default as OktaClient } from './_oktaClient';
-export { default as cleanProfile } from './_cleanProfile';
 export { default as validateJwt } from './_validateJwt';
 export { default as mergeProfiles } from './_mergeProfiles';
 export * from './_error';
 export { default as getLinkedProfiles } from './_getLinkedProfiles';
-export { default as getIdps } from './_getIdps';
+export { default as getCredentials } from './_getCredentials';
 export { default as getOktaUser } from './_getOktaUser';
 export { default as linkUsers } from './_linkUsers';
+export { default as unlinkUsers } from './_unlinkUsers';
 export { default as getUnifiedProfile } from './_getUnifiedProfile';
+export { default as JwtVerifier } from './_customJwtVerifier';

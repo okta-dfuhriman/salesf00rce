@@ -62,7 +62,7 @@ const Header = () => {
 				borderBottom: '3px solid rgb(0, 112, 210)',
 				position: 'sticky',
 				top: 0,
-				zIndex: 10,
+				zIndex: 5000,
 			}}
 		>
 			<div className='slds-grid slds-container_x-large slds-container_center slds-p-horizontal_small'>
@@ -74,7 +74,7 @@ const Header = () => {
 				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
 					<div className='slds-p-right_large slds-m-right_large border'>
 						<LDS.AppLauncher
-							id='app-launcher-tigger'
+							id='app-launcher-trigger'
 							modalHeaderButton={<LDS.Button label='App Exchange' />}
 						>
 							<LDS.AppLauncherExpandableSection title='Tile Section' />

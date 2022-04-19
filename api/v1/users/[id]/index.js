@@ -4,12 +4,7 @@ const getUser = async (req, res) => {
 	try {
 		// 1) Validate the accessToken
 
-		const { isValid, error, accessToken } = await validateJwt(
-			{
-				assertClaims: { 'scp.includes': ['user:read:self'] },
-			},
-			req
-		);
+		const { isValid, error, accessToken } = await validateJwt({}, req);
 
 		if (!isValid) {
 			if (error) {
@@ -19,11 +14,8 @@ const getUser = async (req, res) => {
 			}
 		}
 
-		const {
-			claims: { sub },
-		} = accessToken;
 		// Return the unified profile
-		return res.json(await getUnifiedProfile(sub));
+		return res.json(await getUnifiedProfile(accessToken));
 	} catch (error) {
 		throw new Error(`getUser(): ${error}`);
 	}

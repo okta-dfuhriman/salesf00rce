@@ -1,27 +1,26 @@
 import { getLinkedProfiles, getOktaUser } from './_common';
 
-const getUnifiedProfile = async sub => {
-	// 1) Get the Okta user
+const getUnifiedProfile = async accessToken => {
+	const {
+		claims: { sub },
+	} = accessToken;
+
+	// 2) Get the Okta user
 	const user = await getOktaUser(sub);
 
-	const { id, profile: userProfile } = user;
+	const {
+		id,
+		profile: { unifiedId },
+		credentials,
+	} = user;
 
-	// 2) Get linked users
-	const linkedUsers = await getLinkedProfiles({ id, unifiedId: userProfile?.unifiedId });
+	// 3) Get linked users
+	const { linkedUsers, linkedCredentials } = await getLinkedProfiles({
+		id,
+		unifiedId,
+	});
 
-	const { login, providers } = userProfile;
-	const _linkedUsers = [...linkedUsers, { id, login, providers }];
-
-	// 3) Generate accounts per linked user
-	const accounts = _linkedUsers
-		.map(({ id: linkedId, login, providers = [] }) =>
-			providers.map(provider => {
-				return { id: linkedId, login, provider, isLoggedIn: id !== linkedId };
-			})
-		)
-		.flat();
-
-	return { ...user, profile: { ...userProfile, linkedUsers, accounts } };
+	return { ...user, linkedUsers, credentials: [...credentials, ...linkedCredentials] };
 };
 
 export default getUnifiedProfile;
