@@ -64,23 +64,31 @@ const linkUsers = async (req, res, client) => {
 			claims: { sub: primarySub },
 		} = accessToken;
 
-		// 2) Link objects
+		// Check if we are attempting to link a primary profile to itself. If so, return. Otherwise, continue to link.
 
-		const id = primarySub || uid;
+		if (associatedSub !== primarySub) {
+			// 3) Link objects
 
-		// If a `primaryId` is present, the new associated account should be linked to it, not the logged in user's Id.
+			const id = primarySub || uid;
 
-		const url = `/api/v1/users/${associatedSub}/linkedObjects/${LINKED_OBJECT_NAME}/${id}`;
+			// If a `primaryId` is present, the new associated account should be linked to it, not the logged in user's Id.
 
-		const response = await client.fetch({ url, options: { method: 'put' } });
+			const url = `/api/v1/users/${associatedSub}/linkedObjects/${LINKED_OBJECT_NAME}/${id}`;
 
-		if (response.status === 204) {
-			// 3) Link success! Now onto the profile merge...
+			const response = await client.fetch({ url, options: { method: 'put' } });
 
+			if (response.status !== 204) {
+				return new ErrorResponse(
+					{ statusCode: response.status, errorSummary: (await response.json()) || '' },
+					res
+				);
+			}
+
+			// 4) Link success! Now onto the profile merge...
 			await mergeProfiles({ primaryId: id, associatedSub }, client);
-
-			res.status(204).send();
 		}
+
+		res.status(204).send();
 	} catch (error) {
 		console.error(error);
 		return new ErrorResponse(error, res);
