@@ -34,6 +34,7 @@ const AuthProvider = ({ children }) => {
 		if (
 			state?.isAuthenticated &&
 			!state?.isLoadingUserProfile &&
+			!state?.isLoadingLinkProfile &&
 			state?.userInfo?.sub &&
 			(state?.isStaleUserProfile || !state?.user)
 		) {
@@ -42,9 +43,9 @@ const AuthProvider = ({ children }) => {
 	}, [
 		state?.isAuthenticated,
 		state?.isLoadingUserProfile,
+		state?.isLoadingLinkProfile,
 		state?.userInfo?.sub,
 		state?.isStaleUserProfile,
-		state?.isLoadingLinkProfile,
 		state?.user,
 	]);
 

@@ -97,7 +97,19 @@ export default class OktaClient extends Client {
 	}
 
 	async unlinkAssociatedAccount(associatedUserId) {
-		const url = `/api/v1/users/${associatedUserId}/linkedObjects/${LINKED_OBJECT_NAME}`;
+		const url = `api/v1/users/${associatedUserId}/linkedObjects/${LINKED_OBJECT_NAME}`;
+
+		const response = await this.fetch({ url, options: { method: 'delete' } });
+
+		if (response.status !== 204) {
+			throw new ApiError({ statusCode: response.status, message: (await response.json()) || '' });
+		}
+
+		return;
+	}
+
+	async unlinkIdp(id, idpId) {
+		const url = `api/v1/idps/${idpId}/users/${id}`;
 
 		const response = await this.fetch({ url, options: { method: 'delete' } });
 
@@ -121,7 +133,17 @@ export default class OktaClient extends Client {
 			});
 		}
 
-		return (await response.json()) || [];
+		const body = await response.json();
+
+		const providers = [];
+
+		for (let i = 0; i < body.length; i++) {
+			const { id: idpId, name } = body[i];
+
+			providers.push({ id: idpId, name: name?.toLowerCase() });
+		}
+
+		return providers;
 	}
 
 	async cleanProfile(profile) {

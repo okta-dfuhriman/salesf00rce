@@ -188,7 +188,8 @@ const useAuthActions = () => {
 						const isLoggedIn =
 							credentials.length === 1 ||
 							(credentials.length === 2 && ['email', 'password'].includes(name)) ||
-							(id === loggedInUserId && idpId === idp);
+							(id === loggedInUserId && idpId === idp) ||
+							(id === loggedInUserId && ['email', 'password'].includes(name));
 
 						return { ...credential, isLoggedIn };
 					});
@@ -571,6 +572,8 @@ const useAuthActions = () => {
 						json: (await response.json()) || '',
 					});
 				}
+
+				await oktaAuth.tokenManager.renew('accessToken');
 
 				return dispatch({ type: 'USER_UNLINK_SUCCEEDED' });
 			} catch (error) {

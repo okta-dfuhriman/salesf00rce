@@ -1,4 +1,16 @@
-import { validateJwt, ErrorResponse } from './_common';
+import { ErrorResponse, getCredentials, validateJwt } from './_common';
+
+const getCredentialCount = async credentials => {
+	const oktaCredentials =
+		credentials.filter(({ id: userId, login, provider: { id: providerId, name: providerName } }) =>
+			['email', 'password'].includes(providerName)
+		) || [];
+
+	const okta = oktaCredentials.length || 0;
+	const social = credentials.length - okta || 0;
+
+	return { okta, social };
+};
 
 const unlinkUsers = async (req, res, client) => {
 	try {
@@ -6,13 +18,6 @@ const unlinkUsers = async (req, res, client) => {
 			query: { id, idpId },
 			// headers,
 		} = req || {};
-
-		if (idpId) {
-			return new ErrorResponse(
-				{ statusCode: 501, errorSummary: 'Unlinking a Social Idp is not currently supported' },
-				res
-			);
-		}
 
 		// 1) Validate JWT
 
@@ -35,24 +40,69 @@ const unlinkUsers = async (req, res, client) => {
 			}
 		}
 
-		// 2) Unlink objects
+		// 2) fetch the user
 		const {
 			claims: { sub, uid },
 		} = accessToken;
 
-		const associatedUserId = id === sub ? uid : id;
+		let user = await client.getUser(id);
 
-		await client.unlinkAssociatedAccount(associatedUserId);
+		// 3) Check if the request is for the primary user or an associated user
+		// const isPrimaryUser = id === sub;
+		// const associatedUserId = id === sub && sub !== uid ? uid : id;
 
-		// No error thrown so unlink is success! Now onto the profile un-merge...
+		// 3) Check if the user is SOCIAL or not
+		const isSocialOnly = user?.credentials?.provider?.type === 'SOCIAL' || false;
 
-		// 3) Remove unifiedId meta from profile.
-		const user = await client.getUser(associatedUserId);
+		/*
+		 * 4) If the request is for a social credential, run some additional logic...
+		 *   - If the profile is SOCIAL ONLY and there is...
+		 *      a) more than one Idp, we want to disconnect the Idp but not the entire Okta profile.
+		 *      b) only one Idp, then completely disconnect the profile (which requires additional logic)
+		 * 			-> DO NOT break the Idp link (as it will leave that profile 'orphaned')
+		 *   - If the profile has Okta credentials, just disconnect the social Idp per the request.
+		 */
 
-		user.profile.unifiedId = '';
-		user.profile.isUnifiedProfile = false;
+		let numberOfSocialCredentials = 0;
 
-		await user.update();
+		if (idpId && isSocialOnly) {
+			const credentials = await getCredentials({ user });
+
+			const { social } = await getCredentialCount(credentials);
+
+			numberOfSocialCredentials = social;
+		}
+
+		if (idpId && (!isSocialOnly || numberOfSocialCredentials > 1)) {
+			await client.unlinkIdp(id, idpId);
+		} else {
+			// We always want to disconnect the associated account, not the primary account.
+
+			// If there is no idpId and the request is for the same account, throw an error
+			if (!idpId && id === uid) {
+				throw new ErrorResponse({
+					statusCode: 401,
+					errorSummary: 'Cannot unlink the currently authenticated account!',
+				});
+			}
+
+			// If the `id` in the request is for the primary, we need to swap it out for the associated user to unlink it properly.
+			// To simplify, we will simply fetch a new user object and then always unlink the current user.id.
+			if (id === sub && sub !== uid) {
+				user = await client.getUser(uid);
+			}
+
+			// do the unlinking
+			await client.unlinkAssociatedAccount(user.id);
+
+			// No error thrown so unlink is success! Now onto the profile un-merge...
+
+			// 5) Remove unifiedId meta from the profile that has been unlinked (i.e. NOT the primary).
+			user.profile.unifiedId = '';
+			user.profile.isUnifiedProfile = false;
+
+			await user.update();
+		}
 
 		return res.status(204).send();
 	} catch (error) {

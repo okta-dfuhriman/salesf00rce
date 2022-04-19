@@ -3,7 +3,7 @@ import AccountCard from './AccountCard';
 
 const Account = props => {
 	const dispatch = Auth.useAuthDispatch();
-	const { isLoadingUserProfile, isLoadingLinkProfile, user } = Auth.useAuthState();
+	const { isLoadingUserProfile, isLoadingLinkProfile } = Auth.useAuthState();
 	const { linkUser, unlinkUser } = Auth.useAuthActions();
 
 	const handleAdd = provider => linkUser(dispatch, provider);

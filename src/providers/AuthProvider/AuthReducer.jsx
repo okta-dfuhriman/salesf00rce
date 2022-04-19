@@ -185,7 +185,7 @@ export const AuthReducer = (state, action) => {
 				delete state?.user;
 
 				tempState = {
-					isLoadingLinkProfile: false,
+					isLoadingLinkProfile: true,
 				};
 
 				return { ...state, ...tempState, ...action?.payload };
