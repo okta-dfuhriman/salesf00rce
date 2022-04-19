@@ -46,6 +46,9 @@ export class ErrorResponse {
 				errorCode: 'E0000004',
 				...this.body,
 			},
+			403: {
+				...this.body,
+			},
 			500: {
 				errorCode: 'E0000009',
 				errorSummary: 'Internal Server Error',
