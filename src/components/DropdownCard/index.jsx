@@ -17,7 +17,7 @@ const DropdownCard = () => {
 			<div className='menu__header'>{userInfo?.name}</div>
 			<ul className='menu__items'>
 				<li role='presentation'>
-					<Link to='/id' className='menu__item' role='menuitem'>
+					<Link to='/' className='menu__item' role='menuitem'>
 						Profile
 					</Link>
 				</li>
