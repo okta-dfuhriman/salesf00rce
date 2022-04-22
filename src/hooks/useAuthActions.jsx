@@ -26,64 +26,6 @@ const idpMap = {
 	[SALESFORCE_IDP_ID]: 'salesforce',
 };
 
-const buildAuthorizeParams = tokenParams => {
-	let params = {};
-
-	const oAuthParamMap = {
-		clientId: 'client_id',
-		codeChallenge: 'code_challenge',
-		codeChallengeMethod: 'code_challenge_method',
-		display: 'display',
-		idp: 'idp',
-		idpScope: 'idp_scope',
-		loginHint: 'login_hint',
-		maxAge: 'max_age',
-		nonce: 'nonce',
-		prompt: 'prompt',
-		redirectUri: 'redirect_uri',
-		responseMode: 'response_mode',
-		responseType: 'response_type',
-		sessionToken: 'sessionToken',
-		state: 'state',
-		scopes: 'scope',
-	};
-
-	// eslint-disable-next-line no-restricted-syntax
-	for (const [key, value] of Object.entries(tokenParams)) {
-		const oAuthKey = oAuthParamMap[key];
-
-		if (oAuthKey) {
-			params[oAuthKey] = value;
-		}
-	}
-
-	params.response_mode = 'okta_post_message';
-
-	params = removeNils(params);
-
-	return toQueryString(params);
-};
-
-const generateAuthUrl = async (sdk, options) => {
-	try {
-		const tokenParams = await sdk.token.prepareTokenParams(options);
-
-		const baseUrl = getOAuthBaseUrl(sdk);
-		const authorizeUrl =
-			removeTrailingSlash(options?.authorizeUrl) ||
-			sdk.options.authorizeUrl ||
-			baseUrl + 'v1/authorize';
-
-		// Use the query params to build the authorize url
-
-		const authUrl = authorizeUrl + buildAuthorizeParams(tokenParams);
-
-		return { authUrl, tokenParams };
-	} catch (error) {
-		throw new Error(`Unable to generate auth url [${error}]`);
-	}
-};
-
 const useAuthActions = () => {
 	try {
 		const { authState, oktaAuth } = Okta.useOktaAuth();
@@ -266,25 +208,6 @@ const useAuthActions = () => {
 			}
 		};
 
-		const loginWithModal = async (dispatch, options) => {
-			try {
-				console.debug('generating URL...');
-
-				dispatch({ type: 'LOGIN_START_WITH_MODAL' });
-
-				const { authUrl, tokenParams } = await generateAuthUrl(oktaAuth, options);
-
-				return dispatch({ type: 'LOGIN_PENDING', payload: { authUrl, tokenParams } });
-			} catch (error) {
-				if (dispatch) {
-					console.log('loginWithModal error:', error);
-					dispatch({ type: 'LOGIN_ERROR', error });
-				} else {
-					throw new Error(error);
-				}
-			}
-		};
-
 		const loginWithCredentials = async (dispatch, { username, password }) => {
 			try {
 				dispatch({ type: 'LOGIN_WITH_CREDENTIALS_STARTED' });
@@ -346,12 +269,6 @@ const useAuthActions = () => {
 
 					await oktaAuth.handleLoginRedirect();
 
-					// await oktaAuth.storeTokensFromRedirect();
-
-					// oktaAuth.removeOriginalUri();
-
-					// await oktaAuth.authStateManager.updateAuthState();
-
 					dispatch({ type: 'LOGIN_SUCCESS' });
 
 					return await getUserInfo(dispatch);
@@ -365,7 +282,9 @@ const useAuthActions = () => {
 					if (!hasSession) {
 						const loginHint = props?.loginhint;
 
-						return await loginWithModal(dispatch, { loginHint });
+						dispatch({ type: 'LOGIN_WITH_REDIRECT_STARTED' });
+
+						return await oktaAuth.signInWithRedirect({ loginHint });
 					}
 
 					return await silentAuth(dispatch, { hasSession });
@@ -440,7 +359,6 @@ const useAuthActions = () => {
 				oktaAuth.options.redirectUri = LINK_REDIRECT_URI;
 
 				if (oktaAuth.isLoginRedirect()) {
-					// const { state } = await oktaAuth.parseOAuthResponseFromUrl(oktaAuth);
 					dispatch({
 						type: 'USER_LINK_PENDING',
 					});
@@ -590,7 +508,6 @@ const useAuthActions = () => {
 			getUserInfo,
 			linkUser,
 			login,
-			loginWithModal,
 			logout,
 			silentAuth,
 			toggleEmailAuth,

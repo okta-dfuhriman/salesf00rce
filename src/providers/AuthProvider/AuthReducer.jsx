@@ -10,8 +10,6 @@ const initialLoginFormState = {
 
 const initialLoginState = {
 	isLoadingLogin: false,
-	isVisibleAuthIframe: false,
-	isVisibleAuthModal: false,
 	...initialLoginFormState,
 };
 
@@ -95,13 +93,6 @@ export const AuthReducer = (state, action) => {
 					isLoadingLogout: true,
 				};
 				return { ...state, ...tempState, ...action?.payload };
-			case 'LOGIN_START_WITH_MODAL':
-				tempState = {
-					isVisibleAuthIframe: true,
-					isVisibleAuthModal: true,
-					isLoadingLogin: true,
-				};
-				return { ...state, ...tempState, ...action?.payload };
 			case 'LOGIN_SUCCESS':
 				tempState = {
 					...initialLoginState,
@@ -110,8 +101,6 @@ export const AuthReducer = (state, action) => {
 			case 'LOGIN_WITH_REDIRECT_STARTED':
 				tempState = {
 					isLoadingLogin: true,
-					isVisibleAuthModal: false,
-					isVisibleAuthIframe: false,
 				};
 				return { ...state, ...tempState, ...action?.payload };
 
@@ -132,8 +121,6 @@ export const AuthReducer = (state, action) => {
 			case 'SILENT_AUTH_STARTED':
 				tempState = {
 					isLoadingLogin: true,
-					isVisibleAuthModal: false,
-					isVisibleAuthIframe: false,
 				};
 				return { ...state, ...tempState, ...action?.payload };
 			case 'SILENT_AUTH_SUCCESS':

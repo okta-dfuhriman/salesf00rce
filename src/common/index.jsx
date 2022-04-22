@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 // Okta SDKs
 import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
 import { LoginCallback, SecureRoute, Security, useOktaAuth } from '@okta/okta-react';
-import * as OktaUtils from './utils/OktaUtils';
 import { authConfig } from './config/authConfig';
 
 import AuthProvider from '../providers/AuthProvider/AuthContext';
@@ -73,7 +72,6 @@ const Okta = {
 	SecureRoute,
 	toRelativeUrl,
 	useOktaAuth,
-	Utils: OktaUtils,
 	config: authConfig,
 };
 
