@@ -228,6 +228,23 @@ const useAuthActions = () => {
 			}
 		};
 
+		const signInWithRedirect = async (dispatch, idp) => {
+			let options = {};
+
+			if (dispatch) {
+				dispatch({ type: 'LOGIN_WITH_REDIRECT_STARTED' });
+			}
+
+			if (idp) {
+				options = {
+					...options,
+					idp: idpMap[idp],
+				};
+			}
+
+			return await oktaAuth.signInWithRedirect(options);
+		};
+
 		const login = async (dispatch, props) => {
 			try {
 				const { tokens, tokenParams, username, password, idp } = props || {};
@@ -239,9 +256,7 @@ const useAuthActions = () => {
 				}
 
 				if (idp) {
-					dispatch({ type: 'LOGIN_WITH_REDIRECT_STARTED' });
-
-					return await oktaAuth.signInWithRedirect({ idp: idpMap[idp] });
+					return await signInWithRedirect(dispatch, idp);
 				}
 
 				// eslint-disable-next-line camelcase
@@ -509,6 +524,7 @@ const useAuthActions = () => {
 			linkUser,
 			login,
 			logout,
+			signInWithRedirect,
 			silentAuth,
 			toggleEmailAuth,
 			toggleSignUp,
