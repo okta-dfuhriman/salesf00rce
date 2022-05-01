@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
@@ -7,11 +8,19 @@ import Header from '../../components/Header';
 import './styles.css';
 
 const SecureApp = ({ onAuthRequired, children }) => {
-	const { oktaAuth, _onAuthRequired } = Okta.useOktaAuth();
-	const { signInWithRedirect } = Auth.useAuthActions();
-	const { isAuthenticated } = Auth.useAuthState();
+	const { authState, oktaAuth, _onAuthRequired } = Okta.useOktaAuth();
+	const { signInWithRedirect, getUserInfo, getUser, silentAuth } = Auth.useAuthActions();
+	const dispatch = Auth.useAuthDispatch();
+	const {
+		isAuthenticated,
+		isPendingAccountLink,
+		isPendingLogin,
+		isPendingUserInfoFetch,
+		isStaleUserInfo,
+		isStaleUserProfile,
+		userInfo,
+	} = Auth.useAuthState();
 	const pendingLogin = React.useRef(false);
-
 	React.useEffect(() => {
 		const handleLogin = async () => {
 			if (pendingLogin.current) {
@@ -20,32 +29,62 @@ const SecureApp = ({ onAuthRequired, children }) => {
 
 			pendingLogin.current = true;
 
-			const originalUri = Okta.toRelativeUrl(window.location.href, window.location.origin);
+			// try silentAuth before redirecting to login
+			console.debug('SecureApp > trying silentAuth()');
+			const { isAuthenticated: silentIsAuthenticated = false } = (await silentAuth(dispatch)) || {};
+			console.debug('SecureApp > isSilentAuthenticated:', silentIsAuthenticated);
+			if (!silentIsAuthenticated) {
+				const originalUri = Okta.toRelativeUrl(window.location.href, window.location.origin);
 
-			oktaAuth.setOriginalUri(originalUri);
+				oktaAuth.setOriginalUri(originalUri);
 
-			const onAuthRequiredFn = onAuthRequired || _onAuthRequired;
-
-			if (onAuthRequiredFn) {
-				await onAuthRequiredFn(oktaAuth);
-			} else {
-				await signInWithRedirect();
+				const onAuthRequiredFn = onAuthRequired || _onAuthRequired;
+				console.debug('authRequired');
+				if (onAuthRequiredFn) {
+					await onAuthRequiredFn(oktaAuth);
+				} else {
+					console.debug('SecureApp > signInWithRedirect()');
+					await signInWithRedirect(dispatch);
+				}
 			}
 		};
-
-		if (!oktaAuth) {
-			return;
-		}
 
 		if (isAuthenticated) {
 			pendingLogin.current = false;
 			return;
 		}
 
-		if (!isAuthenticated) {
+		if (!isAuthenticated && !isPendingLogin) {
+			console.debug('SecureApp > handleLogin()');
 			handleLogin();
 		}
-	}, [isAuthenticated, oktaAuth, onAuthRequired, _onAuthRequired, signInWithRedirect]);
+	}, [isPendingLogin, isAuthenticated, onAuthRequired, _onAuthRequired]);
+
+	React.useEffect(() => {
+		if (
+			(isStaleUserInfo || !userInfo) &&
+			isAuthenticated &&
+			!isPendingLogin &&
+			!isPendingAccountLink
+		) {
+			console.debug('SecureApp > getUserInfo()');
+			return getUserInfo(dispatch);
+		}
+	}, [isStaleUserInfo, isAuthenticated, userInfo]);
+
+	React.useEffect(() => {
+		if (
+			isStaleUserProfile &&
+			isAuthenticated &&
+			!isPendingLogin &&
+			!isPendingUserInfoFetch &&
+			!isPendingAccountLink &&
+			userInfo?.sub
+		) {
+			console.debug('SecureApp > getUser()');
+			return getUser(dispatch, { userId: userInfo.sub });
+		}
+	}, [isStaleUserProfile]);
 
 	if (!isAuthenticated) {
 		return <LDS.Spinner variant='inverse' size='large' containerClassName='sign-in-loader' />;
@@ -54,7 +93,7 @@ const SecureApp = ({ onAuthRequired, children }) => {
 	if (children) {
 		return children;
 	}
-
+	console.debug('SecureApp > return <Outlet/>');
 	return (
 		<>
 			<Header />

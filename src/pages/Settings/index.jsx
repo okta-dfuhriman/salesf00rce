@@ -45,14 +45,15 @@ const Settings = () => {
 		ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	};
 	return (
-		<>
-			<div id='settings-page' className='slds-container_x-large slds-container_center'>
+		<div id='settings-page' className='layout__container'>
+			<div className='slds-container_x-large slds-container_center'>
 				<h1 className='slds-text-heading_large slds-p-left_large slds-p-top_large'>Settings</h1>
 				<div className='slds-grid slds-p-around_large slds-wrap grid'>
 					<div className='slds-col slds-large-size_1-of-5 slds-is-relative nav-col slds-p-right_large'>
 						<div className='tds-is-sticky nav'>
 							<LDS.Card
 								id='nav-card'
+								key='nav-card'
 								hasNoHeader
 								className='tds-card tds-card_flush'
 								bodyClassName='slds-card__body_inner'
@@ -71,6 +72,8 @@ const Settings = () => {
 					<div className='slds-col slds-size_1-of-1 slds-large-size_4-of-5'>
 						{/* welcome card */}
 						<SettingsCard
+							key='privacy'
+							id='privacy'
 							header='Privacy'
 							subheader='Choose how others see your profile.'
 							content={
@@ -82,16 +85,22 @@ const Settings = () => {
 							}
 						/>
 						<SettingsCard
+							key='connected-accounts'
+							id='connected-accounts'
 							header='Connected Accounts'
 							subheader='You can log in using verified emails, Salesforce accounts, or your social media accounts.'
 							content={<Providers />}
 						/>
 						<SettingsCard
+							key='email-preferences'
+							id='email-preferences'
 							header='Email Preferences'
 							subheader='Get email updates from Salesforce-related sites about ne content, replies to community posts, and more. To stop receiving email updates, manage your notification choices here.'
 							content={'{{insert preferences}}'}
 						/>
 						<SettingsCard
+							key='my-address'
+							id='my-address'
 							header='My Address'
 							subheader={
 								<p>
@@ -111,6 +120,8 @@ const Settings = () => {
 							}
 						/>
 						<SettingsCard
+							key='account-deletion'
+							id='account-deletion'
 							header='Account Deletion'
 							subheader={
 								<>
@@ -124,7 +135,7 @@ const Settings = () => {
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

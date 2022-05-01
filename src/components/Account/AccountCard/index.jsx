@@ -1,4 +1,5 @@
 import {
+	Auth,
 	LDS,
 	React,
 	AppleIconRound,
@@ -9,6 +10,8 @@ import {
 	SalesforceIconRound,
 } from '../../../common';
 
+import './styles.css';
+
 const provider2IdpMap = {
 	google: 'Google',
 	linkedin: 'LinkedIn',
@@ -17,11 +20,11 @@ const provider2IdpMap = {
 	facebook: 'Facebook',
 };
 
-const AccountCardBody = ({ login, providerName }) => (
+const AccountCardBody = ({ login, providerName, type: providerType }) => (
 	<>
 		<div className='tds-line-height_small'>
 			<strong className='break-word'>
-				{providerName === 'email'
+				{providerType !== 'social'
 					? login
 					: `Connected to ${provider2IdpMap[providerName]} as ${login}`}
 			</strong>
@@ -40,7 +43,9 @@ const AccountCardBody = ({ login, providerName }) => (
 );
 
 const AccountCard = props => {
-	const { credential, onDisconnect } = props;
+	const { isPendingAccountLink, isPendingUserFetch } = Auth.useAuthState();
+	const [isLoading, setIsLoading] = React.useState(false);
+	const { id, credential, onDisconnect, type } = props;
 	const {
 		id: userId,
 		provider: { name: providerName },
@@ -51,6 +56,11 @@ const AccountCard = props => {
 	if (providerName === 'password') {
 		return null;
 	}
+
+	const disconnect = () => {
+		setIsLoading(() => true);
+		return onDisconnect(credential);
+	};
 
 	let providerIcon;
 
@@ -67,15 +77,20 @@ const AccountCard = props => {
 		case 'linkedin':
 			providerIcon = <LinkedInIconRound className='slds-icon tds-icon-social slds-icon_large' />;
 			break;
+		case 'salesforce':
+			providerIcon = <SalesforceIconRound className='tds-icon-social slds-icon_large' />;
+			break;
 		default:
 			providerIcon = <EmailIconRound className='slds-icon tds-icon-social slds-icon_large' />;
 	}
 
 	return (
 		<div
+			id={id}
 			className='slds-p-around_medium slds-m-vertical_small action-item'
-			id={`${providerName}-${userId}`}
+			style={{ position: isLoading ? 'relative' : 'static' }}
 		>
+			{isLoading && <LDS.Spinner />}
 			<LDS.IconSettings iconPath='/assets/icons'>
 				<div
 					className={
@@ -88,14 +103,17 @@ const AccountCard = props => {
 						<span className='slds-icon__container'>{providerIcon}</span>
 					</div>
 					<div className='slds-media__body'>
-						<AccountCardBody login={login} providerName={providerName} />
+						<AccountCardBody login={login} providerName={providerName} type={type} />
 					</div>
 					<div className='slds-no-flex'>
 						<LDS.Button
-							disabled={isLoggedIn}
+							id={`${providerName}-${userId}-disconnect`}
+							disabled={isLoggedIn || isPendingAccountLink || isPendingUserFetch}
 							label='Disconnect'
-							variant={isLoggedIn ? 'brand' : 'destructive'}
-							onClick={() => onDisconnect(userId)}
+							variant='destructive'
+							onClick={disconnect}
+							className='tds-button_destructive-inverse'
+							style={{ fontSize: '14px' }}
 						/>
 					</div>
 				</div>

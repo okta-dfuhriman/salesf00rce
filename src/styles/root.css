@@ -410,6 +410,8 @@
 	--tds-z-index-overlay: 8000;
 	--tds-z-index-modal: 9000;
 	--tds-z-index-toast: 10000;
+
+	--text-color-secondary: rgb(88, 88, 88);
 }
 @media screen and (max-width: 64rem) {
 	:host {

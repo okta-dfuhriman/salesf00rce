@@ -3,9 +3,7 @@ import { Auth, React } from '../../common';
 import Account from '../../components/Account';
 
 const Providers = () => {
-	const { user } = Auth.useAuthState();
-
-	const { credentials = [] } = user || {};
+	const { credentials = [] } = Auth.useAuthState();
 
 	return (
 		<>

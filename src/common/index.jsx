@@ -5,7 +5,13 @@ import PropTypes from 'prop-types';
 import * as _ from 'lodash';
 
 // Okta SDKs
-import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
+import {
+	OktaAuth,
+	toRelativeUrl,
+	removeNils,
+	getOAuthUrls,
+	toQueryString,
+} from '@okta/okta-auth-js';
 import { LoginCallback, SecureRoute, Security, useOktaAuth } from '@okta/okta-react';
 import { authConfig } from './config/authConfig';
 
@@ -72,6 +78,9 @@ const Okta = {
 	SecureRoute,
 	toRelativeUrl,
 	useOktaAuth,
+	removeNils,
+	getOAuthUrls,
+	toQueryString,
 	config: authConfig,
 };
 
