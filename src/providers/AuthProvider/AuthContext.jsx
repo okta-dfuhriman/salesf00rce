@@ -15,15 +15,6 @@ const AuthProvider = ({ children }) => {
 		...state,
 	};
 
-	useEffect(() => {
-		oktaAuth.tokenManager.on('renewed', (key, newToken, oldToken) => {
-			console.info('Token with key', key, 'has been renewed');
-			console.info('New token:', newToken);
-		});
-
-		return () => oktaAuth.tokenManager.off('renewed');
-	}, []);
-
 	return (
 		<AuthStateContext.Provider value={contextValues}>
 			<AuthDispatchContext.Provider value={dispatch}>{children}</AuthDispatchContext.Provider>

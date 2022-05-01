@@ -1,5 +1,6 @@
 import { Auth, LDS, Link, React, TrailblazerLogo } from '../../common';
 
+import AppLauncher from '../AppLauncher';
 import DropdownCard from '../DropdownCard';
 
 const Header = () => {
@@ -51,7 +52,7 @@ const Header = () => {
 									<LDS.Avatar
 										imgSrc={userInfo?.picture ?? 'assets/images/astro.svg'}
 										imgAlt={userInfo?.name}
-										size='large'
+										size='medium'
 									/>
 								</div>
 							</LDS.Button>
@@ -79,12 +80,7 @@ const Header = () => {
 				</div>
 				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
 					<div className='slds-p-right_large slds-m-right_large border'>
-						<LDS.AppLauncher
-							id='app-launcher-trigger'
-							modalHeaderButton={<LDS.Button label='App Exchange' />}
-						>
-							<LDS.AppLauncherExpandableSection title='Tile Section' />
-						</LDS.AppLauncher>
+						<AppLauncher />
 					</div>
 					{userPanel}
 				</div>
