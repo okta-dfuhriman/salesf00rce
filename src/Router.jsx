@@ -22,7 +22,7 @@ const Router = () => {
 			<Route path='/login/callback' element={<AppLoginCallback />} />
 			<Route path='/' element={<HomePage />} />
 			<Route element={<SecureApp />}>
-				<Route path='/today' element={<Today />} />
+				<Route path='/today' element={<TodayPage />} />
 			</Route>
 		</Routes>
 	);

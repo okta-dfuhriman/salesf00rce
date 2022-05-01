@@ -24,3 +24,6 @@ export { ReactComponent as TrailblazerMe } from './_tbme.svg';
 
 export * from './arid-dunes';
 export * from './astro';
+export * from './trailhead-banner';
+export * from './trailhead-first-step';
+export * from './trailhead-basics';
