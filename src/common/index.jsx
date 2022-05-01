@@ -21,26 +21,28 @@ import useAuthActions from '../hooks/useAuthActions';
 import useAuthDispatch from '../hooks/useAuthDispatch';
 import useAuthState from '../hooks/useAuthState';
 
-import {
-	AppLauncher,
-	AppLauncherExpandableSection,
-	Avatar,
-	Button,
-	Card,
-	Checkbox,
-	Combobox,
-	Dropdown,
-	DropdownTrigger,
-	Icon,
-	IconSettings,
-	Input,
-	InputIcon,
-	MediaObject,
-	Modal,
-	Spinner,
-	Tooltip,
-	VerticalNavigation,
-} from '@salesforce/design-system-react';
+// import {
+// 	AppLauncher,
+// 	AppLauncherExpandableSection,
+// 	Avatar,
+// 	Button,
+// 	Card,
+// 	Checkbox,
+// 	Combobox,
+// 	Dropdown,
+// 	DropdownTrigger,
+// 	Icon,
+// 	IconSettings,
+// 	Input,
+// 	InputIcon,
+// 	MediaObject,
+// 	Modal,
+// 	Spinner,
+// 	Tooltip,
+// 	VerticalNavigation,
+// } from '@salesforce/design-system-react';
+
+import * as LDS from '@salesforce/design-system-react';
 
 const Auth = {
 	Provider: AuthProvider,
@@ -50,26 +52,26 @@ const Auth = {
 	useAuthActions,
 };
 
-const LDS = {
-	AppLauncher,
-	AppLauncherExpandableSection,
-	Avatar,
-	Button,
-	Card,
-	Checkbox,
-	Combobox,
-	Dropdown,
-	DropdownTrigger,
-	Icon,
-	IconSettings,
-	Input,
-	InputIcon,
-	MediaObject,
-	Modal,
-	Spinner,
-	Tooltip,
-	VerticalNavigation,
-};
+// const LDS = {
+// 	AppLauncher,
+// 	AppLauncherExpandableSection,
+// 	Avatar,
+// 	Button,
+// 	Card,
+// 	Checkbox,
+// 	Combobox,
+// 	Dropdown,
+// 	DropdownTrigger,
+// 	Icon,
+// 	IconSettings,
+// 	Input,
+// 	InputIcon,
+// 	MediaObject,
+// 	Modal,
+// 	Spinner,
+// 	Tooltip,
+// 	VerticalNavigation,
+// };
 
 const Okta = {
 	Auth: OktaAuth,

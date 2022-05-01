@@ -1,6 +1,7 @@
-import { getUnifiedProfile, validateJwt } from '../../../_common';
+import { getUnifiedProfile, updateUnifiedProfile, validateJwt } from '../../../_common';
+import { ErrorResponse } from '../../../_error';
 
-const getUser = async (req, res) => {
+const doAuthZ = async (req, res) => {
 	try {
 		// 1) Validate the accessToken
 
@@ -10,14 +11,38 @@ const getUser = async (req, res) => {
 			if (error) {
 				throw error;
 			} else {
-				return res.status(401).json('Unauthorized');
+				return new ErrorResponse(401, res);
 			}
 		}
+
+		return accessToken;
+	} catch (error) {}
+};
+
+const getUser = async (req, res) => {
+	try {
+		// 1) Validate the accessToken
+		const accessToken = await doAuthZ(req, res);
 
 		// Return the unified profile
 		return res.json(await getUnifiedProfile(accessToken));
 	} catch (error) {
 		throw new Error(`getUser(): ${error}`);
+	}
+};
+
+const updateUser = async (req, res) => {
+	try {
+		// 1) Validate the accessToken
+		const accessToken = await doAuthZ(req, res);
+
+		const {
+			query: { id },
+		} = req || {};
+
+		return res.json(await updateUnifiedProfile({ accessToken, body: await req.json(), id }));
+	} catch (error) {
+		throw new Error(`updateUser(): ${error}`);
 	}
 };
 
@@ -27,7 +52,7 @@ module.exports = async (req, res) => {
 
 		switch (method) {
 			case 'POST':
-				// await updateUser(req, res);
+				await updateUser(req, res);
 				break;
 			case 'GET':
 			default:

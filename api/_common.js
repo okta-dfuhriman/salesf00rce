@@ -8,4 +8,5 @@ export { default as getOktaUser } from './_getOktaUser';
 export { default as linkUsers } from './_linkUsers';
 export { default as unlinkUsers } from './_unlinkUsers';
 export { default as getUnifiedProfile } from './_getUnifiedProfile';
+export { default as updateUnifiedProfile } from './_updateUser';
 export { default as JwtVerifier } from './_customJwtVerifier';
