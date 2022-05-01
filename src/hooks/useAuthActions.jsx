@@ -476,86 +476,39 @@ const useAuthActions = () => {
 			});
 		};
 
-		const linkModalCodeExchange = async (dispatch, data) => {
-			dispatch({ type: 'USER_LINK_MODAL_CODE_EXCHANGE_STARTED' });
+		const linkUserInteractive = async (dispatch, options) => {
+			const { idp } = options || {};
 
-			const { state, code: authorizationCode, interaction_code: interactionCode } = data || {};
+			dispatch({ type: 'USER_LINK_POPUP_STARTED' });
 
-			const tokenParams = oktaAuth.transactionManager.load({
-				oauth: true,
-				pkce: true,
-				state,
-			});
+			const scopes = oktaAuth.options.scopes;
 
-			const response = await oktaAuth.token.exchangeCodeForTokens({
-				...tokenParams,
-				authorizationCode,
-				interactionCode,
-			});
+			const requestOptions = {
+				idp: idpMap[idp],
+				prompt: 'login',
+				scopes: [...scopes, 'user:link'],
+			};
 
-			if (!response?.tokens) {
+			if (idp === 'email' || idp === 'password') {
+				delete requestOptions.idp;
+
+				requestOptions['loginHint'] = 'email';
+			}
+
+			const response = await oktaAuth.token.getWithPopup(requestOptions);
+
+			const { tokens } = response || {};
+
+			if (!tokens) {
 				return dispatch({
-					type: 'USER_LINK_MODAL_CODE_EXCHANGE_FAILED',
+					type: 'USER_LINK_POPUP_FAILED',
 					error: `No tokens in response. Something went wrong! [${response}]`,
 				});
 			}
 
-			dispatch({ type: 'USER_LINK_MODAL_CODE_EXCHANGED' });
+			dispatch({ type: 'USER_LINK_POPUP_CODE_EXCHANGED' });
 
-			return await doUserLinking(dispatch, { tokens: response.tokens });
-		};
-
-		const linkUserInteractive = async (dispatch, options) => {
-			const { data, idp, display } = options || {};
-
-			if (!_.isEmpty(data)) {
-				return await linkModalCodeExchange(dispatch, data);
-			} else if (display && display === 'popup') {
-				dispatch({ type: 'USER_LINK_POPUP_STARTED' });
-
-				const scopes = oktaAuth.options.scopes;
-
-				const requestOptions = {
-					idp: idpMap[idp],
-					prompt: 'login',
-					scopes: [...scopes, 'user:link'],
-				};
-
-				if (idp === 'email' || idp === 'password') {
-					delete requestOptions.idp;
-
-					requestOptions['loginHint'] = 'email';
-				}
-
-				const response = await oktaAuth.token.getWithPopup(requestOptions);
-
-				const { tokens } = response || {};
-
-				if (!tokens) {
-					return dispatch({
-						type: 'USER_LINK_POPUP_FAILED',
-						error: `No tokens in response. Something went wrong! [${response}]`,
-					});
-				}
-
-				dispatch({ type: 'USER_LINK_POPUP_CODE_EXCHANGED' });
-
-				return await doUserLinking(dispatch, { tokens });
-			} else {
-				dispatch({ type: 'USER_LINK_MODAL_STARTED' });
-
-				const { authUrl, tokenParams } = await generateAuthUrl(oktaAuth, {
-					idp: idpMap[idp],
-					prompt: 'login',
-				});
-
-				if (authUrl && tokenParams) {
-					return dispatch({
-						type: 'USER_LINK_MODAL_PARAMS_GENERATED',
-						payload: { authUrl, tokenParams },
-					});
-				}
-			}
+			return await doUserLinking(dispatch, { tokens });
 		};
 
 		const linkUser = async (dispatch, options) => {

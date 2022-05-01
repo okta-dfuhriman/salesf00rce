@@ -13,15 +13,8 @@ const initialLoginState = {
 	...initialLoginFormState,
 };
 
-const initialAuthModalState = {
-	isVisibleAuthModal: false,
-	isPendingAuthModalLoad: true,
-	isVisibleIframe: false,
-};
-
 const initialAccountLinkState = {
 	isPendingAccountLink: false,
-	...initialAuthModalState,
 };
 
 const initialUserState = {
@@ -237,37 +230,6 @@ export const AuthReducer = (state, action) => {
 				return { ...state, ...tempState, ...action?.payload };
 
 			// USER LINK
-			case 'USER_LINK_MODAL_CODE_EXCHANGED':
-				tempState = {
-					...initialAuthModalState,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_PARAMS_GENERATED':
-				tempState = {
-					isVisibleIframe: true,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_CANCELLED':
-				tempState = {
-					...initialAccountLinkState,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_LOADED':
-				tempState = {
-					isPendingAuthModalLoad: false,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_STARTED':
-				tempState = {
-					isPendingAccountLink: true,
-					isVisibleAuthModal: true,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
 			case 'USER_LINK_POPUP_CODE_EXCHANGED':
 			case 'USER_LINK_PENDING':
 				tempState = {
@@ -275,7 +237,6 @@ export const AuthReducer = (state, action) => {
 				};
 
 				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_CODE_EXCHANGE_STARTED':
 			case 'USER_LINK_POPUP_STARTED':
 			case 'USER_LINK_STARTED':
 				tempState = {
@@ -322,9 +283,7 @@ export const AuthReducer = (state, action) => {
 			case 'USER_FETCH_FAILED':
 			case 'USER_INFO_FETCH_FAILED':
 			case 'USER_LINK_FAILED':
-			case 'USER_LINK_MODAL_CODE_EXCHANGE_FAILED':
 			case 'USER_LINK_POPUP_FAILED':
-			case 'USER_LINK_MODAL_FAILED':
 			case 'USER_UNLINK_FAILED':
 				console.log('login error:', action);
 				return {
