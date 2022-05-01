@@ -4,6 +4,8 @@ import SettingsCard from '../../components/SettingsCard';
 import Providers from '../../components/Providers';
 import AddressForm from '../../components/AddressForm';
 
+import WelcomeCard from '../../components/WelcomeCard';
+
 import './styles.css';
 
 const menuItems = [
@@ -70,7 +72,7 @@ const Settings = () => {
 						</div>
 					</div>
 					<div className='slds-col slds-size_1-of-1 slds-large-size_4-of-5'>
-						{/* welcome card */}
+						<WelcomeCard />
 						<SettingsCard
 							key='privacy'
 							id='privacy'

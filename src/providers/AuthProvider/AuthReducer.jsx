@@ -290,8 +290,6 @@ export const AuthReducer = (state, action) => {
 				tempState = {
 					...initialUserState,
 					...initialAccountLinkState,
-					isStaleUserInfo: true,
-					isPendingUserFetch: true,
 				};
 
 				localStorage.removeItem('app_state');
