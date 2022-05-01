@@ -13,10 +13,6 @@ const initialLoginState = {
 	...initialLoginFormState,
 };
 
-const initialAccountLinkState = {
-	isPendingAccountLink: false,
-};
-
 const initialUserState = {
 	isPendingUserFetch: false,
 	isPendingUserInfoFetch: false,
@@ -32,7 +28,6 @@ const initializeState = () => {
 		isLoadingLogout: false,
 		errors: [],
 		...initialLoginState,
-		...initialAccountLinkState,
 		...initialUserState,
 	};
 
@@ -85,14 +80,9 @@ export const AuthReducer = (state, action) => {
 				return { ...state, ...tempState, ...action?.payload };
 			case 'APP_STATE_UPDATED':
 				tempState = {
-					...initialUserState,
+					...tempState,
+					isStaleUserInfo: true,
 				};
-				if (!state?.isPendingAccountLink) {
-					tempState = {
-						...tempState,
-						isStaleUserInfo: true,
-					};
-				}
 				return { ...state, ...tempState, ...action?.payload };
 
 			case 'AUTH_STATE_UPDATED':
@@ -229,62 +219,12 @@ export const AuthReducer = (state, action) => {
 
 				return { ...state, ...tempState, ...action?.payload };
 
-			// USER LINK
-			case 'USER_LINK_POPUP_CODE_EXCHANGED':
-			case 'USER_LINK_PENDING':
-				tempState = {
-					isPendingAccountLink: true,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_POPUP_STARTED':
-			case 'USER_LINK_STARTED':
-				tempState = {
-					isPendingAccountLink: true,
-				};
-				const newState = { ...state, ...tempState, ...action?.payload };
-
-				localStorage.setItem('app_state', JSON.stringify(newState));
-
-				return newState;
-			case 'USER_LINK_SUCCEEDED':
-				tempState = {
-					...initialUserState,
-					...initialAccountLinkState,
-				};
-
-				localStorage.removeItem('app_state');
-
-				return { ...state, ...tempState, ...action?.payload };
-
-			// USER UNLINK
-			case 'USER_UNLINK_STARTED':
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_UNLINK_SUCCEEDED':
-				// tempState = {
-				// 	...initialUserState,
-				// 	...initialAccountLinkState,
-				// };
-				const { id: credentialId } = action?.item || {};
-
-				const credentials = state?.credentials.filter(({ id }) => id !== credentialId);
-
-				return {
-					...state,
-					credentials,
-					...initialUserState,
-					...initialAccountLinkState,
-				};
-
 			// ERRORS
 			case 'APP_STATE_UPDATE_FAILED':
 			case 'LOGIN_ERROR':
 			case 'SILENT_AUTH_ERROR':
 			case 'USER_FETCH_FAILED':
 			case 'USER_INFO_FETCH_FAILED':
-			case 'USER_LINK_FAILED':
-			case 'USER_LINK_POPUP_FAILED':
-			case 'USER_UNLINK_FAILED':
 				console.log('login error:', action);
 				return {
 					...state,
