@@ -18,11 +18,11 @@ const getCredentials = async ({ user, id }, client = new OktaClient()) => {
 
 	const providers = await client.getIdps(userId);
 
-	if (providerType === 'OKTA') {
-		if (password) {
-			providers.push({ name: 'password' });
-		}
-		providers.push({ name: 'email' });
+	// Okta enrolls an email 'factor' by default when coming from an Idp
+	providers.push({ name: 'email' });
+
+	if (providerType === 'OKTA' && password) {
+		providers.push({ name: 'password' });
 	}
 
 	return providers.map(provider => ({ id: userId, login, provider }));
