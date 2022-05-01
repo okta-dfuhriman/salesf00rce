@@ -3,11 +3,9 @@ import { Auth, Okta, React } from './common';
 import { Routes, Route } from 'react-router-dom';
 
 import AppLoginCallback from './pages/LoginCallback';
-import Profile from './pages/Profile';
 import SecureApp from './components/SecureApp';
-import Settings from './pages/Settings';
-import SignIn from './pages/SignIn';
-import UserLinkCallback from './pages/UserLinkCallback';
+import HomePage from './pages/Home';
+import TodayPage from './pages/Today';
 
 const Router = () => {
 	const { oktaAuth } = Okta.useOktaAuth();
@@ -21,12 +19,10 @@ const Router = () => {
 
 	return (
 		<Routes>
-			<Route path='/signin' element={<SignIn />} />
 			<Route path='/login/callback' element={<AppLoginCallback />} />
-			<Route path='/identities/callback' element={<UserLinkCallback />} />
+			<Route path='/' element={<HomePage />} />
 			<Route element={<SecureApp />}>
-				<Route path='/' element={<Profile />} />
-				<Route path='settings' element={<Settings />} />
+				<Route path='/today' element={<Today />} />
 			</Route>
 		</Routes>
 	);
