@@ -1,67 +1,55 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Auth, LDS, useEffect, PropTypes } from '../../common';
-import { actions } from '../../providers/AuthProvider/AuthReducer';
-import './styles.css';
+import { Auth, LDS, PropTypes, React } from '../../common';
+
+import { IconButton, DialogContent, DialogTitle } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+
+import AuthDialog from './AuthDialog';
 
 const ENV = process.env.NODE_ENV;
-const ORIGINS = process.env.REACT_APP_ORIGIN_ALLOW?.split(/, {0,2}/) || [window.location.origin];
+const OKTA_ORIGINS = ['https://id.salesf00rce.com', 'https://sfdc-tbid.oktapreview.com'];
+const ALLOWED_ORIGINS_PROD = ['https://profile.salesf00rce.com', ...OKTA_ORIGINS];
+const ALLOWED_ORIGINS_DEV = ['http://localhost:3000', ...OKTA_ORIGINS];
+const ALLOWED_ORIGINS = ENV === 'production' ? ALLOWED_ORIGINS_PROD : ALLOWED_ORIGINS_DEV;
+const IFRAME_ALLOW = `publickey-credentials-get ${ALLOWED_ORIGINS.join(' ')}`;
 
-const AuthModal = ({ onClose }) => {
-	const { isVisibleAuthModal, isVisibleIframe, isLoadingLogin, authUrl, tokenParams } =
-		Auth.useAuthState();
-	const { login } = Auth.useAuthActions();
+const AuthModal = props => {
+	const { onClose } = props;
 	const dispatch = Auth.useAuthDispatch();
+	const {
+		isVisibleAuthModal,
+		isPendingAccountLink,
+		isPendingAuthModalLoad,
+		isVisibleIframe,
+		authUrl,
+	} = Auth.useAuthState();
+	const { linkUser } = Auth.useAuthActions();
 
-	const ALLOW = process.env.REACT_APP_ALLOW;
 	const modalWidth = '400px';
 	const modalHeight = '650px';
 
 	const onCancel = () => {
-		dispatch({ type: 'LOGIN_CANCELLED' });
-		return onClose ? onClose() : () => {};
+		dispatch({ type: 'USER_LINK_MODAL_CANCELLED' });
+		return onClose();
 	};
 
-	useEffect(() => {
-		if (isVisibleAuthModal) {
-			login(dispatch);
-		}
-	}, [isVisibleAuthModal]);
-
-	useEffect(() => {
-		if (tokenParams?.authorizationCode) {
-			return login(dispatch, { tokenParams });
-		}
-	}, [tokenParams]);
-
-	useEffect(() => {
+	React.useEffect(() => {
 		const responseHandler = ({ origin, data }) => {
-			if (ENV === 'production') {
-				const isAllowed = ORIGINS.includes(origin);
+			const isAllowed = ALLOWED_ORIGINS.includes(origin);
 
-				if (!isAllowed) {
-					return dispatch({
-						type: 'LOGIN_ERROR',
-						payload: { isVisibleIframe: false, isVisibleAuthModal: false },
-						error: `'origin [${origin}] not allowed`,
-					});
-				}
-			}
-
-			if (data?.type === 'onload' && data?.result === 'success') {
-				return dispatch({ type: actions.login.started.type });
+			if (!isAllowed) {
+				return dispatch({
+					type: 'USER_LINK_MODAL_FAILED',
+					error: `'origin ${origin} is not allowed`,
+				});
 			}
 
 			if (data?.code) {
-				dispatch({
-					type: actions.login.codeExchange.type,
-					payload: {
-						tokenParams: {
-							...tokenParams,
-							authorizationCode: data?.code,
-							interactionCode: data?.interaction_code,
-						},
-					},
-				});
+				return linkUser(dispatch, { data, isModal: true });
+			}
+
+			if (data?.result === 'success') {
+				return dispatch({ type: 'USER_LINK_MODAL_LOADED' });
 			}
 		};
 
@@ -69,10 +57,13 @@ const AuthModal = ({ onClose }) => {
 			if (error) {
 				throw error;
 			}
+
+			console.debug('removing listener...');
 			window.removeEventListener('message', responseHandler);
 		};
 
 		if (isVisibleAuthModal) {
+			console.debug('adding listener...');
 			window.addEventListener('message', responseHandler);
 		}
 
@@ -80,32 +71,52 @@ const AuthModal = ({ onClose }) => {
 	}, [isVisibleAuthModal]);
 
 	return (
-		<LDS.Modal isOpen={isVisibleAuthModal} onRequestClose={onCancel}>
-			{isLoadingLogin && (
-				<LDS.Spinner size='large' variant='brand' hasContainer={false} align='center'></LDS.Spinner>
-			)}
-			{authUrl && isVisibleIframe && (
-				<iframe
-					src={authUrl}
-					name='iframe-auth'
-					title='Login'
-					width={modalWidth}
-					height={modalHeight}
-					frameBorder='0'
-					style={{ display: 'block', borderRadius: '4px' }}
-					allow={ALLOW}
-				/>
-			)}
-		</LDS.Modal>
+		<AuthDialog open={isVisibleAuthModal} onClose={onClose}>
+			<DialogTitle>
+				<IconButton
+					edge='end'
+					size='small'
+					onClick={onCancel}
+					sx={{
+						color: 'white',
+						position: 'absolute',
+						borderRadius: 25,
+						background: 'rgba(0, 0, 0, 0.53)',
+						right: -15,
+						top: -15,
+						'z-index': '10000',
+					}}
+				>
+					<CloseIcon />
+				</IconButton>
+			</DialogTitle>
+			<DialogContent sx={{ minWidth: modalWidth, minHeight: modalHeight }}>
+				{isPendingAuthModalLoad && <LDS.Spinner />}
+				{authUrl && isVisibleIframe && (
+					<iframe
+						src={authUrl}
+						name='iframe-auth'
+						title='Link Account'
+						width={modalWidth}
+						height={modalHeight}
+						frameBorder='0'
+						style={{ display: 'block', borderRadius: '4px' }}
+						allow={IFRAME_ALLOW}
+					/>
+				)}
+			</DialogContent>
+		</AuthDialog>
 	);
 };
 
 AuthModal.defaultProps = {
+	open: false,
 	onClose: () => {},
 };
 
 AuthModal.propTypes = {
 	onClose: PropTypes.func,
+	open: PropTypes.bool,
 };
 
 export default AuthModal;

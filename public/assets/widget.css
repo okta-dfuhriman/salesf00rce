@@ -1,9 +1,3 @@
-@font-face {
-	font-family: 'TrailheadBold';
-	src: url('https://storage.googleapis.com/salesf00rce/fonts/Trailhead-Bold.woff') format('woff2'),
-		url('https://storage.googleapis.com/salesf00rce/fonts/Trailhead-Bold.woff') format('woff');
-}
-
 #okta-sign-in a,
 #okta-sign-in abbr,
 #okta-sign-in acronym,

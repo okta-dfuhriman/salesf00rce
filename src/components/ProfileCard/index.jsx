@@ -2,7 +2,7 @@ import { Auth, LDS, Link, AstroAvatar } from '../../common';
 import './ProfileCard.css';
 
 const ProfileCard = () => {
-	const { isLoadingUserInfo, userInfo } = Auth.useAuthState();
+	const { isPendingUserInfoFetch, userInfo } = Auth.useAuthState();
 
 	const UserAvatar = (
 		<div className='avatar'>
@@ -43,10 +43,10 @@ const ProfileCard = () => {
 
 	const UserDetails = (
 		<div className='details'>
-			<h1 title={userInfo?.name} className='name truncate'>
+			<h1 title={userInfo?.name} className='name slds-truncate'>
 				{userInfo?.name}
 			</h1>
-			<div className='company truncate'>{userInfo?.organization ?? 'Unknown Employer'}</div>
+			<div className='company slds-truncate'>{userInfo?.organization ?? 'Unknown Employer'}</div>
 			<div className='location'>{`${userInfo?.city ?? 'Unknown City'}, ${
 				userInfo?.countryCode ?? 'Unknown Country'
 			}`}</div>
@@ -55,7 +55,7 @@ const ProfileCard = () => {
 	);
 
 	const cardBody =
-		isLoadingUserInfo || !userInfo ? (
+		isPendingUserInfoFetch || !userInfo ? (
 			<LDS.Spinner variant='brand' />
 		) : (
 			<>
@@ -87,15 +87,16 @@ const ProfileCard = () => {
 							href='https://trailblazer.me/id/dfuhriman1'
 							target='_blank'
 							rel='noopener noreferrer'
-							className='slug-url truncate'
+							className='slug-url slds-truncate'
 						>
 							trailblazer.me/id/dfuhriman1
 						</a>
 						<LDS.Button
 							iconCategory='utility'
 							iconName='copy'
-							iconVariant='border-filled'
+							iconVariant='container'
 							iconSize='large'
+							style={{ height: 40 }}
 						/>
 					</div>
 				</div>
@@ -103,8 +104,8 @@ const ProfileCard = () => {
 		);
 
 	return (
-		<div className='card p-top_large'>
-			<div className='card__body card__body_inner' style={{ minHeight: '16rem' }}>
+		<div id='profile-card' className='slds-card slds-p-top_large'>
+			<div className='slds-card__body card__body_inner' style={{ minHeight: '16rem' }}>
 				{cardBody}
 			</div>
 		</div>

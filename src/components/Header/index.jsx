@@ -1,12 +1,18 @@
-import { Auth, LDS, Link, TrailblazerLogo } from '../../common';
+import { Auth, LDS, Link, React, TrailblazerLogo } from '../../common';
 
 import DropdownCard from '../DropdownCard';
 
 const Header = () => {
-	const { isLoadingUserInfo, userInfo } = Auth.useAuthState();
+	const { isAuthenticated, isPendingUserInfoFetch, userInfo } = Auth.useAuthState();
+
+	React.useEffect(() => {
+		if (!isAuthenticated) {
+			return <LDS.Spinner variant='brand' />;
+		}
+	}, [isAuthenticated]);
 
 	const userPanel =
-		isLoadingUserInfo || !userInfo ? (
+		isPendingUserInfoFetch || !userInfo ? (
 			<div style={{ width: '8rem', height: '3rem' }}>
 				<LDS.Spinner
 					variant='brand'
