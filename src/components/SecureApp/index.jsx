@@ -3,12 +3,11 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 
 import { Auth, LDS, Okta } from '../../common';
-import Header from '../../components/Header';
 
 import './styles.css';
 
 const SecureApp = ({ onAuthRequired, children }) => {
-	const { authState, oktaAuth, _onAuthRequired } = Okta.useOktaAuth();
+	const { oktaAuth, _onAuthRequired } = Okta.useOktaAuth();
 	const { signInWithRedirect, getUserInfo, getUser, silentAuth } = Auth.useAuthActions();
 	const dispatch = Auth.useAuthDispatch();
 	const {
@@ -94,12 +93,7 @@ const SecureApp = ({ onAuthRequired, children }) => {
 		return children;
 	}
 	console.debug('SecureApp > return <Outlet/>');
-	return (
-		<>
-			<Header />
-			<Outlet />
-		</>
-	);
+	return <Outlet />;
 };
 
 export default SecureApp;

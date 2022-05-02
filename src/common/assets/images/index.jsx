@@ -20,6 +20,7 @@ export { ReactComponent as SalesforceIconRound } from './salesforce-round.svg';
 export { ReactComponent as TrailblazerCommunityIcon } from './trailblazer-community.svg';
 export { ReactComponent as TrailblazerLogo } from './trailblazer-me.svg';
 export { ReactComponent as TrailheadIcon } from './trailhead.svg';
+export { ReactComponent as TrailheadLogo } from './trailhead-logo.svg';
 export { ReactComponent as TrailblazerMe } from './_tbme.svg';
 
 export * from './arid-dunes';

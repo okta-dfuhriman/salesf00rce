@@ -1,7 +1,10 @@
-import { Auth, LDS, Link, React, TrailblazerLogo } from '../../common';
+import { Auth, LDS, Link, React, TrailheadLogo } from '../../common';
 
 import AppLauncher from '../AppLauncher';
 import DropdownCard from '../DropdownCard';
+import HeaderNav from './HeaderNav';
+
+import './styles.css';
 
 const TrailheadHeader = () => {
 	const { isAuthenticated, isPendingUserInfoFetch, userInfo } = Auth.useAuthState();
@@ -29,7 +32,7 @@ const TrailheadHeader = () => {
 						className='header-dropdown'
 						align='right'
 						width='small'
-						menuStyle={{ width: '16rem' }}
+						menuStyle={{ width: '16rem', border: 'none', boxShadow: 'none' }}
 					>
 						<DropdownCard />
 						<LDS.DropdownTrigger>
@@ -64,6 +67,7 @@ const TrailheadHeader = () => {
 
 	return (
 		<div
+			id='nav-bar'
 			className='tds-desktop-header tds-bg_white slds-show__medium slds-show_medium'
 			style={{
 				borderBottom: '3px solid rgb(0, 112, 210)',
@@ -72,17 +76,32 @@ const TrailheadHeader = () => {
 				zIndex: 5000,
 			}}
 		>
-			<div className='slds-grid slds-container_x-large slds-container_center slds-p-horizontal_small'>
-				<div className='slds-p-vertical_small slds-p-horizontal_medium slds-grid slds-grid_align-spread slds-grow slds-grid_vertical-align-center'>
+			<div
+				id='nav-container'
+				className='slds-grid slds-container_x-large slds-container_center slds-p-horizontal_small'
+			>
+				<div
+					id='logo'
+					className='slds-p-vertical_small slds-p-horizontal_medium slds-grid slds-grid_align-spread slds-grow slds-grid_vertical-align-center'
+				>
 					<Link to='/'>
-						<TrailblazerLogo />
+						<TrailheadLogo style={{ height: '86px' }} />
 					</Link>
 				</div>
-				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
-					<div className='slds-p-right_large slds-m-right_large border'>
-						<AppLauncher />
+				<div id='nav-search'>
+					<LDS.Search placeholder='Search' styleContainer={{ width: '100%' }} />
+				</div>
+				<HeaderNav />
+				<div
+					id='nav-actions'
+					className='slds-grid slds-grid_vertical-align-top slds-p-around-small'
+				>
+					<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
+						<div className='slds-p-right_large slds-m-right_large'>
+							<AppLauncher />
+						</div>
+						{userPanel}
 					</div>
-					{userPanel}
 				</div>
 			</div>
 		</div>
