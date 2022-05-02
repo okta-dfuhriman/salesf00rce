@@ -1,15 +1,21 @@
 const VERCEL_GIT_COMMIT_REF = process.env.VERCEL_GIT_COMMIT_REF;
+const ENV = process.env.VERCEL_ENV;
 const PROJECT_BRANCH = process.env.PROJECT_BRANCH;
 
 (() => {
-	console.log('VERCEL_GIT_COMMIT_REF:', VERCEL_GIT_COMMIT_REF);
-	console.log('git branch:', PROJECT_BRANCH);
+	const passIcon = '✅';
+	const passMsg = 'can proceed';
+	const skipIcon = '🛑';
+	const skipMsg = 'skipped';
 
-	if (VERCEL_GIT_COMMIT_REF && VERCEL_GIT_COMMIT_REF === PROJECT_BRANCH) {
-		console.log('✅ - Build can proceed');
-		return 1;
-	} else {
-		console.log('🛑  - Build skipped');
-		return 0;
-	}
+	const result =
+		ENV === 'production' || (VERCEL_GIT_COMMIT_REF && VERCEL_GIT_COMMIT_REF === PROJECT_BRANCH);
+	const resultIcon = result ? passIcon : skipIcon;
+	const msg = result ? passMsg : skipMsg;
+
+	console.log(`${resultIcon} - Build for ${ENV} ${msg}.`);
+	console.log(`${resultIcon} - Build branch: ${VERCEL_GIT_COMMIT_REF}.`);
+	console.log(`${resultIcon} - Project branch: ${PROJECT_BRANCH}.`);
+
+	return result ? 1 : 0;
 })();
