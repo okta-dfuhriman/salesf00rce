@@ -38,6 +38,7 @@ const initializeState = () => {
 		isLoading: false,
 		isLoadingLogout: false,
 		isVisibleAppLauncher: false,
+
 		errors: [],
 		...initialLoginState,
 		...initialAccountLinkState,
