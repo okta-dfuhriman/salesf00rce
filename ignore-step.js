@@ -17,5 +17,9 @@ const PROJECT_BRANCH = process.env.PROJECT_BRANCH;
 	console.log(`${resultIcon} - Build branch: ${VERCEL_GIT_COMMIT_REF}.`);
 	console.log(`${resultIcon} - Project branch: ${PROJECT_BRANCH}.`);
 
-	return result ? 1 : 0;
+	if (result) {
+		return 1;
+	}
+
+	return 0;
 })();
