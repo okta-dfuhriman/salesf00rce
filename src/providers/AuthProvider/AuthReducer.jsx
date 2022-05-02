@@ -37,6 +37,7 @@ const initializeState = () => {
 		isAuthenticated: false,
 		isLoading: false,
 		isLoadingLogout: false,
+		isVisibleAppLauncher: false,
 		errors: [],
 		...initialLoginState,
 		...initialAccountLinkState,
@@ -290,6 +291,7 @@ export const AuthReducer = (state, action) => {
 				tempState = {
 					...initialUserState,
 					...initialAccountLinkState,
+					isStaleUserInfo: true,
 				};
 
 				localStorage.removeItem('app_state');
