@@ -26,10 +26,9 @@ const Router = () => {
 			{showHeader && <TrailheadHeader />}
 			<Routes>
 				<Route path='/login/callback' element={<AppLoginCallback />} />
-				<Route path='/' element={<HomePage />} />
+				<Route path='/home' element={<HomePage />} />
 				<Route element={<SecureApp />}>
-					<Route path='/' element={<HomePage />} />
-					<Route path='/today' element={<TodayPage />} />
+					<Route path='/' element={<TodayPage />} />
 				</Route>
 			</Routes>
 		</>

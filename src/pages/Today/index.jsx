@@ -22,31 +22,31 @@ const TodayPage = () => {
 				<div style={{ width: '130px' }}>
 					<svg width='100%' height='100%' viewBox='0 0 42 42'>
 						<circle
-							class='donut-hole'
+							className='donut-hole'
 							cx='21'
 							cy='21'
 							r='15.91549430918954'
 							fill='#FFFFFF'
 						></circle>
 						<circle
-							class='donut-ring'
+							className='donut-ring'
 							cx='21'
 							cy='21'
 							r='15.91549430918954'
 							fill='transparent'
 							stroke='#E3E3E3'
-							stroke-width='2'
+							strokeWidth='2'
 						></circle>
 						<circle
-							class='donut-segment'
+							className='donut-segment'
 							cx='21'
 							cy='21'
 							r='15.91549430918954'
 							fill='transparent'
 							stroke='#2C7F5C'
-							stroke-width='2'
-							stroke-dasharray='0 100'
-							stroke-dashoffset='25'
+							strokeWidth='2'
+							strokeDasharray='0 100'
+							strokeDashoffset='25'
 						></circle>
 						<clipPath id='user_avatar'>
 							<circle r='13' cx='21' cy='21'></circle>
@@ -58,13 +58,14 @@ const TodayPage = () => {
 							height='30'
 							x='6'
 							y='6'
-							clip-path='url(#user_avatar)'
+							clipPath='url(#user_avatar)'
 						></image>
 					</svg>
 				</div>
 			</div>
 			<h1 className='tds-text-heading_neutraface-large slds-text-align_center slds-p-around--medium slds-m-bottom_medium'>
-				{name + ' '}, let's learn something new today!
+				{!_.isEmpty(name) ? `${profile?.firstName ?? profile?.nickName}, ` : ''}let's learn
+				something new today!
 			</h1>
 			<div>
 				<div>

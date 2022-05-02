@@ -1,4 +1,4 @@
-import { Auth, LDS, Link, React, TrailheadLogo } from '../../common';
+import { Auth, LDS, Link, Okta, React, TrailheadLogo } from '../../common';
 
 import AppLauncher from '../AppLauncher';
 import DropdownCard from '../DropdownCard';
@@ -103,11 +103,13 @@ const TrailheadHeader = () => {
 				>
 					<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
 						{isAuthenticated && (
+							<>
 								<div className='slds-p-right_large slds-m-right_large'>
 									<AppLauncher />
 								</div>
-							) &&
-							userPanel}
+								{userPanel}
+							</>
+						)}
 						{!isAuthenticated && (
 							<LDS.Button label='Sign Up' variant='brand' onClick={handleSignUp} />
 						)}

@@ -12,7 +12,6 @@ const SecureApp = ({ onAuthRequired, children }) => {
 	const dispatch = Auth.useAuthDispatch();
 	const {
 		isAuthenticated,
-		isPendingAccountLink,
 		isPendingLogin,
 		isPendingUserInfoFetch,
 		isStaleUserInfo,
@@ -60,12 +59,7 @@ const SecureApp = ({ onAuthRequired, children }) => {
 	}, [isPendingLogin, isAuthenticated, onAuthRequired, _onAuthRequired]);
 
 	React.useEffect(() => {
-		if (
-			(isStaleUserInfo || !userInfo) &&
-			isAuthenticated &&
-			!isPendingLogin &&
-			!isPendingAccountLink
-		) {
+		if ((isStaleUserInfo || !userInfo) && isAuthenticated && !isPendingLogin) {
 			console.debug('SecureApp > getUserInfo()');
 			return getUserInfo(dispatch);
 		}
@@ -77,7 +71,6 @@ const SecureApp = ({ onAuthRequired, children }) => {
 			isAuthenticated &&
 			!isPendingLogin &&
 			!isPendingUserInfoFetch &&
-			!isPendingAccountLink &&
 			userInfo?.sub
 		) {
 			console.debug('SecureApp > getUser()');
