@@ -1,5 +1,5 @@
 /** @format */
-import { _, ApiError, Okta } from '../common';
+import { Okta } from '../common';
 
 const GOOGLE_IDP_ID = '0oa3cdpdvdd3BHqDA1d7';
 const LINKEDIN_IDP_ID = '0oa3cdljzgEyGBMez1d7';
@@ -231,8 +231,8 @@ const useAuthActions = () => {
 			}
 		};
 
-		const signInWithRedirect = async (dispatch, idp) => {
-			let options = {};
+		const signInWithRedirect = async (dispatch, options) => {
+			const { idp } = options || {};
 
 			if (dispatch) {
 				dispatch({ type: 'LOGIN_WITH_REDIRECT_STARTED' });
@@ -250,7 +250,7 @@ const useAuthActions = () => {
 
 		const login = async (dispatch, props) => {
 			try {
-				const { username, password, idp } = props || {};
+				const { username, password, idp, isSignUp = false } = props || {};
 				// eslint-disable-next-line camelcase
 
 				if (username && password) {
@@ -277,9 +277,9 @@ const useAuthActions = () => {
 					const hasSession = await oktaAuth.session.exists();
 
 					if (!hasSession) {
-						const loginHint = props?.loginhint;
+						const loginHint = isSignUp ? 'signup' : props?.loginhint;
 
-						return await signInWithRedirect({ loginHint });
+						return await signInWithRedirect(dispatch, { idp, loginHint });
 					}
 
 					return await silentAuth(dispatch, { hasSession });

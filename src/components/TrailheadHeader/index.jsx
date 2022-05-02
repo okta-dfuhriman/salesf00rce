@@ -8,6 +8,11 @@ import './styles.css';
 
 const TrailheadHeader = () => {
 	const { isAuthenticated, isPendingUserInfoFetch, userInfo } = Auth.useAuthState();
+	const dispatch = Auth.useAuthDispatch();
+	const { login } = Auth.useAuthActions();
+
+	const handleLogin = () => login(dispatch);
+	const handleSignUp = () => login(dispatch, { isSignUp: true });
 
 	React.useEffect(() => {
 		if (!isAuthenticated) {
@@ -97,10 +102,16 @@ const TrailheadHeader = () => {
 					className='slds-grid slds-grid_vertical-align-top slds-p-around-small'
 				>
 					<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
-						<div className='slds-p-right_large slds-m-right_large'>
-							<AppLauncher />
-						</div>
-						{userPanel}
+						{isAuthenticated && (
+								<div className='slds-p-right_large slds-m-right_large'>
+									<AppLauncher />
+								</div>
+							) &&
+							userPanel}
+						{!isAuthenticated && (
+							<LDS.Button label='Sign Up' variant='brand' onClick={handleSignUp} />
+						)}
+						{!isAuthenticated && <LDS.Button label='Log In' onClick={handleLogin} />}
 					</div>
 				</div>
 			</div>
