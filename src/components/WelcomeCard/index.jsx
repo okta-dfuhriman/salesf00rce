@@ -13,11 +13,12 @@ import {
 const WelcomeCard = () => {
 	const { profile, credentials, isPendingAccountLink, isPendingUserFetch } = Auth.useAuthState();
 
-	const currentAccounts = credentials.filter(({ isLoggedIn }) => isLoggedIn);
+	const currentAccounts = credentials?.filter(({ isLoggedIn }) => isLoggedIn);
 
 	const currentAccount =
-		currentAccounts.length > 1
-			? currentAccounts.filter(
+		currentAccounts?.length > 1
+			? currentAccounts?.filter(
+
 					({ provider: { type } }) => type !== 'email' && type !== 'password'
 			  )[0]
 			: currentAccounts[0];
@@ -57,8 +58,9 @@ const WelcomeCard = () => {
 				</div>
 			)}
 			<div>
-				Hey{profile ? ' ' && profile?.firstName : ''}! You're logged in with your{' '}
-				{_.capitalize(providerName)} account:&nbsp;&nbsp;
+				Hey{!_.isEmpty(profile) ? ` ${profile?.firstName ?? profile?.nickName}` : ''}! You're logged
+				in with your {_.capitalize(providerName)} account:&nbsp;&nbsp;
+
 				<span className='tds-text_bold break-word'>
 					{providerIcon} {login}.
 				</span>

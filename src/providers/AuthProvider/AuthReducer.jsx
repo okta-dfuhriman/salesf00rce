@@ -37,6 +37,8 @@ const initializeState = () => {
 		isAuthenticated: false,
 		isLoading: false,
 		isLoadingLogout: false,
+		isVisibleAppLauncher: false,
+
 		errors: [],
 		...initialLoginState,
 		...initialAccountLinkState,
@@ -92,15 +94,31 @@ export const AuthReducer = (state, action) => {
 				return { ...state, ...tempState, ...action?.payload };
 			case 'APP_STATE_UPDATED':
 				tempState = {
+					...state,
 					...initialUserState,
+					...action?.payload,
 				};
-				if (!state?.isPendingAccountLink) {
+
+				if (!tempState?.isAuthenticated) {
+					if (!_.isEmpty(tempState?.userInfo)) {
+						localStorage.removeItem('userInfo');
+						tempState = { ...tempState, userInfo: {} };
+					}
+
+					if (!_.isEmpty(tempState?.profile)) {
+						localStorage.removeItem('user');
+
+						tempState = { ...tempState, credentials: [], profile: {}, linkedUsers: [] };
+					}
+				}
+
+				if (!tempState?.isPendingAccountLink) {
 					tempState = {
 						...tempState,
 						isStaleUserInfo: true,
 					};
 				}
-				return { ...state, ...tempState, ...action?.payload };
+				return tempState;
 
 			case 'AUTH_STATE_UPDATED':
 			case 'AUTH_STATE_CHECKED':
@@ -290,6 +308,7 @@ export const AuthReducer = (state, action) => {
 				tempState = {
 					...initialUserState,
 					...initialAccountLinkState,
+					isStaleUserInfo: true,
 				};
 
 				localStorage.removeItem('app_state');

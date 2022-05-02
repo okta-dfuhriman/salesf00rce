@@ -91,33 +91,31 @@ const AccountCard = props => {
 			style={{ position: isLoading ? 'relative' : 'static' }}
 		>
 			{isLoading && <LDS.Spinner />}
-			<LDS.IconSettings iconPath='/assets/icons'>
-				<div
-					className={
-						providerName === 'salesforce'
-							? 'slds-media slds-media_top tds-media slds-grid_vertical-align-top'
-							: 'slds-media slds-media_center slds-grid_vertical-align-center'
-					}
-				>
-					<div className='slds-media__figure'>
-						<span className='slds-icon__container'>{providerIcon}</span>
-					</div>
-					<div className='slds-media__body'>
-						<AccountCardBody login={login} providerName={providerName} type={type} />
-					</div>
-					<div className='slds-no-flex'>
-						<LDS.Button
-							id={`${providerName}-${userId}-disconnect`}
-							disabled={isLoggedIn || isPendingAccountLink || isPendingUserFetch}
-							label='Disconnect'
-							variant='destructive'
-							onClick={disconnect}
-							className='tds-button_destructive-inverse'
-							style={{ fontSize: '14px' }}
-						/>
-					</div>
+			<div
+				className={
+					providerName === 'salesforce'
+						? 'slds-media slds-media_top tds-media slds-grid_vertical-align-top'
+						: 'slds-media slds-media_center slds-grid_vertical-align-center'
+				}
+			>
+				<div className='slds-media__figure'>
+					<span className='slds-icon__container'>{providerIcon}</span>
 				</div>
-			</LDS.IconSettings>
+				<div className='slds-media__body'>
+					<AccountCardBody login={login} providerName={providerName} type={type} />
+				</div>
+				<div className='slds-no-flex'>
+					<LDS.Button
+						id={`${providerName}-${userId}-disconnect`}
+						disabled={isLoggedIn || isPendingAccountLink || isPendingUserFetch}
+						label='Disconnect'
+						variant='destructive'
+						onClick={disconnect}
+						className='tds-button_destructive-inverse'
+						style={{ fontSize: '14px' }}
+					/>
+				</div>
+			</div>
 		</div>
 	);
 };
