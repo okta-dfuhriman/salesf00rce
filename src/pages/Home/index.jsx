@@ -1,47 +1,12 @@
-import { React, TrailheadConnect, TrailheadEarn, TrailheadLearn } from '../../common';
-import lottie from 'lottie-web';
+import {
+	React,
+	HelpHeroBackground,
+	TrailheadConnect,
+	TrailheadEarn,
+	TrailheadLearn,
+} from '../../common';
 
 const HomePage = () => {
-	React.useEffect(() => {
-		const setupAnimations = async () => {
-			const animationConfigs = [
-				{
-					container: document.querySelector('.th-new-hero__astro-animation'),
-					path: '/animations/astro-animation.json',
-				},
-				{
-					container: document.querySelector('.th-new-hero__codey-animation'),
-					path: '/animations/codey-animation.json',
-				},
-			];
-			let animations = animationConfigs.map(config =>
-				lottie.loadAnimation({ ...config, renderer: 'svg', loop: true, autoplay: false })
-			);
-
-			if (typeof IntersectionObserver !== 'undefined') {
-				const observer = new IntersectionObserver(entries => {
-					entries.forEach(entry => {
-						let index = animationConfigs.map(c => c.container).indexOf(entry.target);
-						let animation = animations[index];
-
-						if (entry.isIntersecting) {
-							animation.play();
-						} else {
-							animation.pause();
-						}
-					});
-				});
-				animationConfigs.forEach(config => observer.observe(config.container));
-			} else {
-				animations.forEach(animation => animation.play());
-			}
-		};
-
-		document.addEventListener('DOMContentLoaded', setupAnimations);
-
-		return () => document.removeEventListener('DOMContentLoaded', setupAnimations);
-	}, []);
-
 	return (
 		<>
 			<div className='th-new-hero_outer'></div>
