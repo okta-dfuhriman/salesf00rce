@@ -9,6 +9,7 @@ import './styles.css';
 
 const SecureApp = ({ onAuthRequired, children }) => {
 	const { authState, oktaAuth, onAuthRequired: _onAuthRequired } = Okta.useOktaAuth();
+
 	const { signInWithRedirect, getUserInfo, getUser, silentAuth } = Auth.useAuthActions();
 	const dispatch = Auth.useAuthDispatch();
 	const {

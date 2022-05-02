@@ -18,6 +18,7 @@ const WelcomeCard = () => {
 	const currentAccount =
 		currentAccounts?.length > 1
 			? currentAccounts?.filter(
+
 					({ provider: { type } }) => type !== 'email' && type !== 'password'
 			  )[0]
 			: currentAccounts[0];
@@ -59,6 +60,7 @@ const WelcomeCard = () => {
 			<div>
 				Hey{!_.isEmpty(profile) ? ` ${profile?.firstName ?? profile?.nickName}` : ''}! You're logged
 				in with your {_.capitalize(providerName)} account:&nbsp;&nbsp;
+
 				<span className='tds-text_bold break-word'>
 					{providerIcon} {login}.
 				</span>
