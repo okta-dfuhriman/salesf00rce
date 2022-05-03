@@ -1,8 +1,6 @@
 import { Auth, Okta, LDS, React, useEffect } from './common';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import './styles/App.css';
-
 import useBodyClass from './hooks/useBodyClass';
 
 import Router from './Router';
