@@ -1,21 +1,22 @@
-import { Auth, LDS, Link, AstroAvatar } from '../../common';
+import { Auth, LDS, Link, isUrl } from '../../common';
 import './ProfileCard.css';
 
 const ProfileCard = () => {
-	const { isPendingUserInfoFetch, userInfo } = Auth.useAuthState();
+	const { isPendingUserInfoFetch, profile, userInfo } = Auth.useAuthState();
+
+	const picture = profile?.picture ?? userInfo?.picture;
 
 	const UserAvatar = (
 		<div className='avatar'>
 			<div style={{ position: 'absolute', top: '-6px' }}>
 				<div className='slds-is-relative slds-m-right_medium user-avatar'>
 					<LDS.Button
-						style={{ backgroundImage: `url(${userInfo?.picture})` }}
+						id='avatar-button'
+						style={isUrl(picture) ? { backgroundImage: `url(${picture})` } : {}}
 						title='View Profile Picture'
 						variant='base'
 						className='avatar-img avatar-img_expandable'
-					>
-						{!userInfo?.picture && <AstroAvatar />}
-					</LDS.Button>
+					/>
 					<div className='slds-is-absolute cAvatarUploader'>
 						<LDS.Button
 							title='Upload Profile Picture'
@@ -47,8 +48,8 @@ const ProfileCard = () => {
 				{userInfo?.name}
 			</h1>
 			<div className='company slds-truncate'>{userInfo?.organization ?? 'Unknown Employer'}</div>
-			<div className='location'>{`${userInfo?.city ?? 'Unknown City'}, ${
-				userInfo?.countryCode ?? 'Unknown Country'
+			<div className='location'>{`${profile?.city ?? userInfo?.city ?? 'Unknown City'}, ${
+				profile?.countryCode ?? userInfo?.countryCode ?? 'Unknown Country'
 			}`}</div>
 			<div className='social-links'></div>
 		</div>
@@ -81,7 +82,7 @@ const ProfileCard = () => {
 							className='slug-icon'
 						/>
 						<span tabIndex='-1' aria-hidden='true' className='slug-value'>
-							https://trailblazer.me/id/dfuhriman1
+							https://trailblazer.me/...
 						</span>
 						<a
 							href='https://trailblazer.me/id/dfuhriman1'

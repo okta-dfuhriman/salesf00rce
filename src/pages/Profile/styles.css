@@ -1,6 +1,7 @@
 :host {
 	display: block;
 }
+
 .root {
 	--tds-toaster-offset-top: 4rem;
 	position: relative;

@@ -13,15 +13,15 @@ import {
 const WelcomeCard = () => {
 	const { profile, credentials, isPendingAccountLink, isPendingUserFetch } = Auth.useAuthState();
 
-	const currentAccounts = credentials?.filter(({ isLoggedIn }) => isLoggedIn);
+	const currentAccounts = credentials?.filter(({ isLoggedIn }) => isLoggedIn) || [];
+
 
 	const currentAccount =
 		currentAccounts?.length > 1
 			? currentAccounts?.filter(
-
 					({ provider: { type } }) => type !== 'email' && type !== 'password'
 			  )[0]
-			: currentAccounts[0];
+			: currentAccounts[0] || [];
 
 	let providerIcon;
 
@@ -60,7 +60,6 @@ const WelcomeCard = () => {
 			<div>
 				Hey{!_.isEmpty(profile) ? ` ${profile?.firstName ?? profile?.nickName}` : ''}! You're logged
 				in with your {_.capitalize(providerName)} account:&nbsp;&nbsp;
-
 				<span className='tds-text_bold break-word'>
 					{providerIcon} {login}.
 				</span>
@@ -73,7 +72,7 @@ const WelcomeCard = () => {
 			body={cardBody}
 			figure={
 				<LDS.Avatar
-					imgSrc={profile?.picture ?? 'assets/images/astro.svg'}
+					imgSrc={profile?.picture ?? '../../common/assets/images/astro.svg'}
 					imgAlt={profile?.displayName}
 					size='large'
 				/>
@@ -85,7 +84,7 @@ const WelcomeCard = () => {
 		<LDS.Card
 			id='welcome-card'
 			key='welcome-card'
-			className='tds-carde'
+			className='tds-card'
 			bodyClassName='slds-card__body_inner'
 			header={cardHeader}
 		/>

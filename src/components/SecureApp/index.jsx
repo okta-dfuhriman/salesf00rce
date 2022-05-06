@@ -8,21 +8,17 @@ import Header from '../../components/Header';
 import './styles.css';
 
 const SecureApp = ({ onAuthRequired, children }) => {
-	const { authState, oktaAuth, onAuthRequired: _onAuthRequired } = Okta.useOktaAuth();
 
-	const { signInWithRedirect, getUserInfo, getUser, silentAuth } = Auth.useAuthActions();
+	const { authState, oktaAuth } = Okta.useOktaAuth();
+
+	const { signInWithRedirect, silentAuth } = Auth.useAuthActions();
+
 	const dispatch = Auth.useAuthDispatch();
-	const {
-		isAuthenticated,
-		isPendingAccountLink,
-		isPendingLogin,
-		isPendingUserInfoFetch,
-		isStaleUserInfo,
-		isStaleUserProfile,
-		userInfo,
-	} = Auth.useAuthState();
+	const { isAuthenticated, isPendingLogin } = Auth.useAuthState();
 	const pendingLogin = React.useRef(false);
 	React.useEffect(() => {
+		const _isAuthenticated = authState?.isAuthenticated || isAuthenticated;
+
 		const handleLogin = async () => {
 			if (pendingLogin.current) {
 				return;
@@ -39,7 +35,7 @@ const SecureApp = ({ onAuthRequired, children }) => {
 
 				oktaAuth.setOriginalUri(originalUri);
 
-				const onAuthRequiredFn = onAuthRequired || _onAuthRequired;
+				const onAuthRequiredFn = onAuthRequired;
 				console.debug('authRequired');
 				if (onAuthRequiredFn) {
 					await onAuthRequiredFn(oktaAuth);
@@ -50,42 +46,16 @@ const SecureApp = ({ onAuthRequired, children }) => {
 			}
 		};
 
-		if (isAuthenticated) {
+		if (_isAuthenticated) {
 			pendingLogin.current = false;
 			return;
 		}
 
-		if (!isAuthenticated && !isPendingLogin) {
+		if (!_isAuthenticated && !isPendingLogin) {
 			console.debug('SecureApp > handleLogin()');
 			handleLogin();
 		}
-	}, [isPendingLogin, isAuthenticated, onAuthRequired, _onAuthRequired]);
-
-	React.useEffect(() => {
-		if (
-			(isStaleUserInfo || !userInfo) &&
-			isAuthenticated &&
-			!isPendingLogin &&
-			!isPendingAccountLink
-		) {
-			console.debug('SecureApp > getUserInfo()');
-			return getUserInfo(dispatch);
-		}
-	}, [isStaleUserInfo, isAuthenticated, userInfo]);
-
-	React.useEffect(() => {
-		if (
-			isStaleUserProfile &&
-			isAuthenticated &&
-			!isPendingLogin &&
-			!isPendingUserInfoFetch &&
-			!isPendingAccountLink &&
-			userInfo?.sub
-		) {
-			console.debug('SecureApp > getUser()');
-			return getUser(dispatch, { userId: userInfo.sub });
-		}
-	}, [isStaleUserProfile]);
+	}, [isPendingLogin, authState?.isAuthenticated, isAuthenticated, onAuthRequired]);
 
 	if (!isAuthenticated) {
 		return <LDS.Spinner variant='inverse' size='large' containerClassName='sign-in-loader' />;

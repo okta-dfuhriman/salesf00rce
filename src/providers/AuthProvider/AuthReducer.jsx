@@ -2,48 +2,36 @@
 
 import { _ } from '../../common';
 
-const initialLoginFormState = {
-	isSignUp: false,
-	isEmailAuth: false,
-	isRecovery: false,
-};
-
 const initialLoginState = {
 	isPendingLogin: false,
-	...initialLoginFormState,
-};
-
-const initialAuthModalState = {
-	isVisibleAuthModal: false,
-	isPendingAuthModalLoad: true,
-	isVisibleIframe: false,
+	isLoggedOut: false,
 };
 
 const initialAccountLinkState = {
 	isPendingAccountLink: false,
-	...initialAuthModalState,
 };
 
 const initialUserState = {
 	isPendingUserFetch: false,
 	isPendingUserInfoFetch: false,
-	isStaleUserProfile: false,
-	isStaleUserInfo: false,
+	isStaleUserProfile: true,
+	isStaleUserInfo: true,
 };
 
-const initializeState = () => {
-	let state = {
-		isError: false,
-		isAuthenticated: false,
-		isLoading: false,
-		isLoadingLogout: false,
-		isVisibleAppLauncher: false,
+export const initialState = {
+	isError: false,
+	isAuthenticated: false,
+	isLoading: false,
+	isPendingLogout: false,
+	errors: [],
+	...initialLoginState,
+	...initialAccountLinkState,
+	...initialUserState,
+};
 
-		errors: [],
-		...initialLoginState,
-		...initialAccountLinkState,
-		...initialUserState,
-	};
+export const initializeState = _initialState => {
+	const state = { ..._initialState };
+
 
 	const _storedState = localStorage.getItem('app_state');
 	const storedState = _storedState !== null ? JSON.parse(_storedState) : {};
@@ -73,239 +61,188 @@ const initializeState = () => {
 	return { ...state, ...storedState };
 };
 
-export const initialState = {
-	...initializeState(),
+const updateUserState = state => {
+	const { userInfo, profile, isAuthenticated } = state || {};
+	let userState = { ...state };
+
+	if (!isAuthenticated) {
+		if (!_.isEmpty(userInfo)) {
+			userState = {
+				...userState,
+				userInfo: {},
+			};
+
+			localStorage.removeItem('userInfo');
+		}
+
+		if (!_.isEmpty(profile)) {
+			userState = {
+				...userState,
+				profile: {},
+				credentials: {},
+				linkedUsers: [],
+			};
+
+			localStorage.removeItem('user');
+		}
+	}
+	return userState;
 };
 
 export const AuthReducer = (state, action) => {
 	try {
-		let tempState = {};
-		console.debug('===== STATE =====');
-		console.debug(JSON.stringify(state, null, 2));
-		console.debug('===== ACTION =====');
-		console.debug(JSON.stringify(action, null, 2));
-		switch (action?.type) {
-			case 'APP_STATE_UPDATE_STARTED':
-				tempState = {
-					isPendingUserFetch: true,
-					isPendingUserInfoFetch: true,
-				};
+		const { type: message, payload = {}, error = {}, item } = action || {};
 
-				return { ...state, ...tempState, ...action?.payload };
-			case 'APP_STATE_UPDATED':
-				tempState = {
-					...state,
-					...initialUserState,
-					...action?.payload,
-				};
+		const createState = ({ newState = {}, msg = message, state = {}, payload = {} }) => {
+			const endState = { ...state, ...newState, ...payload };
 
-				if (!tempState?.isAuthenticated) {
-					if (!_.isEmpty(tempState?.userInfo)) {
-						localStorage.removeItem('userInfo');
-						tempState = { ...tempState, userInfo: {} };
-					}
+			console.group('===== NEW STATE =====');
+			console.log(JSON.stringify(endState, null, 2));
+			console.groupEnd();
+			console.groupEnd();
 
-					if (!_.isEmpty(tempState?.profile)) {
-						localStorage.removeItem('user');
+			return endState;
+		};
 
-						tempState = { ...tempState, credentials: [], profile: {}, linkedUsers: [] };
-					}
-				}
+		let newState = {};
 
-				if (!tempState?.isPendingAccountLink) {
-					tempState = {
-						...tempState,
-						isStaleUserInfo: true,
-					};
-				}
-				return tempState;
+		const _default = () => createState({ state, newState, payload });
 
-			case 'AUTH_STATE_UPDATED':
+		console.group('===== AUTH REDUCER =====');
+		console.group('===== CURRENT STATE =====');
+		console.log(JSON.stringify(state, null, 2));
+		console.groupEnd();
+
+		console.group(`===== ${action?.type} =====`);
+		console.log(JSON.stringify(payload, null, 2));
+		console.groupEnd();
+
+		if (!_.isEmpty(error)) {
+			console.group('===== ERROR =====');
+			console.log(error);
+			console.groupEnd();
+		}
+
+		switch (message) {
+			case 'AUTH_STATE_CHECK_STARTED':
+				return _default();
+
 			case 'AUTH_STATE_CHECKED':
-				return { ...state, ...action?.payload };
+			case 'AUTH_STATE_UPDATED':
+				newState = {
+					...state,
+					...payload,
+				};
 
-			// CREDENTIAL RECOVERY
-			case 'RECOVERY_STARTED':
-				return { ...state, ...tempState, ...action?.payload };
-			case 'RECOVERY_SUCCEEDED':
-				return { ...state, ...tempState, ...action?.payload };
+				newState.isAuthenticated =
+					newState?.authState?.isAuthenticated || newState?.isAuthenticated;
+
+				newState = {
+					...updateUserState(newState),
+				};
+
+				return createState({ newState });
 
 			// LOGIN
 			case 'LOGIN_CANCELLED':
-				tempState = {
+				newState = {
 					...initialLoginState,
 				};
-				return { ...state, ...tempState, ...action?.payload };
-			case 'LOGIN_INIT_WITH_EMAIL'.type:
-				tempState = {
-					...initialLoginFormState,
-					isEmailAuth: true,
-					content: {
-						header: {
-							headline: 'Login with your email',
-							subheadline: "Enter your email address and we'll send you a single-use code.",
-						},
-						primaryCTA: 'Log In',
-					},
-				};
-				return { ...state, ...tempState, ...action?.payload };
-			case 'LOGIN_INIT_SIGN_UP'.type:
-				tempState = {
-					...initialLoginFormState,
-					isSignUp: true,
-					content: {
-						header: {
-							headline: 'Sign up with your email',
-							subheadline: "Enter your email address and we'll send you a single-use code.",
-						},
-						primaryCTA: 'Sign Up',
-					},
-				};
-				return { ...state, ...tempState, ...action?.payload };
-			case 'LOGIN_INIT_RECOVERY'.type:
-				tempState = {
-					...initialLoginFormState,
-					isRecovery: true,
-					content: {
-						header: {
-							headline: "Can't log in?",
-							subheadline: "Enter your email address and we'll get you back on the trail.",
-						},
-						primaryCTA: 'Send Verification Email',
-					},
-				};
-				return { ...state, ...tempState, ...action?.payload };
-			case 'LOGIN_PENDING':
-				tempState = {
+				return _default();
+			case 'LOGIN_CODE_EXCHANGE_STARTED':
+				newState = {
 					isPendingLogin: true,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'LOGOUT_STARTED':
-				tempState = {
-					isLoadingLogout: true,
+				newState = {
+					isPendingLogout: true,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'LOGIN_SUCCESS':
-				tempState = {
+				newState = {
 					...initialLoginState,
 					isAuthenticated: true,
 					isStaleUserInfo: true,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'LOGIN_WITH_REDIRECT_STARTED':
-				tempState = {
+				newState = {
 					isPendingLogin: true,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 
 			// LOGOUT
 			case 'LOGOUT_SUCCEEDED':
-				tempState = {
-					isLoadingLogout: false,
+				newState = {
 					...initialLoginState,
+					isPendingLogout: false,
+					isLoggedOut: true,
+					...updateUserState(payload),
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 
 			// SILENT AUTH
 			case 'SILENT_AUTH_ABORTED':
-				tempState = {
+				newState = {
 					...initialLoginState,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'SILENT_AUTH_STARTED':
-				tempState = {
+				newState = {
 					isPendingLogin: true,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'SILENT_AUTH_SUCCESS':
-				tempState = {
+				newState = {
 					...initialLoginState,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 
 			// USER FETCH
 			case 'USER_FETCH_STARTED':
-				tempState = {
+				newState = {
 					isPendingUserFetch: true,
 					isStaleUserProfile: false,
 				};
-
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'USER_INFO_FETCH_STARTED':
-				tempState = {
+				newState = {
 					isPendingUserInfoFetch: true,
 					isStaleUserInfo: false,
 				};
-
-				return { ...state, ...tempState, ...action?.payload };
-
+				return _default();
 			case 'USER_FETCH_SUCCEEDED':
-				tempState = {
+				newState = {
 					...initialLoginState,
 					isPendingUserFetch: false,
 				};
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'USER_INFO_FETCH_SUCCEEDED':
-				tempState = {
+				newState = {
 					...initialLoginState,
 					isStaleUserProfile: true,
 					isPendingUserInfoFetch: false,
 				};
-
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 
 			// USER LINK
-			case 'USER_LINK_MODAL_CODE_EXCHANGED':
-				tempState = {
-					...initialAuthModalState,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_PARAMS_GENERATED':
-				tempState = {
-					isVisibleIframe: true,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_CANCELLED':
-				tempState = {
-					...initialAccountLinkState,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_LOADED':
-				tempState = {
-					isPendingAuthModalLoad: false,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_STARTED':
-				tempState = {
-					isPendingAccountLink: true,
-					isVisibleAuthModal: true,
-				};
-
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_POPUP_CODE_EXCHANGED':
 			case 'USER_LINK_PENDING':
-				tempState = {
+				newState = {
 					isPendingAccountLink: true,
 				};
 
-				return { ...state, ...tempState, ...action?.payload };
-			case 'USER_LINK_MODAL_CODE_EXCHANGE_STARTED':
-			case 'USER_LINK_POPUP_STARTED':
+				return _default();
 			case 'USER_LINK_STARTED':
-				tempState = {
+				newState = {
 					isPendingAccountLink: true,
 				};
-				const newState = { ...state, ...tempState, ...action?.payload };
 
-				localStorage.setItem('app_state', JSON.stringify(newState));
+				localStorage.setItem('app_state', JSON.stringify({ ...state, ...newState, ...payload }));
 
-				return newState;
+				return _default();
 			case 'USER_LINK_SUCCEEDED':
-				tempState = {
+				newState = {
 					...initialUserState,
 					...initialAccountLinkState,
 					isStaleUserInfo: true,
@@ -313,27 +250,23 @@ export const AuthReducer = (state, action) => {
 
 				localStorage.removeItem('app_state');
 
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 
 			// USER UNLINK
 			case 'USER_UNLINK_STARTED':
-				return { ...state, ...tempState, ...action?.payload };
+				return _default();
 			case 'USER_UNLINK_SUCCEEDED':
-				// tempState = {
-				// 	...initialUserState,
-				// 	...initialAccountLinkState,
-				// };
-				const { id: credentialId } = action?.item || {};
+				const { id: credentialId } = item || {};
 
 				const credentials = state?.credentials.filter(({ id }) => id !== credentialId);
 
-				return {
-					...state,
+				newState = {
 					credentials,
 					...initialUserState,
 					...initialAccountLinkState,
 				};
 
+				return createState({ state, newState });
 			// ERRORS
 			case 'APP_STATE_UPDATE_FAILED':
 			case 'LOGIN_ERROR':
@@ -341,20 +274,18 @@ export const AuthReducer = (state, action) => {
 			case 'USER_FETCH_FAILED':
 			case 'USER_INFO_FETCH_FAILED':
 			case 'USER_LINK_FAILED':
-			case 'USER_LINK_MODAL_CODE_EXCHANGE_FAILED':
-			case 'USER_LINK_POPUP_FAILED':
-			case 'USER_LINK_MODAL_FAILED':
 			case 'USER_UNLINK_FAILED':
 				console.log('login error:', action);
-				return {
-					...state,
+				newState = {
 					...initialState,
-					...action?.payload,
+					...updateUserState(),
+					...payload,
 					...{
-						error: action?.error,
+						error,
 						isError: true,
 					},
 				};
+				return createState({ newState });
 			default:
 				throw new Error(`Unhandled action type: ${action?.type}`);
 		}

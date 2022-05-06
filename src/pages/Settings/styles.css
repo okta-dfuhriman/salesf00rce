@@ -1,3 +1,9 @@
+#settings *,
+#settings *:before,
+#settings *:after {
+	box-sizing: border-box;
+}
+
 #settings-page .nav {
 	top: 1.3125rem;
 	/* top: 4.75rem; */

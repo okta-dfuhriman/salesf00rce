@@ -95,9 +95,6 @@ const Account = props => {
 					<LDS.Spinner containerStyle={{ opacity: 0.4 }} />
 				</div>
 			)}
-			{/* {!isPendingUserFetch &&
-				!isPendingAccountLink &&
-			} */}
 			{credentials.map(credential => (
 				<AccountCard
 					id={`${credential?.provider?.name}-${credential?.id}`}
