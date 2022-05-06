@@ -174,8 +174,8 @@ export const AuthReducer = (state, action) => {
 			// LOGOUT
 			case 'LOGOUT_SUCCEEDED':
 				newState = {
-					isPendingLogout: false,
 					...initialLoginState,
+					isPendingLogout: false,
 					isLoggedOut: true,
 					...updateUserState(payload),
 				};
@@ -255,10 +255,6 @@ export const AuthReducer = (state, action) => {
 			case 'USER_UNLINK_STARTED':
 				return _default();
 			case 'USER_UNLINK_SUCCEEDED':
-				// newState = {
-				// 	...initialUserState,
-				// 	...initialAccountLinkState,
-				// };
 				const { id: credentialId } = item || {};
 
 				const credentials = state?.credentials.filter(({ id }) => id !== credentialId);

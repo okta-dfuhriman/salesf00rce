@@ -1,10 +1,7 @@
-import { Auth, LDS, Link, React, TrailblazerLogo } from '../../common';
+import { Auth, Link, React, TrailblazerLogo } from '../../common';
 
 import AppLauncher from '../AppLauncher';
-import DropdownCard from '../DropdownCard';
 import UserMenu from '../UserMenu';
-
-import './styles.css';
 
 const Header = () => {
 	const { isAuthenticated, isPendingLogout } = Auth.useAuthState();
@@ -33,16 +30,16 @@ const Header = () => {
 					</Link>
 				</div>
 				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
-					<div className='slds-p-right_large slds-m-right_large border'>
-						{(isAuthenticated || isPendingLogout) && (
-							<>
-								<div className='slds-p-right_large slds-m-right_large'>
-									<AppLauncher />
-								</div>
-								<UserMenu />
-							</>
-						)}
-					</div>
+					{(isAuthenticated || isPendingLogout) && (
+						<>
+							<div className='slds-p-right_large slds-m-right_large border'>
+								{/* <div className='slds-p-right_large slds-m-right_large'> */}
+								<AppLauncher />
+								{/* </div> */}
+							</div>
+							<UserMenu />
+						</>
+					)}
 				</div>
 			</div>
 		</div>

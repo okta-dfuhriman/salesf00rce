@@ -311,66 +311,6 @@ const useAuthActions = () => {
 			return oktaAuth.signOut(config).then(() => dispatch({ type: 'LOGOUT_SUCCEEDED' }));
 		};
 
-		const doUserLinking = async (dispatch, { tokens }) => {
-			dispatch({ type: 'USER_LINK_PENDING' });
-
-			const primaryAccessToken = await oktaAuth.getAccessToken();
-
-			const {
-				payload: { uid: primaryUid },
-			} = await oktaAuth.token.decode(primaryAccessToken);
-
-			const {
-				accessToken: { accessToken: linkAccessToken },
-			} = tokens || {};
-
-			const options = {
-				method: 'post',
-				headers: {
-					Authorization: `Bearer ${primaryAccessToken}`,
-				},
-				body: JSON.stringify({ linkWith: linkAccessToken }),
-			};
-
-			const url = `${window.location.origin}/api/v1/users/${primaryUid}/identities`;
-
-			const response = await fetch(url, options);
-
-			if (!response.ok) {
-				throw new Error(await response.json());
-			}
-
-			const { tokens: freshTokens } = await oktaAuth.token.getWithoutPrompt();
-
-			if (!freshTokens) {
-				return dispatch({
-					type: 'USER_LINK_FAILED',
-					error: `Unable to obtain fresh tokens. Something went wrong!`,
-				});
-			}
-
-			// Update the authState w/ the new tokens
-			await oktaAuth.tokenManager.setTokens(freshTokens);
-
-			// Because isPendingAccountLink === true a getUserInfo() will NOT be triggered.
-			// So silently update userInfo
-			const { sub: userId } = await getUserInfoSync();
-
-			// And then silently update user
-			const user = await getUserSync(userId);
-
-			const { profile = {}, credentials = [], linkedUsers = [] } = user || {};
-
-			delete user.profile;
-			delete user.credentials;
-			delete user.linkedUsers;
-
-			return dispatch({
-				type: 'USER_LINK_SUCCEEDED',
-				payload: { profile: { ...user, ...profile }, credentials, linkedUsers },
-			});
-		};
-
 		const linkUser = async (dispatch, options) => {
 			try {
 				const { idp } = options || {};
@@ -414,16 +354,21 @@ const useAuthActions = () => {
 						throw new Error(await response.json());
 					}
 
-					await oktaAuth.tokenManager.renew('accessToken');
-
-					dispatch({
-						type: 'USER_LINK_SUCCEEDED',
-					});
+					const renewedAccessToken = await oktaAuth.tokenManager.renew('accessToken');
 
 					// restore the redirect_uri
 					oktaAuth.options.redirectUri = `${window.location.origin}/login/callback`;
 
-					return;
+					if (!renewedAccessToken) {
+						return dispatch({
+							type: 'USER_LINK_FAILED',
+							error: 'Unable to renew the accessToken. Something went wrong!',
+						});
+					}
+
+					return dispatch({
+						type: 'USER_LINK_SUCCEEDED',
+					});
 				} else {
 					const scopes = oktaAuth.options.scopes;
 
@@ -431,14 +376,16 @@ const useAuthActions = () => {
 						type: 'USER_LINK_STARTED',
 					});
 
-					console.info(' ===== CURRENT ORIGINAL URI ===== ');
+					console.group(' ===== CURRENT ORIGINAL URI ===== ');
 					console.log(oktaAuth.getOriginalUri());
+					console.groupEnd();
 
 					// Ensures we reroute to the /settings page where we started.
 					await oktaAuth.setOriginalUri(window.location.href);
 
-					console.info(' ===== NOW RETURNING TO ===== ');
+					console.group(' ===== NOW RETURNING TO ===== ');
 					console.log(oktaAuth.getOriginalUri());
+					console.groupEnd();
 
 					const requestOptions = {
 						idp: idpMap[idp],

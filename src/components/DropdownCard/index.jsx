@@ -1,4 +1,4 @@
-import { Auth, LDS, Link, aridDunes } from '../../common';
+import { Auth, LDS, Link, isUrl } from '../../common';
 
 import './styles.css';
 
@@ -7,20 +7,30 @@ const DropdownCard = () => {
 	const { logout } = Auth.useAuthActions();
 	const { profile, userInfo } = Auth.useAuthState();
 
+	const picture = profile?.picture ?? userInfo?.picture;
+	const name =
+		profile?.nickName ??
+		userInfo?.nickname ??
+		profile?.firstName ??
+		userInfo?.given_name ??
+		profile?.displayName ??
+		userInfo?.name ??
+		'';
+
 	return (
 		<div className='dropdown-menu' id='dropdown'>
-			<div className='menu__banner' style={{ backgroundImage: `url(${aridDunes})` }} />
+			<div className='menu__banner' />
 			<div
 				className='menu__banner-photo'
 				style={
-					profile?.picture || userInfo?.picture
+					isUrl(picture)
 						? {
-								backgroundImage: `url(${profile?.picture || userInfo?.picture})`,
+								backgroundImage: `url(${picture})`,
 						  }
 						: {}
 				}
 			/>
-			<div className='menu__header'>{userInfo?.name}</div>
+			<div className='menu__header'>{name}</div>
 			<ul className='menu__items'>
 				<li role='presentation'>
 					<Link to='/' className='menu__item' role='menuitem'>

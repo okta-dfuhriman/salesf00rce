@@ -1,17 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Auth, Okta, React } from './common';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import AppLoginCallback from './pages/LoginCallback';
 import Profile from './pages/Profile';
 import SecureApp from './components/SecureApp';
 import Settings from './pages/Settings';
-import SignIn from './pages/SignIn';
 import UserLinkCallback from './pages/UserLinkCallback';
 
 const Router = () => {
 	const { authState, oktaAuth } = Okta.useOktaAuth();
-	const navigate = useNavigate();
 	const dispatch = Auth.useAuthDispatch();
 	const { getUserInfo, getUser, silentAuth } = Auth.useAuthActions();
 	const {

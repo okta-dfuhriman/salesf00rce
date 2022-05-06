@@ -37,6 +37,8 @@ const menuItems = [
 ];
 
 const Settings = () => {
+	document.body.id = 'settings';
+
 	const ref = React.useRef(null);
 
 	const [selectedItem, setSelectedItem] = useState('privacy');

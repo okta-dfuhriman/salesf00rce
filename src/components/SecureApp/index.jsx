@@ -12,15 +12,7 @@ const SecureApp = ({ onAuthRequired, children }) => {
 
 	const { signInWithRedirect, silentAuth } = Auth.useAuthActions();
 	const dispatch = Auth.useAuthDispatch();
-	const {
-		isAuthenticated,
-		isPendingAccountLink,
-		isPendingLogin,
-		isPendingUserInfoFetch,
-		isStaleUserInfo,
-		isStaleUserProfile,
-		userInfo,
-	} = Auth.useAuthState();
+	const { isAuthenticated, isPendingLogin } = Auth.useAuthState();
 	const pendingLogin = React.useRef(false);
 	React.useEffect(() => {
 		const _isAuthenticated = authState?.isAuthenticated || isAuthenticated;
@@ -63,7 +55,7 @@ const SecureApp = ({ onAuthRequired, children }) => {
 		}
 	}, [isPendingLogin, authState?.isAuthenticated, isAuthenticated, onAuthRequired]);
 
-	if (!authState?.isAuthenticated || !isAuthenticated) {
+	if (!isAuthenticated) {
 		return <LDS.Spinner variant='inverse' size='large' containerClassName='sign-in-loader' />;
 	}
 

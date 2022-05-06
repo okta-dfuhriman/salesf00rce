@@ -71,7 +71,7 @@ const WelcomeCard = () => {
 			body={cardBody}
 			figure={
 				<LDS.Avatar
-					imgSrc={profile?.picture ?? 'assets/images/astro.svg'}
+					imgSrc={profile?.picture ?? '../../common/assets/images/astro.svg'}
 					imgAlt={profile?.displayName}
 					size='large'
 				/>
@@ -83,7 +83,7 @@ const WelcomeCard = () => {
 		<LDS.Card
 			id='welcome-card'
 			key='welcome-card'
-			className='tds-carde'
+			className='tds-card'
 			bodyClassName='slds-card__body_inner'
 			header={cardHeader}
 		/>
