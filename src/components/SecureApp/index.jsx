@@ -8,9 +8,11 @@ import Header from '../../components/Header';
 import './styles.css';
 
 const SecureApp = ({ onAuthRequired, children }) => {
+
 	const { authState, oktaAuth } = Okta.useOktaAuth();
 
 	const { signInWithRedirect, silentAuth } = Auth.useAuthActions();
+
 	const dispatch = Auth.useAuthDispatch();
 	const { isAuthenticated, isPendingLogin } = Auth.useAuthState();
 	const pendingLogin = React.useRef(false);

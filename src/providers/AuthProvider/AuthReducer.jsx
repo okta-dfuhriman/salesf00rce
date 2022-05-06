@@ -32,6 +32,7 @@ export const initialState = {
 export const initializeState = _initialState => {
 	const state = { ..._initialState };
 
+
 	const _storedState = localStorage.getItem('app_state');
 	const storedState = _storedState !== null ? JSON.parse(_storedState) : {};
 

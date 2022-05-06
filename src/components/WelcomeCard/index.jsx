@@ -15,6 +15,7 @@ const WelcomeCard = () => {
 
 	const currentAccounts = credentials?.filter(({ isLoggedIn }) => isLoggedIn) || [];
 
+
 	const currentAccount =
 		currentAccounts?.length > 1
 			? currentAccounts?.filter(
