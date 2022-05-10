@@ -33,9 +33,7 @@ const Header = () => {
 					{(isAuthenticated || isPendingLogout) && (
 						<>
 							<div className='slds-p-right_large slds-m-right_large border'>
-								{/* <div className='slds-p-right_large slds-m-right_large'> */}
 								<AppLauncher />
-								{/* </div> */}
 							</div>
 							<UserMenu />
 						</>

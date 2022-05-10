@@ -4,7 +4,6 @@ import AppLauncherCard from './AppLauncherCard';
 
 const AppLauncher = () => (
 	<LDS.Popover
-		id='app-launcher'
 		align='bottom right'
 		className='slds-m-top_xx-small slds-p-vertical_small slds-p-horizontal_x-small slds-is-absolute tds-app-launcher'
 		triggerClassName='header-dropdown__trigger'
