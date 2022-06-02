@@ -59,6 +59,8 @@ export {
 	LDS,
 };
 
+export * from '../hooks/useUserProfileQuery';
+export * from '../hooks/useUserInfoQuery';
 export { default as useLockBodyScroll } from '../hooks/useLockBodyScroll';
 export * from './assets/images';
 export { default as ApiError } from './utils/ApiError';

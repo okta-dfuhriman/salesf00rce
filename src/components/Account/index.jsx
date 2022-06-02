@@ -1,9 +1,11 @@
-import { Auth, LDS, React } from '../../common';
+import { Auth, LDS, React, useUserProfileQuery } from '../../common';
 import AccountCard from './AccountCard';
 
 const Account = props => {
 	const dispatch = Auth.useAuthDispatch();
-	const { isPendingUserFetch, isPendingAccountLink } = Auth.useAuthState();
+	const { isLoading: isLoadingUserProfile } = useUserProfileQuery({ dispatch });
+
+	const { isPendingAccountLink } = Auth.useAuthState();
 	const { linkUser, unlinkUser } = Auth.useAuthActions();
 
 	const handleAdd = provider => linkUser(dispatch, { idp: provider });
@@ -90,7 +92,7 @@ const Account = props => {
 		<div className='slds-m-bottom_xx-large'>
 			<h3 className='slds-text-title_caps slds-m-vertical_small'>{header}</h3>
 			<p className='slds-m-vertical_small slds-text-title tds-color_meteorite'>{subtitle}</p>
-			{(isPendingAccountLink || isPendingUserFetch) && (
+			{(isPendingAccountLink || isLoadingUserProfile) && (
 				<div>
 					<LDS.Spinner containerStyle={{ opacity: 0.4 }} />
 				</div>

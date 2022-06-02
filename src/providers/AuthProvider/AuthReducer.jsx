@@ -11,17 +11,6 @@ const initialAccountLinkState = {
 	isPendingAccountLink: false,
 };
 
-const initialUserState = {
-	isPendingUserFetch: false,
-	isPendingUserInfoFetch: false,
-	isStaleUserProfile: true,
-	isStaleUserInfo: true,
-	profile: {},
-	credentials: [],
-	linkedUsers: [],
-	userInfo: {},
-};
-
 export const initialState = {
 	isError: false,
 	isAuthenticated: false,
@@ -30,7 +19,6 @@ export const initialState = {
 	errors: [],
 	...initialLoginState,
 	...initialAccountLinkState,
-	...initialUserState,
 };
 
 export const getStoredUser = () => {
@@ -67,39 +55,6 @@ export const getStoredUser = () => {
 	return {};
 };
 
-const getStoredUserInfo = () => {
-	const _userInfo = sessionStorage.getItem('userInfo');
-
-	return _userInfo !== null ? JSON.parse(_userInfo) : {};
-};
-
-const getStoredUserState = () => {
-	let userState = {};
-
-	const user = getStoredUser();
-	const userInfo = getStoredUserInfo();
-
-	if (!_.isEmpty(user?.profile)) {
-		userState = {
-			...userState,
-			...user,
-			isPendingUserFetch: false,
-			isStaleUserProfile: false,
-		};
-
-		if (!_.isEmpty(userInfo)) {
-			userState = {
-				...userState,
-				userInfo,
-				isPendingUserInfoFetch: false,
-				isStaleUserInfo: false,
-			};
-		}
-	}
-
-	return userState;
-};
-
 export const initializeState = _initialState => {
 	const state = { ..._initialState, _initialized: false };
 
@@ -107,27 +62,6 @@ export const initializeState = _initialState => {
 	const storedState = _storedState !== null ? JSON.parse(_storedState) : {};
 
 	return { ...state, ...storedState };
-};
-
-const updateUserState = state => {
-	const { isAuthenticated } = state || {};
-	let userState = { ...state };
-
-	if (isAuthenticated) {
-		userState = {
-			...userState,
-			...getStoredUserState(),
-		};
-	} else {
-		sessionStorage.clear();
-
-		userState = {
-			...userState,
-			...initialUserState,
-		};
-	}
-
-	return userState;
 };
 
 export const AuthReducer = (state, action) => {
@@ -183,12 +117,6 @@ export const AuthReducer = (state, action) => {
 
 				newState.isAuthenticated =
 					newState?.authState?.isAuthenticated || newState?.isAuthenticated;
-
-				newState = {
-					...updateUserState(newState),
-					isStaleUserInfo: true,
-					isLoading: !!(state?._initialized && newState?.isAuthenticated),
-				};
 
 				return createState({ newState });
 
@@ -257,6 +185,8 @@ export const AuthReducer = (state, action) => {
 					isStaleUserProfile: false,
 				};
 				return _default();
+			case 'USER_FETCH_ABORTED':
+				return _default();
 			case 'USER_INFO_FETCH_STARTED':
 				newState = {
 					isPendingUserInfoFetch: true,
@@ -294,7 +224,6 @@ export const AuthReducer = (state, action) => {
 				return _default();
 			case 'USER_LINK_SUCCEEDED':
 				newState = {
-					...initialUserState,
 					...initialAccountLinkState,
 					isStaleUserInfo: true,
 				};
@@ -313,7 +242,6 @@ export const AuthReducer = (state, action) => {
 
 				newState = {
 					credentials,
-					...initialUserState,
 					...initialAccountLinkState,
 				};
 
@@ -331,7 +259,6 @@ export const AuthReducer = (state, action) => {
 				newState = {
 					...initialState,
 					isLoading: false,
-					...updateUserState(),
 					...payload,
 					...{
 						error,

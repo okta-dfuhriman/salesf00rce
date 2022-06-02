@@ -1,6 +1,7 @@
 import {
 	_,
 	Auth,
+	getUserName,
 	LDS,
 	AppleIconRound,
 	EmailIconRound,
@@ -8,13 +9,25 @@ import {
 	GoogleIconRound,
 	LinkedInIconRound,
 	SalesforceIconRound,
+	getProfilePicture,
+	useUserProfileQuery,
+	useUserInfoQuery,
 } from '../../common';
 
 const WelcomeCard = () => {
-	const { profile, credentials, isPendingAccountLink, isPendingUserFetch } = Auth.useAuthState();
+	const dispatch = Auth.useAuthDispatch();
+
+	const { data: userInfo } = useUserInfoQuery(dispatch);
+	const { isLoading: isLoadingUserProfile, data: user } = useUserProfileQuery({
+		dispatch,
+		userInfo,
+	});
+
+	const { profile, credentials } = user || {};
+
+	const { isPendingAccountLink } = Auth.useAuthState();
 
 	const currentAccounts = credentials?.filter(({ isLoggedIn }) => isLoggedIn) || [];
-
 
 	const currentAccount =
 		currentAccounts?.length > 1
@@ -25,10 +38,9 @@ const WelcomeCard = () => {
 
 	let providerIcon;
 
-	const {
-		login,
-		provider: { name: providerName },
-	} = currentAccount || {};
+	const { login, provider } = currentAccount || {};
+
+	const providerName = provider?.name || '';
 
 	switch (providerName) {
 		case 'apple':
@@ -46,20 +58,24 @@ const WelcomeCard = () => {
 		case 'salesforce':
 			providerIcon = <SalesforceIconRound className='tds-icon-social slds-icon_small' />;
 			break;
-		default:
+		case 'email':
 			providerIcon = <EmailIconRound className='slds-icon tds-icon-social slds-icon_small' />;
+			break;
+		default:
+			providerIcon = <></>;
+			break;
 	}
 
 	const cardBody = (
 		<>
-			{(isPendingAccountLink || isPendingUserFetch) && (
+			{(isPendingAccountLink || isLoadingUserProfile) && (
 				<div>
 					<LDS.Spinner />
 				</div>
 			)}
 			<div>
-				Hey{!_.isEmpty(profile) ? ` ${profile?.firstName ?? profile?.nickName}` : ''}! You're logged
-				in with your {_.capitalize(providerName)} account:&nbsp;&nbsp;
+				Hey {getUserName(userInfo, profile)}! You're logged in with your{' '}
+				{_.capitalize(providerName)} account:&nbsp;&nbsp;
 				<span className='tds-text_bold break-word'>
 					{providerIcon} {login}.
 				</span>
@@ -72,8 +88,8 @@ const WelcomeCard = () => {
 			body={cardBody}
 			figure={
 				<LDS.Avatar
-					imgSrc={profile?.picture ?? '../../common/assets/images/astro.svg'}
-					imgAlt={profile?.displayName}
+					imgSrc={getProfilePicture(userInfo, profile)}
+					imgAlt={getUserName(userInfo, profile) ?? 'user avatar'}
 					size='large'
 				/>
 			}

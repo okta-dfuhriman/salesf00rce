@@ -87,150 +87,6 @@ const useAuthActions = _oktaAuth => {
 			}
 		};
 
-		const getUserSync = async (userId, _user) => {
-			let user = _user;
-
-			const accessToken = oktaAuth.getAccessToken();
-			const {
-				payload: { uid: loggedInUserId },
-			} = oktaAuth.token.decode(accessToken);
-
-			const idToken = oktaAuth.getIdToken();
-			const {
-				payload: { idp },
-			} = oktaAuth.token.decode(idToken);
-
-			if (!user && userId) {
-				const url = `${window.location.origin}/api/v1/users/${userId}`;
-
-				const request = new Request(url);
-
-				request.headers.append('Authorization', `Bearer ${accessToken}`);
-
-				const response = await fetch(request);
-
-				if (!response.ok) {
-					const body = await response.json();
-					console.error(body);
-					throw new Error(JSON.stringify(body));
-				}
-
-				user = await response.json();
-			}
-
-			if (user) {
-				// set active credential
-				const { credentials = [] } = user;
-
-				const _credentials = credentials.map(credential => {
-					const {
-						id,
-						provider: { id: idpId, name },
-					} = credential;
-
-					const isLoggedIn =
-						credentials.length === 1 ||
-						(credentials.length === 2 && ['email', 'password'].includes(name)) ||
-						(id === loggedInUserId && idpId === idp) ||
-						(id === loggedInUserId && ['email', 'password'].includes(name));
-
-					return { ...credential, isLoggedIn };
-				});
-
-				const _now = Date.now();
-				const _expires = new Date(_now);
-
-				user = {
-					...user,
-					credentials: _credentials,
-					_expires: _expires.setMinutes(_expires.getMinutes() + 10),
-				};
-
-				sessionStorage.setItem('user', JSON.stringify(user));
-
-				return user;
-			}
-		};
-
-		const getUser = async (dispatch, { userId, user: _user, force = false }) => {
-			try {
-				dispatch({
-					type: 'USER_FETCH_STARTED',
-				});
-
-				const storedUser = getStoredUser();
-
-				let user = {};
-
-				if (force || _.isEmpty(storedUser)) {
-					user = await getUserSync(userId, _user);
-				}
-
-				const { profile = {}, credentials = [], linkedUsers = [] } = user || {};
-
-				delete user.profile;
-				delete user.credentials;
-				delete user.linkedUsers;
-
-				const payload = { profile: { ...user, ...profile }, credentials, linkedUsers };
-
-				dispatch({
-					type: 'USER_FETCH_SUCCEEDED',
-					payload,
-				});
-
-				return payload;
-			} catch (error) {
-				if (dispatch) {
-					console.log(error);
-					dispatch({
-						type: 'USER_FETCH_FAILED',
-						error,
-					});
-				} else {
-					throw new Error(error);
-				}
-			}
-		};
-
-		const getUserInfoSync = async () => {
-			const userInfo = await oktaAuth.getUser();
-
-			if (userInfo) {
-				if (userInfo.headers) {
-					delete userInfo.headers;
-				}
-
-				sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-
-				return userInfo;
-			}
-		};
-
-		const getUserInfo = async dispatch => {
-			try {
-				if (dispatch) {
-					dispatch({
-						type: 'USER_INFO_FETCH_STARTED',
-					});
-				}
-
-				const userInfo = await getUserInfoSync();
-
-				if (dispatch) {
-					dispatch({ type: 'USER_INFO_FETCH_SUCCEEDED', payload: { userInfo } });
-				}
-				return userInfo;
-			} catch (error) {
-				if (dispatch) {
-					console.log(error);
-					dispatch({ type: 'USER_INFO_FETCH_FAILED', error });
-				} else {
-					throw new Error(error);
-				}
-			}
-		};
-
 		const loginWithCredentials = async (dispatch, { username, password }) => {
 			try {
 				dispatch({ type: 'LOGIN_WITH_CREDENTIALS_STARTED' });
@@ -287,8 +143,8 @@ const useAuthActions = _oktaAuth => {
 					await oktaAuth.handleLoginRedirect();
 
 					dispatch({ type: 'LOGIN_SUCCESS' });
-
-					return await getUserInfo(dispatch);
+					return;
+					// return await getUserInfo(dispatch);
 				}
 
 				if (!authState?.isAuthenticated) {
@@ -500,9 +356,6 @@ const useAuthActions = _oktaAuth => {
 		};
 
 		return {
-			getUserSync,
-			getUser,
-			getUserInfo,
 			linkUser,
 			login,
 			logout,

@@ -4,8 +4,9 @@
 import { Auth } from '../../common';
 
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from 'react-query';
 
-import { PropTypes, React } from '../../common';
+import { PropTypes, React, userInfoQueryFn } from '../../common';
 import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
 import { Security } from '@okta/okta-react';
 import { authConfig } from '../../common/config/authConfig';
@@ -17,14 +18,20 @@ export const AuthStateContext = React.createContext();
 const oktaAuth = new OktaAuth(authConfig.oidc);
 
 const AuthProvider = ({ children }) => {
+	const queryClient = useQueryClient();
+
+	console.log(queryClient.getDefaultOptions());
+
 	const navigate = useNavigate();
-	const { getUserInfo, getUser, silentAuth } = Auth.useAuthActions(oktaAuth);
+	const { silentAuth } = Auth.useAuthActions(oktaAuth);
+
 	const restoreOriginalUri = async (_oktaAuth, originalUri) =>
 		navigate(toRelativeUrl(originalUri || '/', window.location.origin), { replace: true });
 
 	const customAuthHandler = () => {
 		navigate('/', { replace: true });
 	};
+
 	const [state, dispatch] = React.useReducer(AuthReducer, initialState, initializeState);
 
 	React.useLayoutEffect(() => {
@@ -39,7 +46,13 @@ const AuthProvider = ({ children }) => {
 				return isAuthenticated;
 			}
 		};
-		const handler = authState => dispatch({ type: 'AUTH_STATE_UPDATED', payload: { authState } });
+		const handler = authState => {
+			if (authState && !authState.isAuthenticated) {
+				queryClient.invalidateQueries('user');
+			}
+
+			dispatch({ type: 'AUTH_STATE_UPDATED', payload: { authState } });
+		};
 
 		console.log('AuthContext > authStateManager.subscribe()');
 
@@ -55,38 +68,20 @@ const AuthProvider = ({ children }) => {
 	}, []);
 
 	React.useEffect(() => {
-		const {
-			isAuthenticated,
-			isPendingLogin,
-			isPendingAccountLink,
-			isPendingUserInfoFetch,
-			isPendingUserFetch,
-			isStaleUserInfo,
-			isStaleUserProfile,
-			profile,
-			userInfo,
-		} = state || {};
+		const { isAuthenticated, isPendingLogin, isPendingAccountLink } = state || {};
 
 		if (
 			!isPendingAccountLink &&
 			isAuthenticated &&
 			(!oktaAuth.isLoginRedirect() || !isPendingLogin)
 		) {
-			if (!isPendingUserInfoFetch) {
-				if (isStaleUserInfo || !userInfo) {
-					console.debug('AuthProvider > getUserInfo()');
+			console.group('AuthContext > getUserInfo()');
 
-					getUserInfo(dispatch);
-				}
+			queryClient.prefetchQuery(['user-info'], () => userInfoQueryFn({ dispatch, oktaAuth }));
 
-				if (userInfo?.sub && !isPendingUserFetch && (isStaleUserProfile || !profile)) {
-					console.debug('AuthProvider > getUser()');
-
-					getUser(dispatch, { userId: userInfo.sub });
-				}
-			}
+			console.groupEnd();
 		}
-	}, [state]);
+	}, [state?.isPendingAccountLink, state?.isAuthenticated, state?.isPendingLogin]);
 
 	// eslint-disable-next-line react/jsx-no-constructed-context-values
 	const contextValues = {

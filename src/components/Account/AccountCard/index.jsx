@@ -8,6 +8,7 @@ import {
 	GoogleIconRound,
 	LinkedInIconRound,
 	SalesforceIconRound,
+	useUserProfileQuery,
 } from '../../../common';
 
 import './styles.css';
@@ -43,9 +44,14 @@ const AccountCardBody = ({ login, providerName, type: providerType }) => (
 );
 
 const AccountCard = props => {
-	const { isPendingAccountLink, isPendingUserFetch } = Auth.useAuthState();
+	const dispatch = Auth.useAuthDispatch();
+	const { isLoading: isLoadingUserProfile } = useUserProfileQuery({ dispatch });
+	const { isPendingAccountLink } = Auth.useAuthState();
+
 	const [isLoading, setIsLoading] = React.useState(false);
+
 	const { id, credential, onDisconnect, type } = props;
+
 	const {
 		id: userId,
 		provider: { name: providerName },
@@ -107,7 +113,7 @@ const AccountCard = props => {
 				<div className='slds-no-flex'>
 					<LDS.Button
 						id={`${providerName}-${userId}-disconnect`}
-						disabled={isLoggedIn || isPendingAccountLink || isPendingUserFetch}
+						disabled={isLoggedIn || isPendingAccountLink || isLoadingUserProfile}
 						label='Disconnect'
 						variant='destructive'
 						onClick={disconnect}

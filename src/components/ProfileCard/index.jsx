@@ -1,8 +1,14 @@
-import { Auth, LDS, Link, isUrl } from '../../common';
+import { Auth, LDS, Link, isUrl, useUserInfoQuery, useUserProfileQuery } from '../../common';
+
 import './ProfileCard.css';
 
 const ProfileCard = () => {
-	const { isPendingUserInfoFetch, profile, userInfo } = Auth.useAuthState();
+	const dispatch = Auth.useAuthDispatch();
+
+	const { isLoading: isLoadingUserInfo, data: userInfo } = useUserInfoQuery(dispatch);
+	const { data: profile } = useUserProfileQuery({ dispatch, userInfo });
+
+	// const { isPendingUserInfoFetch, profile, userInfo } = Auth.useAuthState();
 
 	const picture = profile?.picture ?? userInfo?.picture;
 
@@ -48,15 +54,15 @@ const ProfileCard = () => {
 				{userInfo?.name}
 			</h1>
 			<div className='company slds-truncate'>{userInfo?.organization ?? 'Unknown Employer'}</div>
-			<div className='location'>{`${profile?.city ?? userInfo?.city ?? 'Unknown City'}, ${
-				profile?.countryCode ?? userInfo?.countryCode ?? 'Unknown Country'
+			<div className='location'>{`${userInfo?.city ?? 'Unknown City'}, ${
+				userInfo?.countryCode ?? 'Unknown Country'
 			}`}</div>
 			<div className='social-links'></div>
 		</div>
 	);
 
 	const cardBody =
-		isPendingUserInfoFetch || !userInfo ? (
+		isLoadingUserInfo || !userInfo ? (
 			<LDS.Spinner variant='brand' />
 		) : (
 			<>

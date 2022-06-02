@@ -1,11 +1,22 @@
-import { Auth, LDS, Link, getProfilePicture, getUserName } from '../../common';
+import {
+	Auth,
+	LDS,
+	Link,
+	getProfilePicture,
+	getUserName,
+	useUserInfoQuery,
+	useUserProfileQuery,
+} from '../../common';
 
 import './styles.css';
 
 const DropdownCard = () => {
 	const dispatch = Auth.useAuthDispatch();
 	const { logout } = Auth.useAuthActions();
-	const { profile, userInfo } = Auth.useAuthState();
+
+	const { data: userInfo } = useUserInfoQuery(dispatch);
+	const { data: user } = useUserProfileQuery({ dispatch, userInfo });
+	const { profile } = user || {};
 
 	return (
 		<div className='dropdown-menu' id='dropdown'>

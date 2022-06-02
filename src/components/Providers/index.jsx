@@ -1,9 +1,13 @@
-import { Auth, React } from '../../common';
+import { Auth, React, useUserProfileQuery } from '../../common';
 
 import Account from '../../components/Account';
 
 const Providers = () => {
-	const { credentials = [] } = Auth.useAuthState();
+	const dispatch = Auth.useAuthDispatch();
+
+	const { data: user } = useUserProfileQuery({ dispatch });
+
+	const { credentials = [] } = user || {};
 
 	return (
 		<>

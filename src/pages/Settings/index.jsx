@@ -1,4 +1,4 @@
-import { _, Auth, LDS, React, useState } from '../../common';
+import { _, LDS, React } from '../../common';
 
 import SettingsCard from '../../components/SettingsCard';
 import Providers from '../../components/Providers';
@@ -41,7 +41,7 @@ const Settings = () => {
 
 	const ref = React.useRef(null);
 
-	const [selectedItem, setSelectedItem] = useState('privacy');
+	const [selectedItem, setSelectedItem] = React.useState('privacy');
 
 	const handleSelect = (event, { item }) => {
 		setSelectedItem(() => item?.id);
