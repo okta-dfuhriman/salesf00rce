@@ -12734,7 +12734,6 @@ a.slds-button--inverse:focus {
 	border-radius: 0.25rem;
 	padding: 0.25rem 0;
 	font-size: 0.75rem;
-	background: white;
 	box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
 	transform: translateX(-50%);
 	/**
