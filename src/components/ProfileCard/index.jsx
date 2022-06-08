@@ -8,8 +8,6 @@ const ProfileCard = () => {
 	const { isLoading: isLoadingUserInfo, data: userInfo } = useUserInfoQuery(dispatch);
 	const { data: profile } = useUserProfileQuery({ dispatch, userInfo });
 
-	// const { isPendingUserInfoFetch, profile, userInfo } = Auth.useAuthState();
-
 	const picture = profile?.picture ?? userInfo?.picture;
 
 	const UserAvatar = (

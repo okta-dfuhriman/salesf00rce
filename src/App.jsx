@@ -1,8 +1,7 @@
-import { LDS, React } from './common';
+import { LDS, React, ReactQuery } from './common';
 import AuthProvider from './providers/AuthProvider/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
 import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor-experimental';
 
@@ -12,7 +11,7 @@ import Router from './Router';
 
 const STALE_TIME = process.env.QUERY_STALE_TIME || 2.5; // Time in **MINUTES** to be used when setting the staleTime configuration.
 
-const queryClient = new QueryClient({
+const queryClient = new ReactQuery.QueryClient({
 	defaultOptions: { queries: { staleTime: 1000 * 60 * STALE_TIME } },
 });
 
@@ -41,14 +40,14 @@ const App = () => {
 
 	return (
 		<React.Suspense fallback={<LDS.Spinner variant='brand' />}>
-			<QueryClientProvider client={queryClient}>
+			<ReactQuery.QueryClientProvider client={queryClient}>
 				<AuthProvider>
 					<LDS.IconSettings iconPath='/assets/icons'>
 						<Router />
 					</LDS.IconSettings>
 				</AuthProvider>
 				<ReactQueryDevtools initialIsOpen={true} />
-			</QueryClientProvider>
+			</ReactQuery.QueryClientProvider>
 		</React.Suspense>
 	);
 };

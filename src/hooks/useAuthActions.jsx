@@ -144,7 +144,6 @@ const useAuthActions = _oktaAuth => {
 
 					dispatch({ type: 'LOGIN_SUCCESS' });
 					return;
-					// return await getUserInfo(dispatch);
 				}
 
 				if (!authState?.isAuthenticated) {
