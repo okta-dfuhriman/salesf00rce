@@ -3,6 +3,7 @@ import {
 	Auth,
 	getUserName,
 	LDS,
+	ReactQuery,
 	AppleIconRound,
 	EmailIconRound,
 	FacebookIconRound,
@@ -16,6 +17,7 @@ import {
 
 const WelcomeCard = () => {
 	const dispatch = Auth.useAuthDispatch();
+	const isPendingAccountLink = ReactQuery.useIsMutating('account-link') > 0;
 
 	const { data: userInfo } = useUserInfoQuery(dispatch);
 	const { isLoading: isLoadingUserProfile, data: user } = useUserProfileQuery({
@@ -24,8 +26,6 @@ const WelcomeCard = () => {
 	});
 
 	const { profile, credentials } = user || {};
-
-	const { isPendingAccountLink } = Auth.useAuthState();
 
 	const currentAccounts = credentials?.filter(({ isLoggedIn }) => isLoggedIn) || [];
 

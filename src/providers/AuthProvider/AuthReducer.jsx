@@ -1,3 +1,4 @@
+/* eslint-disable no-fallthrough */
 /** @format */
 
 import { _ } from '../../common';
@@ -7,61 +8,14 @@ const initialLoginState = {
 	isLoggedOut: false,
 };
 
-const initialAccountLinkState = {
-	isPendingAccountLink: false,
-};
-
 export const initialState = {
+	_initialized: false,
 	isError: false,
 	isAuthenticated: false,
 	isLoading: true,
 	isPendingLogout: false,
 	errors: [],
 	...initialLoginState,
-	...initialAccountLinkState,
-};
-
-export const getStoredUser = () => {
-	const _user = sessionStorage.getItem('user');
-
-	if (!_.isEmpty(_user)) {
-		const user = _user !== null ? JSON.parse(_user) : {};
-
-		if (!_.isEmpty(user)) {
-			const { profile = {}, credentials = [], linkedUsers = [] } = user;
-
-			if (user?._expires < Date.now()) {
-				if (!_.isEmpty(user?.profile)) {
-					delete user.profile;
-				}
-
-				if (!_.isEmpty(user?.credentials)) {
-					delete user.credentials;
-				}
-
-				if (!_.isEmpty(user?.linkedUsers)) {
-					delete user.linkedUsers;
-				}
-
-				return {
-					profile: { ...user, ...profile },
-					credentials,
-					linkedUsers,
-				};
-			}
-		}
-	}
-
-	return {};
-};
-
-export const initializeState = _initialState => {
-	const state = { ..._initialState, _initialized: false };
-
-	const _storedState = localStorage.getItem('app_state');
-	const storedState = _storedState !== null ? JSON.parse(_storedState) : {};
-
-	return { ...state, ...storedState };
 };
 
 export const AuthReducer = (state, action) => {
@@ -102,6 +56,7 @@ export const AuthReducer = (state, action) => {
 			case 'APP_INITIALIZED':
 				newState = {
 					_initialized: true,
+					isLoading: false,
 				};
 
 				return _default();
@@ -135,13 +90,13 @@ export const AuthReducer = (state, action) => {
 			case 'LOGOUT_STARTED':
 				newState = {
 					isPendingLogout: true,
+					isLoading: true,
 				};
 				return _default();
 			case 'LOGIN_SUCCESS':
 				newState = {
 					...initialLoginState,
 					isAuthenticated: true,
-					isStaleUserInfo: true,
 					isLoading: false,
 				};
 				return _default();
@@ -180,72 +135,28 @@ export const AuthReducer = (state, action) => {
 
 			// USER FETCH
 			case 'USER_FETCH_STARTED':
-				newState = {
-					isPendingUserFetch: true,
-					isStaleUserProfile: false,
-				};
-				return _default();
 			case 'USER_FETCH_ABORTED':
-				return _default();
 			case 'USER_INFO_FETCH_STARTED':
-				newState = {
-					isPendingUserInfoFetch: true,
-					isStaleUserInfo: false,
-				};
 				return _default();
 			case 'USER_FETCH_SUCCEEDED':
 				newState = {
 					...initialLoginState,
-					isPendingUserFetch: false,
 				};
 				return _default();
 			case 'USER_INFO_FETCH_SUCCEEDED':
 				newState = {
 					...initialLoginState,
-					isStaleUserProfile: true,
-					isPendingUserInfoFetch: false,
 				};
 				return _default();
 
 			// USER LINK
-			case 'USER_LINK_PENDING':
-				newState = {
-					isPendingAccountLink: true,
-				};
-
-				return _default();
 			case 'USER_LINK_STARTED':
-				newState = {
-					isPendingAccountLink: true,
-				};
-
-				localStorage.setItem('app_state', JSON.stringify({ ...state, ...newState, ...payload }));
-
-				return _default();
 			case 'USER_LINK_SUCCEEDED':
-				newState = {
-					...initialAccountLinkState,
-					isStaleUserInfo: true,
-				};
-
-				localStorage.removeItem('app_state');
-
-				return _default();
-
+			case 'USER_LINK_CANCELLED':
 			// USER UNLINK
 			case 'USER_UNLINK_STARTED':
-				return _default();
 			case 'USER_UNLINK_SUCCEEDED':
-				const { id: credentialId } = item || {};
-
-				const credentials = state?.credentials.filter(({ id }) => id !== credentialId);
-
-				newState = {
-					credentials,
-					...initialAccountLinkState,
-				};
-
-				return createState({ state, newState });
+				return _default();
 			// ERRORS
 			case 'APP_STATE_UPDATE_FAILED':
 			case 'LOGIN_ERROR':

@@ -1,15 +1,46 @@
-import { Auth, LDS, React, useUserProfileQuery } from '../../common';
+import {
+	Auth,
+	LDS,
+	React,
+	ReactQuery,
+	useUserProfileQuery,
+	useLinkAccountMutation,
+	useUnlinkAccountMutation,
+} from '../../common';
 import AccountCard from './AccountCard';
 
 const Account = props => {
 	const dispatch = Auth.useAuthDispatch();
-	const { isLoading: isLoadingUserProfile } = useUserProfileQuery({ dispatch });
 
-	const { isPendingAccountLink } = Auth.useAuthState();
-	const { linkUser, unlinkUser } = Auth.useAuthActions();
+	const queryClient = ReactQuery.useQueryClient();
 
-	const handleAdd = provider => linkUser(dispatch, { idp: provider });
-	const handleDisconnect = credential => unlinkUser(dispatch, credential);
+	const { mutate: unlinkUser } = useUnlinkAccountMutation({
+		queryClient,
+		dispatch,
+	});
+
+	const {
+		isError: isErrorLinkAccount,
+		error: linkAccountError,
+		mutate: linkAccount,
+		reset: linkAccountReset,
+	} = useLinkAccountMutation({
+		queryClient,
+		dispatch,
+	});
+
+	const { isLoading: isLoadingUserProfile } = useUserProfileQuery({
+		dispatch,
+	});
+
+	React.useEffect(() => {
+		if (isErrorLinkAccount && !linkAccountError) {
+			linkAccountReset();
+		}
+	}, [isErrorLinkAccount, linkAccountError, linkAccountReset]);
+
+	const handleAdd = provider => linkAccount(provider);
+	const handleDisconnect = credential => unlinkUser(credential);
 
 	const { header, subtitle, type, credentials = [] } = props;
 
@@ -92,7 +123,7 @@ const Account = props => {
 		<div className='slds-m-bottom_xx-large'>
 			<h3 className='slds-text-title_caps slds-m-vertical_small'>{header}</h3>
 			<p className='slds-m-vertical_small slds-text-title tds-color_meteorite'>{subtitle}</p>
-			{(isPendingAccountLink || isLoadingUserProfile) && (
+			{isLoadingUserProfile && (
 				<div>
 					<LDS.Spinner containerStyle={{ opacity: 0.4 }} />
 				</div>

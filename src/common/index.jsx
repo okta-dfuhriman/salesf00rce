@@ -59,8 +59,11 @@ export {
 	LDS,
 };
 
+export * as ReactQuery from 'react-query';
 export * from '../hooks/useUserProfileQuery';
 export * from '../hooks/useUserInfoQuery';
+export { default as useUnlinkAccountMutation } from '../hooks/useUnlinkAccountMutation';
+export { default as useLinkAccountMutation } from '../hooks/useLinkAccountMutation';
 export { default as useLockBodyScroll } from '../hooks/useLockBodyScroll';
 export * from './assets/images';
 export { default as ApiError } from './utils/ApiError';

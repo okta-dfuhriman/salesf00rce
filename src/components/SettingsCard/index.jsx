@@ -1,7 +1,7 @@
 import { _, LDS } from '../../common';
 
 const SettingsCard = props => {
-	const { header, subheader, content, children } = props;
+	const { header, subheader, content, children, isLoading } = props;
 
 	return (
 		<LDS.Card
@@ -23,6 +23,7 @@ const SettingsCard = props => {
 			}
 			bodyClassName='slds-card__body_inner'
 		>
+			{isLoading && <LDS.Spinner />}
 			{content}
 			{children}
 		</LDS.Card>

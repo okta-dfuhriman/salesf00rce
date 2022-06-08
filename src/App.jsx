@@ -3,6 +3,8 @@ import AuthProvider from './providers/AuthProvider/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
+import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor-experimental';
 
 import useBodyClass from './hooks/useBodyClass';
 
@@ -12,6 +14,15 @@ const STALE_TIME = process.env.QUERY_STALE_TIME || 2.5; // Time in **MINUTES** t
 
 const queryClient = new QueryClient({
 	defaultOptions: { queries: { staleTime: 1000 * 60 * STALE_TIME } },
+});
+
+const localStoragePersistor = createWebStoragePersistor({ storage: window.localStorage });
+
+persistQueryClient({
+	queryClient,
+	persistor: localStoragePersistor,
+	maxAge: 1000 * 60 * 5,
+	dehydrateOptions: { dehydrateMutations: true, dehydrateQueries: true },
 });
 
 const App = () => {

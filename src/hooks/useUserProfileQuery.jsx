@@ -1,5 +1,4 @@
-import { Okta, useUserInfoQuery } from '../common';
-import { useQuery } from 'react-query';
+import { Okta, ReactQuery, useUserInfoQuery } from '../common';
 
 const getUserAsync = async ({ oktaAuth, userId: _userId, user: _user, abortSignal }) => {
 	let user = _user;
@@ -105,14 +104,20 @@ export const useUserProfileQuery = options => {
 	try {
 		const { data: _userInfo } = useUserInfoQuery(options?.dispatch);
 
+		const isPendingAccountLink = ReactQuery.useIsMutating(['account-link']);
+
 		const userInfo = options?.userInfo || _userInfo;
 
 		const oktaAuth = Okta.useOktaAuth();
 
-		return useQuery('user-profile', () => userProfileQueryFn({ ...options, ...oktaAuth }), {
-			enabled: !!userInfo,
-			retry: 6,
-		});
+		return ReactQuery.useQuery(
+			['user', 'profile'],
+			() => userProfileQueryFn({ ...options, ...oktaAuth }),
+			{
+				enabled: isPendingAccountLink ? false : !!userInfo,
+				retry: 6,
+			}
+		);
 	} catch (error) {
 		throw new Error(`useUserProfileQuery init error [${error}]`);
 	}

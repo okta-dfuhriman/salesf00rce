@@ -1,16 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @format */
-
-import { Auth } from '../../common';
-
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from 'react-query';
 
-import { PropTypes, React, userInfoQueryFn } from '../../common';
+import { Auth, PropTypes, React, ReactQuery, userInfoQueryFn } from '../../common';
 import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
 import { Security } from '@okta/okta-react';
 import { authConfig } from '../../common/config/authConfig';
-import { AuthReducer, initialState, initializeState } from './AuthReducer';
+import { AuthReducer, initialState } from './AuthReducer';
 import AuthDispatchContext from './AuthDispatcher';
 
 export const AuthStateContext = React.createContext();
@@ -18,9 +14,7 @@ export const AuthStateContext = React.createContext();
 const oktaAuth = new OktaAuth(authConfig.oidc);
 
 const AuthProvider = ({ children }) => {
-	const queryClient = useQueryClient();
-
-	console.log(queryClient.getDefaultOptions());
+	const queryClient = ReactQuery.useQueryClient();
 
 	const navigate = useNavigate();
 	const { silentAuth } = Auth.useAuthActions(oktaAuth);
@@ -32,7 +26,7 @@ const AuthProvider = ({ children }) => {
 		navigate('/', { replace: true });
 	};
 
-	const [state, dispatch] = React.useReducer(AuthReducer, initialState, initializeState);
+	const [state, dispatch] = React.useReducer(AuthReducer, initialState);
 
 	React.useLayoutEffect(() => {
 		const initAuthState = async () => {
@@ -46,10 +40,15 @@ const AuthProvider = ({ children }) => {
 				return isAuthenticated;
 			}
 		};
+
+		const initApp = async (_oktaAuth, _queryClient) => {
+			await initAuthState(_oktaAuth);
+
+			oktaAuth.start();
+		};
+
 		const handler = authState => {
-			if (authState && !authState.isAuthenticated) {
-				queryClient.invalidateQueries('user');
-			}
+			queryClient.invalidateQueries('user');
 
 			dispatch({ type: 'AUTH_STATE_UPDATED', payload: { authState } });
 		};
@@ -60,28 +59,22 @@ const AuthProvider = ({ children }) => {
 
 		console.log('AuthContext > initAuthState()');
 
-		initAuthState()
-			.then(() => oktaAuth.start())
-			.finally(() => dispatch({ type: 'APP_INITIALIZED' }));
+		initApp(oktaAuth, queryClient)
+			.then(() => dispatch({ type: 'APP_INITIALIZED' }))
+			.catch(error => console.error(`Unable to initialize app! [${error}]`));
 
 		return () => oktaAuth.authStateManager.unsubscribe();
 	}, []);
 
 	React.useEffect(() => {
-		const { isAuthenticated, isPendingLogin, isPendingAccountLink } = state || {};
+		const { isAuthenticated, isPendingLogin } = state || {};
 
-		if (
-			!isPendingAccountLink &&
-			isAuthenticated &&
-			(!oktaAuth.isLoginRedirect() || !isPendingLogin)
-		) {
-			console.group('AuthContext > getUserInfo()');
+		if (isAuthenticated && (!oktaAuth.isLoginRedirect() || !isPendingLogin)) {
+			console.log('AuthContext > getUserInfo()');
 
-			queryClient.prefetchQuery(['user-info'], () => userInfoQueryFn({ dispatch, oktaAuth }));
-
-			console.groupEnd();
+			queryClient.prefetchQuery(['user', 'info'], () => userInfoQueryFn({ dispatch, oktaAuth }));
 		}
-	}, [state?.isPendingAccountLink, state?.isAuthenticated, state?.isPendingLogin]);
+	}, [state?.isAuthenticated, state?.isPendingLogin]);
 
 	// eslint-disable-next-line react/jsx-no-constructed-context-values
 	const contextValues = {

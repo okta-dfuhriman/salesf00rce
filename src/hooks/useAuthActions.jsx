@@ -1,6 +1,5 @@
 /** @format */
-import { _, ApiError, Okta } from '../common';
-import { getStoredUser } from '../providers/AuthProvider/AuthReducer';
+import { _, Okta, ReactQuery } from '../common';
 
 const GOOGLE_IDP_ID = '0oa3cdpdvdd3BHqDA1d7';
 const LINKEDIN_IDP_ID = '0oa3cdljzgEyGBMez1d7';
@@ -22,6 +21,7 @@ const idpMap = {
 
 const useAuthActions = _oktaAuth => {
 	try {
+		const queryClient = ReactQuery.useQueryClient();
 		const { authState, oktaAuth } = Okta.useOktaAuth() || { oktaAuth: _oktaAuth };
 
 		const silentAuth = async (
@@ -194,7 +194,10 @@ const useAuthActions = _oktaAuth => {
 				// 2) Clear Session Storage
 				sessionStorage.clear();
 
-				// 3) Do Okta Sign Out, which results in a redirect.
+				// 3) Clear the QueryClient
+				queryClient.clear();
+
+				// 4) Do Okta Sign Out, which results in a redirect.
 				return oktaAuth.signOut(config);
 			} catch (error) {
 				if (dispatch) {
@@ -206,162 +209,11 @@ const useAuthActions = _oktaAuth => {
 			}
 		};
 
-		const linkUser = async (dispatch, options) => {
-			try {
-				const { idp } = options || {};
-
-				// 1) Update the redirect_uri. This will need to be restored after!
-				const LINK_REDIRECT_URI = `${window.location.origin}/identities/callback`;
-
-				oktaAuth.options.redirectUri = LINK_REDIRECT_URI;
-
-				if (oktaAuth.isLoginRedirect()) {
-					dispatch({
-						type: 'USER_LINK_PENDING',
-					});
-
-					const primaryAccessToken = oktaAuth.getAccessToken();
-
-					// The `sub` claim will always be the subject of the accessToken. The `uid` will represent that user that is actually logged in.
-					const {
-						payload: { uid },
-					} = await oktaAuth.token.decode(primaryAccessToken);
-
-					await oktaAuth.handleLoginRedirect();
-
-					const linkAccessToken = oktaAuth.getAccessToken();
-
-					const requestOptions = {
-						method: 'post',
-						headers: {
-							Authorization: `Bearer ${primaryAccessToken}`,
-						},
-						body: JSON.stringify({
-							linkWith: linkAccessToken,
-						}),
-					};
-
-					const url = `${window.location.origin}/api/v1/users/${uid}/identities`;
-
-					const response = await fetch(url, requestOptions);
-
-					if (!response.ok) {
-						throw new Error(await response.json());
-					}
-
-					const renewedAccessToken = await oktaAuth.tokenManager.renew('accessToken');
-
-					// restore the redirect_uri
-					oktaAuth.options.redirectUri = `${window.location.origin}/login/callback`;
-
-					if (!renewedAccessToken) {
-						return dispatch({
-							type: 'USER_LINK_FAILED',
-							error: 'Unable to renew the accessToken. Something went wrong!',
-						});
-					}
-
-					return dispatch({
-						type: 'USER_LINK_SUCCEEDED',
-					});
-				} else {
-					const scopes = oktaAuth.options.scopes;
-
-					dispatch({
-						type: 'USER_LINK_STARTED',
-					});
-
-					console.group(' ===== CURRENT ORIGINAL URI ===== ');
-					console.log(oktaAuth.getOriginalUri());
-					console.groupEnd();
-
-					// Ensures we reroute to the /settings page where we started.
-					await oktaAuth.setOriginalUri(window.location.href);
-
-					console.group(' ===== NOW RETURNING TO ===== ');
-					console.log(oktaAuth.getOriginalUri());
-					console.groupEnd();
-
-					const requestOptions = {
-						idp: idpMap[idp],
-						prompt: 'login',
-						scopes: [...scopes, 'user:link'],
-					};
-
-					if (idp === 'email' || idp === 'password') {
-						delete requestOptions.idp;
-
-						requestOptions['loginHint'] = 'email';
-					}
-					console.log(requestOptions);
-
-					await oktaAuth.signInWithRedirect(requestOptions);
-				}
-
-				// call /api/v1/users/{{userId}}/identities
-			} catch (error) {
-				if (dispatch) {
-					dispatch({ type: 'USER_LINK_FAILED', error });
-				} else {
-					throw new Error(error);
-				}
-			}
-		};
-
-		const unlinkUser = async (dispatch, credential) => {
-			try {
-				dispatch({ type: 'USER_UNLINK_STARTED' });
-
-				const {
-					id,
-					provider: { id: idpId },
-					isLoggedIn,
-				} = credential;
-
-				if (isLoggedIn) {
-					throw new Error('Cannot disconnect the currently logged in account.');
-				}
-
-				const baseUrl = `${window.location.origin}/api/v1/users/${id}/identities`;
-
-				const url = idpId ? baseUrl + `/${idpId}` : baseUrl;
-
-				const options = {
-					method: 'delete',
-					headers: {
-						authorization: `Bearer ${oktaAuth.getAccessToken()}`,
-					},
-				};
-
-				const response = await fetch(url, options);
-
-				if (response.status !== 204) {
-					throw new ApiError({
-						statusCode: response.statusCode,
-						message: `Unable to unlink user ${id}`,
-						json: (await response.json()) || '',
-					});
-				}
-
-				await oktaAuth.tokenManager.renew('accessToken');
-
-				return dispatch({ type: 'USER_UNLINK_SUCCEEDED', item: credential });
-			} catch (error) {
-				if (dispatch) {
-					dispatch({ type: 'USER_UNLINK_FAILED', error });
-				} else {
-					throw new Error(error);
-				}
-			}
-		};
-
 		return {
-			linkUser,
 			login,
 			logout,
 			signInWithRedirect,
 			silentAuth,
-			unlinkUser,
 		};
 	} catch (error) {
 		throw new Error(`useAuthActions init error [${error}]`);

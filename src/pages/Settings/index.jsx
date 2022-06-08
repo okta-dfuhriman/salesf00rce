@@ -1,4 +1,4 @@
-import { _, LDS, React } from '../../common';
+import { _, LDS, React, ReactQuery } from '../../common';
 
 import SettingsCard from '../../components/SettingsCard';
 import Providers from '../../components/Providers';
@@ -38,6 +38,8 @@ const menuItems = [
 
 const Settings = () => {
 	document.body.id = 'settings';
+	const isPendingAccountLink = ReactQuery.useIsMutating('account-link') > 0;
+	const isLoadingUserProfile = ReactQuery.useIsMutating('user-profile');
 
 	const ref = React.useRef(null);
 
@@ -94,6 +96,7 @@ const Settings = () => {
 							header='Connected Accounts'
 							subheader='You can log in using verified emails, Salesforce accounts, or your social media accounts.'
 							content={<Providers />}
+							isLoading={isPendingAccountLink || isLoadingUserProfile}
 						/>
 						<SettingsCard
 							key='email-preferences'

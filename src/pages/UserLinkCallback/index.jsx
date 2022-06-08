@@ -1,16 +1,24 @@
 /** @format */
-import { Auth, LDS, Okta, React } from '../../common';
+import { Auth, LDS, Okta, React, ReactQuery, useLinkAccountMutation } from '../../common';
 import ErrorHandler from '../../components/ErrorHandler';
 
 export const UserLinkCallback = () => {
-	const { authState } = Okta.useOktaAuth();
-	const [callbackError, setCallbackError] = React.useState();
 	const dispatch = Auth.useAuthDispatch();
-	const { linkUser } = Auth.useAuthActions();
+	const { authState } = Okta.useOktaAuth();
+
+	const queryClient = ReactQuery.useQueryClient();
+
+	const { handleLinkRedirect } = useLinkAccountMutation({
+		queryClient,
+		dispatch,
+	});
+
+	const [callbackError] = React.useState();
 
 	React.useEffect(() => {
 		console.log('handling callback');
-		linkUser(dispatch);
+		handleLinkRedirect.mutate({ queryClient });
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const authError = authState?.error;
