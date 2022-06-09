@@ -36,3 +36,8 @@ body {
 .slds-combobox {
 	display: block;
 }
+
+#nav-bar *:before,
+#nav-bar *:after {
+	box-sizing: border-box;
+}
