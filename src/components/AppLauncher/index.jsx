@@ -10,6 +10,7 @@ const AppLauncher = () => (
 		body={<AppLauncherCard />}
 		style={{ top: '3rem', right: 0 }}
 		role='dialog'
+		id='app-launcher'
 		hasNoNubbin
 		hasNoCloseButton
 	>
