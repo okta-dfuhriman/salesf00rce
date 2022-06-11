@@ -1,4 +1,4 @@
-import { Okta, ReactQuery } from '../common';
+import { AppError, Okta, ReactQuery } from '../common';
 
 const GOOGLE_IDP_ID = '0oa3cdpdvdd3BHqDA1d7';
 const LINKEDIN_IDP_ID = '0oa3cdljzgEyGBMez1d7';
@@ -19,14 +19,10 @@ const idpMap = {
 };
 
 const linkAccountMutationFn = async options => {
-	const { dispatch, idp, oktaAuth, queryClient } = options || {};
+	const { idp, oktaAuth, queryClient } = options || {};
 
 	try {
 		const scopes = oktaAuth.options.scopes;
-
-		dispatch({
-			type: 'USER_LINK_STARTED',
-		});
 
 		const authParams = {
 			idp: idpMap[idp],
@@ -77,7 +73,10 @@ const linkAccountMutationFn = async options => {
 		const { tokens: renewedTokens } = await oktaAuth.token.getWithoutPrompt();
 
 		if (!renewedTokens) {
-			throw new Error('Unable to renew the tokens. Something went wrong!');
+			throw new AppError({
+				message: 'Unable to renew the tokens. Something went wrong!',
+				type: 'USER_LINK_FAILED',
+			});
 		}
 
 		// Update the tokenManager, which will trigger a userInfo query.
@@ -86,9 +85,7 @@ const linkAccountMutationFn = async options => {
 		// Fetch new profile data
 		await queryClient.setQueryData(['user', 'profile']);
 
-		return dispatch({
-			type: 'USER_LINK_SUCCEEDED',
-		});
+		return;
 	} catch (error) {
 		let actionType = 'USER_LINK_FAILED';
 		let result = 'error';
@@ -102,30 +99,24 @@ const linkAccountMutationFn = async options => {
 			result = 'cancelled';
 		}
 
-		if (dispatch) {
-			dispatch({ type: actionType, error });
-		}
-
-		if (error instanceof Error) {
-			throw error;
-		}
-
 		if (result !== 'error') {
 			return false;
 		}
 
-		throw new Error(error);
+		throw new AppError({ type: actionType });
 	}
 };
 
 const useLinkAccountMutation = options => {
 	const { oktaAuth } = Okta.useOktaAuth();
+	const queryClient = ReactQuery.useQueryClient();
 
-	const { queryClient } = options || {};
-
-	return ReactQuery.useMutation(idp => linkAccountMutationFn({ ...options, idp, oktaAuth }), {
-		mutationKey: ['account-link'],
-	});
+	return ReactQuery.useMutation(
+		idp => linkAccountMutationFn({ ...options, idp, oktaAuth, queryClient }),
+		{
+			mutationKey: ['account-link'],
+		}
+	);
 };
 
 export default useLinkAccountMutation;

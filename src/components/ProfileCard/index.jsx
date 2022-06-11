@@ -1,12 +1,10 @@
-import { Auth, LDS, Link, isUrl, useUserInfoQuery, useUserProfileQuery } from '../../common';
+import { LDS, Link, isUrl, useUserInfoQuery, useUserProfileQuery } from '../../common';
 
 import './ProfileCard.css';
 
 const ProfileCard = () => {
-	const dispatch = Auth.useAuthDispatch();
-
-	const { isLoading: isLoadingUserInfo, data: userInfo } = useUserInfoQuery(dispatch);
-	const { data: profile } = useUserProfileQuery({ dispatch, userInfo });
+	const { isLoading: isLoadingUserInfo, data: userInfo } = useUserInfoQuery();
+	const { data: profile } = useUserProfileQuery({ userInfo });
 
 	const picture = profile?.picture ?? userInfo?.picture;
 

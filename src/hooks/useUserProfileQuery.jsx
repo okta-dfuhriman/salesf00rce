@@ -1,4 +1,4 @@
-import { Okta, ReactQuery, useUserInfoQuery } from '../common';
+import { ApiError, AppError, Okta, ReactQuery, useUserInfoQuery } from '../common';
 
 const getUserAsync = async ({ oktaAuth, userId: _userId, user: _user, abortSignal }) => {
 	let user = _user;
@@ -32,8 +32,7 @@ const getUserAsync = async ({ oktaAuth, userId: _userId, user: _user, abortSigna
 
 		if (!response.ok) {
 			const body = await response.json();
-			console.error(body);
-			throw new Error(JSON.stringify(body));
+			throw new ApiError({ statusCode: response?.statusCode, json: JSON.stringify(body) });
 		}
 
 		user = await response.json();
@@ -66,43 +65,26 @@ const getUserAsync = async ({ oktaAuth, userId: _userId, user: _user, abortSigna
 };
 
 const userProfileQueryFn = async options => {
-	const { dispatch, authState, oktaAuth } = options || {};
+	const { authState, oktaAuth } = options || {};
 
 	const isAuthenticated = authState?.isAuthenticated || (await oktaAuth.isAuthenticated());
 
 	if (!isAuthenticated) {
-		throw new Error('Not authenticated!');
+		throw new AppError({ type: 'USER_FETCH_FAILED', message: 'Not authenticated!' });
 	}
 
 	try {
-		if (dispatch) {
-			dispatch({
-				type: 'USER_FETCH_STARTED',
-			});
-		} else {
-			console.log('no dispatch!');
-		}
-
 		const user = await getUserAsync(options);
-
-		if (dispatch) {
-			dispatch({ type: 'USER_FETCH_SUCCEEDED' });
-		}
 
 		return user;
 	} catch (error) {
-		if (dispatch) {
-			console.log(error);
-			dispatch({ type: 'USER_INFO_FETCH_FAILED', error });
-		} else {
-			throw new Error(error);
-		}
+		throw new AppError({ type: 'USER_INFO_FETCH_FAILED', error });
 	}
 };
 
 export const useUserProfileQuery = options => {
 	try {
-		const { data: _userInfo } = useUserInfoQuery(options?.dispatch);
+		const { data: _userInfo } = useUserInfoQuery();
 
 		const isPendingAccountLink = ReactQuery.useIsMutating(['account-link']);
 

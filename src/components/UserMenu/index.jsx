@@ -1,6 +1,6 @@
 import {
-	Auth,
 	LDS,
+	ReactQuery,
 	getProfilePicture,
 	getUserName,
 	useUserInfoQuery,
@@ -10,13 +10,11 @@ import {
 import DropdownCard from '../DropdownCard';
 
 const UserMenu = () => {
-	const dispatch = Auth.useAuthDispatch();
+	const isPendingLogout = ReactQuery.useIsMutating('logout') > 0;
 
-	const { isPendingLogout } = Auth.useAuthState();
+	const { isLoading: isLoadingUserInfo, data: userInfo } = useUserInfoQuery();
 
-	const { isLoading: isLoadingUserInfo, data: userInfo } = useUserInfoQuery(dispatch);
-
-	const { data: user } = useUserProfileQuery({ dispatch });
+	const { data: user } = useUserProfileQuery();
 
 	const { profile } = user || {};
 

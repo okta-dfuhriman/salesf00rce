@@ -1,17 +1,13 @@
 /** @format */
-import { Auth, LDS, Okta, React, ReactQuery, useLinkAccountMutation } from '../../common';
+import { LDS, Okta, React, ReactQuery, useLinkAccountMutation } from '../../common';
 import ErrorHandler from '../../components/ErrorHandler';
 
 export const UserLinkCallback = () => {
-	const dispatch = Auth.useAuthDispatch();
 	const { authState } = Okta.useOktaAuth();
 
 	const queryClient = ReactQuery.useQueryClient();
 
-	const { handleLinkRedirect } = useLinkAccountMutation({
-		queryClient,
-		dispatch,
-	});
+	const { handleLinkRedirect } = useLinkAccountMutation();
 
 	const [callbackError] = React.useState();
 

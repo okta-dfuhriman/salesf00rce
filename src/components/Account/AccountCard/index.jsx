@@ -1,15 +1,4 @@
-import {
-	Auth,
-	LDS,
-	React,
-	AppleIconRound,
-	EmailIconRound,
-	FacebookIconRound,
-	GoogleIconRound,
-	LinkedInIconRound,
-	SalesforceIconRound,
-	useUserProfileQuery,
-} from '../../../common';
+import { Icons, LDS, React, ReactQuery, useUserProfileQuery } from '../../../common';
 
 import './styles.css';
 
@@ -44,9 +33,8 @@ const AccountCardBody = ({ login, providerName, type: providerType }) => (
 );
 
 const AccountCard = props => {
-	const dispatch = Auth.useAuthDispatch();
-	const { isLoading: isLoadingUserProfile } = useUserProfileQuery({ dispatch });
-	const { isPendingAccountLink } = Auth.useAuthState();
+	const { isLoading: isLoadingUserProfile } = useUserProfileQuery();
+	const isPendingAccountLink = ReactQuery.useIsMutating('account-link') > 0;
 
 	const [isLoading, setIsLoading] = React.useState(false);
 
@@ -72,22 +60,22 @@ const AccountCard = props => {
 
 	switch (providerName) {
 		case 'apple':
-			providerIcon = <AppleIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			providerIcon = <Icons.Apple.Round className='slds-icon tds-icon-social slds-icon_large' />;
 			break;
 		case 'facebook':
-			providerIcon = <FacebookIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			providerIcon = <Icons.Facebook.Round className='slds-icon tds-icon-social slds-icon_large' />;
 			break;
 		case 'google':
-			providerIcon = <GoogleIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			providerIcon = <Icons.Google.Round className='slds-icon tds-icon-social slds-icon_large' />;
 			break;
 		case 'linkedin':
-			providerIcon = <LinkedInIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			providerIcon = <Icons.LinkedIn.Round className='slds-icon tds-icon-social slds-icon_large' />;
 			break;
 		case 'salesforce':
-			providerIcon = <SalesforceIconRound className='tds-icon-social slds-icon_large' />;
+			providerIcon = <Icons.Salesforce.Round className='tds-icon-social slds-icon_large' />;
 			break;
 		default:
-			providerIcon = <EmailIconRound className='slds-icon tds-icon-social slds-icon_large' />;
+			providerIcon = <Icons.Email.Round className='slds-icon tds-icon-social slds-icon_large' />;
 	}
 
 	return (

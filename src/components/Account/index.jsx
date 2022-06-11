@@ -1,8 +1,6 @@
 import {
-	Auth,
 	LDS,
 	React,
-	ReactQuery,
 	useUserProfileQuery,
 	useLinkAccountMutation,
 	useUnlinkAccountMutation,
@@ -10,28 +8,16 @@ import {
 import AccountCard from './AccountCard';
 
 const Account = props => {
-	const dispatch = Auth.useAuthDispatch();
-
-	const queryClient = ReactQuery.useQueryClient();
-
-	const { mutate: unlinkUser } = useUnlinkAccountMutation({
-		queryClient,
-		dispatch,
-	});
+	const { mutate: unlinkUser } = useUnlinkAccountMutation();
 
 	const {
 		isError: isErrorLinkAccount,
 		error: linkAccountError,
 		mutate: linkAccount,
 		reset: linkAccountReset,
-	} = useLinkAccountMutation({
-		queryClient,
-		dispatch,
-	});
+	} = useLinkAccountMutation();
 
-	const { isLoading: isLoadingUserProfile } = useUserProfileQuery({
-		dispatch,
-	});
+	const { isLoading: isLoadingUserProfile } = useUserProfileQuery();
 
 	React.useEffect(() => {
 		if (isErrorLinkAccount && !linkAccountError) {

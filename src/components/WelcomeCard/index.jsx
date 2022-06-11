@@ -1,27 +1,19 @@
 import {
 	_,
-	Auth,
-	getUserName,
+	Icons,
 	LDS,
 	ReactQuery,
-	AppleIconRound,
-	EmailIconRound,
-	FacebookIconRound,
-	GoogleIconRound,
-	LinkedInIconRound,
-	SalesforceIconRound,
+	getUserName,
 	getProfilePicture,
 	useUserProfileQuery,
 	useUserInfoQuery,
 } from '../../common';
 
 const WelcomeCard = () => {
-	const dispatch = Auth.useAuthDispatch();
 	const isPendingAccountLink = ReactQuery.useIsMutating('account-link') > 0;
 
-	const { data: userInfo } = useUserInfoQuery(dispatch);
+	const { data: userInfo } = useUserInfoQuery();
 	const { isLoading: isLoadingUserProfile, data: user } = useUserProfileQuery({
-		dispatch,
 		userInfo,
 	});
 
@@ -44,22 +36,22 @@ const WelcomeCard = () => {
 
 	switch (providerName) {
 		case 'apple':
-			providerIcon = <AppleIconRound className='slds-icon tds-icon-social slds-icon_small' />;
+			providerIcon = <Icons.Apple.Round className='slds-icon tds-icon-social slds-icon_small' />;
 			break;
 		case 'facebook':
-			providerIcon = <FacebookIconRound className='slds-icon tds-icon-social slds-icon_small' />;
+			providerIcon = <Icons.Facebook.Round className='slds-icon tds-icon-social slds-icon_small' />;
 			break;
 		case 'google':
-			providerIcon = <GoogleIconRound className='slds-icon tds-icon-social slds-icon_small' />;
+			providerIcon = <Icons.Google.Round className='slds-icon tds-icon-social slds-icon_small' />;
 			break;
 		case 'linkedin':
-			providerIcon = <LinkedInIconRound className='slds-icon tds-icon-social slds-icon_small' />;
+			providerIcon = <Icons.LinkedIn.Round className='slds-icon tds-icon-social slds-icon_small' />;
 			break;
 		case 'salesforce':
-			providerIcon = <SalesforceIconRound className='tds-icon-social slds-icon_small' />;
+			providerIcon = <Icons.Salesforce.Round className='tds-icon-social slds-icon_small' />;
 			break;
 		case 'email':
-			providerIcon = <EmailIconRound className='slds-icon tds-icon-social slds-icon_small' />;
+			providerIcon = <Icons.Email.Round className='slds-icon tds-icon-social slds-icon_small' />;
 			break;
 		default:
 			providerIcon = <></>;

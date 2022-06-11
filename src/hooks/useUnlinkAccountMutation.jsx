@@ -1,9 +1,7 @@
-import { ApiError, Okta, ReactQuery } from '../common';
+import { ApiError, AppError, Okta, ReactQuery } from '../common';
 
-const unlinkAccountMutation = async ({ dispatch, credential, oktaAuth }) => {
+const unlinkAccountMutation = async ({ credential, oktaAuth }) => {
 	try {
-		dispatch({ type: 'USER_UNLINK_STARTED' });
-
 		const {
 			id,
 			provider: { id: idpId },
@@ -11,7 +9,10 @@ const unlinkAccountMutation = async ({ dispatch, credential, oktaAuth }) => {
 		} = credential;
 
 		if (isLoggedIn) {
-			throw new Error('Cannot disconnect the currently logged in account.');
+			throw new AppError({
+				message: 'Cannot disconnect the currently logged in account.',
+				type: 'USER_UNLINK_FAILED',
+			});
 		}
 
 		const baseUrl = `${window.location.origin}/api/v1/users/${id}/identities`;
@@ -37,22 +38,16 @@ const unlinkAccountMutation = async ({ dispatch, credential, oktaAuth }) => {
 
 		await oktaAuth.tokenManager.renew('accessToken');
 
-		dispatch({ type: 'USER_UNLINK_SUCCEEDED' });
-
 		return id;
 	} catch (error) {
-		if (dispatch) {
-			dispatch({ type: 'USER_UNLINK_FAILED', error });
-		} else {
-			throw new Error(error);
-		}
+		throw new AppError({ type: 'USER_UNLINK_FAILED', error });
 	}
 };
 
 const useUnlinkAccountMutation = options => {
 	const { oktaAuth } = Okta.useOktaAuth();
 
-	const { queryClient } = options || {};
+	const queryClient = ReactQuery.useQueryClient();
 
 	return ReactQuery.useMutation(
 		credential => unlinkAccountMutation({ ...options, credential, oktaAuth }),

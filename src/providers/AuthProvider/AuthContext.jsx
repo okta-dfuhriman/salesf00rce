@@ -2,7 +2,7 @@
 /** @format */
 import { useNavigate } from 'react-router-dom';
 
-import { Auth, PropTypes, React, ReactQuery, userInfoQueryFn } from '../../common';
+import { PropTypes, React, ReactQuery, userInfoQueryFn, silentAuth } from '../../common';
 import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
 import { Security } from '@okta/okta-react';
 import { authConfig } from '../../common/config/authConfig';
@@ -15,9 +15,9 @@ const oktaAuth = new OktaAuth(authConfig.oidc);
 
 const AuthProvider = ({ children }) => {
 	const queryClient = ReactQuery.useQueryClient();
+	const isPendingLogin = ReactQuery.useIsMutating('login') > 0;
 
 	const navigate = useNavigate();
-	const { silentAuth } = Auth.useAuthActions(oktaAuth);
 
 	const restoreOriginalUri = async (_oktaAuth, originalUri) =>
 		navigate(toRelativeUrl(originalUri || '/', window.location.origin), { replace: true });
@@ -27,7 +27,6 @@ const AuthProvider = ({ children }) => {
 	};
 
 	const [state, dispatch] = React.useReducer(AuthReducer, initialState);
-
 	React.useLayoutEffect(() => {
 		const initAuthState = async () => {
 			if (!oktaAuth.isLoginRedirect()) {
@@ -38,9 +37,12 @@ const AuthProvider = ({ children }) => {
 				console.groupEnd();
 
 				if (!isAuthenticated) {
-					const { isAuthenticated: _isAuthenticated } = await silentAuth(null, {
-						isAuthenticated,
-						update: false,
+					const { isAuthenticated: _isAuthenticated } = await silentAuth({
+						oktaAuth,
+						options: {
+							isAuthenticated,
+							update: false,
+						},
 					});
 
 					isAuthenticated = _isAuthenticated;
@@ -78,14 +80,14 @@ const AuthProvider = ({ children }) => {
 	}, []);
 
 	React.useEffect(() => {
-		const { isAuthenticated, isPendingLogin } = state || {};
+		const { isAuthenticated } = state || {};
 
 		if (isAuthenticated && (!oktaAuth.isLoginRedirect() || !isPendingLogin)) {
 			console.log('AuthContext > getUserInfo()');
 
-			queryClient.prefetchQuery(['user', 'info'], () => userInfoQueryFn({ dispatch, oktaAuth }));
+			queryClient.prefetchQuery(['user', 'info'], () => userInfoQueryFn({ oktaAuth }));
 		}
-	}, [state?.isAuthenticated, state?.isPendingLogin]);
+	}, [state?.isAuthenticated, isPendingLogin]);
 
 	// eslint-disable-next-line react/jsx-no-constructed-context-values
 	const contextValues = {

@@ -1,9 +1,9 @@
 import {
-	Auth,
 	LDS,
 	Link,
 	getProfilePicture,
 	getUserName,
+	useLogoutMutation,
 	useUserInfoQuery,
 	useUserProfileQuery,
 } from '../../common';
@@ -11,11 +11,10 @@ import {
 import './styles.css';
 
 const DropdownCard = () => {
-	const dispatch = Auth.useAuthDispatch();
-	const { logout } = Auth.useAuthActions();
+	const logout = useLogoutMutation();
 
-	const { data: userInfo } = useUserInfoQuery(dispatch);
-	const { data: user } = useUserProfileQuery({ dispatch, userInfo });
+	const { data: userInfo } = useUserInfoQuery();
+	const { data: user } = useUserProfileQuery({ userInfo });
 	const { profile } = user || {};
 
 	return (
@@ -45,7 +44,7 @@ const DropdownCard = () => {
 					className='menu__item'
 					variant='base'
 					label='Logout'
-					onClick={() => logout(dispatch, { userId: profile?.id ?? userInfo?.sub })}
+					onClick={() => logout.mutate({ userId: profile?.id ?? userInfo?.sub })}
 				/>
 			</div>
 		</div>

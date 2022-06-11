@@ -1,10 +1,11 @@
-import { Auth, Link, React, TrailblazerLogo } from '../../common';
+import { Auth, Link, React, ReactQuery, Images } from '../../common';
 
 import AppLauncher from '../AppLauncher';
 import UserMenu from '../UserMenu';
 
 const Header = () => {
-	const { isAuthenticated, isPendingLogout } = Auth.useAuthState();
+	const isPendingLogout = ReactQuery.useIsMutating('logout') > 0;
+	const { isAuthenticated } = Auth.useAuthState();
 
 	return (
 		<div
@@ -26,7 +27,7 @@ const Header = () => {
 					className='slds-p-vertical_small slds-p-horizontal_medium slds-grid slds-grid_align-spread slds-grow slds-grid_vertical-align-center'
 				>
 					<Link to='/'>
-						<TrailblazerLogo />
+						<Images.TrailblazerLogo />
 					</Link>
 				</div>
 				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>

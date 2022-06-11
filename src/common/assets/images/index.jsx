@@ -1,26 +1,68 @@
-export { ReactComponent as AppExchangeIcon } from './appexchange.svg';
-export { ReactComponent as AppleIcon } from './apple.svg';
-export { ReactComponent as AppleIconRound } from './apple-round.svg';
-export { ReactComponent as AstroAvatar } from './astro.svg';
-export { ReactComponent as AstroLogin } from './astro-login.svg';
-export { ReactComponent as FacebookIcon } from './facebook.svg';
-export { ReactComponent as FacebookIconRound } from './facebook-round.svg';
-export { ReactComponent as EmailIcon } from './email.svg';
-export { ReactComponent as EmailIconRound } from './email-round.svg';
-export { ReactComponent as EventsIcon } from './events.svg';
-export { ReactComponent as GoogleIcon } from './google.svg';
-export { ReactComponent as GoogleIconRound } from './google-round.svg';
-export { ReactComponent as HelpPortalIcon } from './help_portal.svg';
-export { ReactComponent as IdeaExchangeIcon } from './ideaexchange.svg';
-export { ReactComponent as LinkedInIcon } from './linkedin.svg';
-export { ReactComponent as LinkedInIconRound } from './linkedin-round.svg';
-export { ReactComponent as SalesforceLogo } from './salesforce.svg';
-export { ReactComponent as SalesforceIcon } from './salesforce-icon.svg';
-export { ReactComponent as SalesforceIconRound } from './salesforce-round.svg';
-export { ReactComponent as TrailblazerCommunityIcon } from './trailblazer-community.svg';
-export { ReactComponent as TrailblazerLogo } from './trailblazer-me.svg';
-export { ReactComponent as TrailheadIcon } from './trailhead.svg';
-export { ReactComponent as TrailblazerMe } from './_tbme.svg';
+import { AridDunes } from './arid-dunes';
+import { Astro } from './astro';
+import { ReactComponent as AppExchange } from './appexchange.svg';
+import { ReactComponent as AppleIcon } from './apple.svg';
+import { ReactComponent as AppleIconRound } from './apple-round.svg';
+import { ReactComponent as AstroAvatar } from './astro.svg';
+import { ReactComponent as AstroLogin } from './astro-login.svg';
+import { ReactComponent as FacebookIcon } from './facebook.svg';
+import { ReactComponent as FacebookIconRound } from './facebook-round.svg';
+import { ReactComponent as EmailIcon } from './email.svg';
+import { ReactComponent as EmailIconRound } from './email-round.svg';
+import { ReactComponent as Events } from './events.svg';
+import { ReactComponent as GoogleIcon } from './google.svg';
+import { ReactComponent as GoogleIconRound } from './google-round.svg';
+import { ReactComponent as HelpPortal } from './help_portal.svg';
+import { ReactComponent as IdeaExchange } from './ideaexchange.svg';
+import { ReactComponent as LinkedInIcon } from './linkedin.svg';
+import { ReactComponent as LinkedInIconRound } from './linkedin-round.svg';
+import { ReactComponent as SalesforceLogo } from './salesforce.svg';
+import { ReactComponent as SalesforceIcon } from './salesforce-icon.svg';
+import { ReactComponent as SalesforceIconRound } from './salesforce-round.svg';
+import { ReactComponent as TrailblazerCommunity } from './trailblazer-community.svg';
+import { ReactComponent as TrailblazerLogo } from './trailblazer-me.svg';
+import { ReactComponent as Trailhead } from './trailhead.svg';
+import { ReactComponent as TrailblazerMe } from './_tbme.svg';
 
-export * from './arid-dunes';
-export * from './astro';
+export const Images = {
+	AridDunes,
+	Astro,
+	AstroLogin,
+	SalesforceLogo,
+	TrailblazerLogo,
+	TrailblazerMe,
+};
+
+export const Icons = {
+	AppExchange,
+	Apple: {
+		Regular: AppleIcon,
+		Round: AppleIconRound,
+	},
+	AstroAvatar,
+	Facebook: {
+		Regular: FacebookIcon,
+		Round: FacebookIconRound,
+	},
+	Email: {
+		Regular: EmailIcon,
+		Round: EmailIconRound,
+	},
+	Events,
+	Google: {
+		Regular: GoogleIcon,
+		Round: GoogleIconRound,
+	},
+	HelpPortal,
+	IdeaExchange,
+	LinkedIn: {
+		Regular: LinkedInIcon,
+		Round: LinkedInIconRound,
+	},
+	Salesforce: {
+		Regular: SalesforceIcon,
+		Round: SalesforceIconRound,
+	},
+	TrailblazerCommunity,
+	Trailhead,
+};
