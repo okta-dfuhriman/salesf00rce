@@ -1,10 +1,10 @@
-import { LDS, Link, isUrl, useUserInfoQuery, useUserProfileQuery } from '../../common';
+import { LDS, Queries, ReactRouter, Utils } from '../../common';
 
 import './ProfileCard.css';
 
 const ProfileCard = () => {
-	const { isLoading: isLoadingUserInfo, data: userInfo } = useUserInfoQuery();
-	const { data: profile } = useUserProfileQuery({ userInfo });
+	const { isLoading: isLoadingUserInfo, data: userInfo } = Queries.useUserInfoQuery();
+	const { data: profile } = Queries.useUserProfileQuery({ userInfo });
 
 	const picture = profile?.picture ?? userInfo?.picture;
 
@@ -14,7 +14,11 @@ const ProfileCard = () => {
 				<div className='slds-is-relative slds-m-right_medium user-avatar'>
 					<LDS.Button
 						id='avatar-button'
-						style={isUrl(picture) ? { backgroundImage: `url(${picture})` } : {}}
+						style={
+							Utils.getProfilePicture(userInfo, profile)
+								? { backgroundImage: `url(${picture})` }
+								: {}
+						}
 						title='View Profile Picture'
 						variant='base'
 						className='avatar-img avatar-img_expandable'
@@ -38,9 +42,9 @@ const ProfileCard = () => {
 
 	const UserBio = (
 		<p className='bio'>
-			<Link to='#' className='empty-state-link'>
+			<ReactRouter.Link to='#' className='empty-state-link'>
 				Tell us about yourself! Add a short bio.
-			</Link>
+			</ReactRouter.Link>
 		</p>
 	);
 

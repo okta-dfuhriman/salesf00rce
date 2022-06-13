@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { React } from '../common';
 
 const addBodyClass = className => document.body.classList.add(className);
 const removeBodyClass = className => document.body.classList.remove(className);
 
 const useBodyClass = className => {
-	useEffect(() => {
+	React.useEffect(() => {
 		className instanceof Array ? className.map(addBodyClass) : addBodyClass(className);
 
 		return () => {

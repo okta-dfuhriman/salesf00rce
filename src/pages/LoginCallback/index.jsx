@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @format */
-import { LDS, React, useLoginMutation } from '../../common';
+import { LDS, Mutations, React } from '../../common';
 
 export const AppLoginCallback = () => {
-	const login = useLoginMutation();
+	const login = Mutations.useLoginMutation();
 
 	React.useEffect(() => {
 		console.debug('LoginCallback > login()');

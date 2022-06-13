@@ -1,4 +1,4 @@
-import { ApiError, AppError, Okta, ReactQuery } from '../common';
+import { Errors, Okta, ReactQuery } from '../common';
 
 const unlinkAccountMutation = async ({ credential, oktaAuth }) => {
 	try {
@@ -9,7 +9,7 @@ const unlinkAccountMutation = async ({ credential, oktaAuth }) => {
 		} = credential;
 
 		if (isLoggedIn) {
-			throw new AppError({
+			throw new Errors.AppError({
 				message: 'Cannot disconnect the currently logged in account.',
 				type: 'USER_UNLINK_FAILED',
 			});
@@ -29,7 +29,7 @@ const unlinkAccountMutation = async ({ credential, oktaAuth }) => {
 		const response = await fetch(url, options);
 
 		if (response.status !== 204) {
-			throw new ApiError({
+			throw new Errors.ApiError({
 				statusCode: response.statusCode,
 				message: `Unable to unlink user ${id}`,
 				json: (await response.json()) || '',
@@ -40,7 +40,7 @@ const unlinkAccountMutation = async ({ credential, oktaAuth }) => {
 
 		return id;
 	} catch (error) {
-		throw new AppError({ type: 'USER_UNLINK_FAILED', error });
+		throw new Errors.AppError({ type: 'USER_UNLINK_FAILED', error });
 	}
 };
 

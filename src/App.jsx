@@ -1,12 +1,11 @@
-import { LDS, React, ReactQuery } from './common';
-import AuthProvider from './providers/AuthProvider/AuthContext';
-import { useLocation } from 'react-router-dom';
+import { LDS, React, ReactQuery, ReactRouter } from './common';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
 import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor-experimental';
 
 import useBodyClass from './hooks/useBodyClass';
 
+import AuthProvider from './providers/AuthProvider/AuthContext';
 import Router from './Router';
 
 const STALE_TIME = process.env.QUERY_STALE_TIME || 2.5; // Time in **MINUTES** to be used when setting the staleTime configuration.
@@ -32,7 +31,7 @@ persistQueryClient({
 const App = () => {
 	useBodyClass('tds-bg_sand');
 
-	const { pathname } = useLocation();
+	const { pathname } = ReactRouter.useLocation();
 
 	// Setting page scroll to 0 when changing the route
 	React.useEffect(() => {

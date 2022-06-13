@@ -1,4 +1,4 @@
-import { AppError, Okta, ReactQuery } from '../common';
+import { Errors, Okta, ReactQuery } from '../common';
 
 const getUserInfoAsync = async oktaAuth => {
 	const userInfo = await oktaAuth.getUser();
@@ -25,7 +25,7 @@ export const userInfoQueryFn = async ({ authState, oktaAuth }) => {
 
 		return userInfo;
 	} catch (error) {
-		throw new AppError({ type: 'USER_INFO_FETCH_FAILED', error });
+		throw new Errors.AppError({ type: 'USER_INFO_FETCH_FAILED', error });
 	}
 };
 
@@ -40,6 +40,6 @@ export const useUserInfoQuery = () => {
 			enabled: isPendingAccountLink === 0,
 		});
 	} catch (error) {
-		throw new AppError({ type: 'USER_QUERY_INIT_FAILED', error });
+		throw new Errors.AppError({ type: 'USER_QUERY_INIT_FAILED', error });
 	}
 };

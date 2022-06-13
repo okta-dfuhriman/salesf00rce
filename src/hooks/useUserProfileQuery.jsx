@@ -1,4 +1,4 @@
-import { ApiError, AppError, Okta, ReactQuery, useUserInfoQuery } from '../common';
+import { Errors, Okta, ReactQuery, useUserInfoQuery } from '../common';
 
 const getUserAsync = async ({ oktaAuth, userId: _userId, user: _user, abortSignal }) => {
 	let user = _user;
@@ -32,7 +32,7 @@ const getUserAsync = async ({ oktaAuth, userId: _userId, user: _user, abortSigna
 
 		if (!response.ok) {
 			const body = await response.json();
-			throw new ApiError({ statusCode: response?.statusCode, json: JSON.stringify(body) });
+			throw new Errors.ApiError({ statusCode: response?.statusCode, json: JSON.stringify(body) });
 		}
 
 		user = await response.json();
@@ -70,7 +70,7 @@ const userProfileQueryFn = async options => {
 	const isAuthenticated = authState?.isAuthenticated || (await oktaAuth.isAuthenticated());
 
 	if (!isAuthenticated) {
-		throw new AppError({ type: 'USER_FETCH_FAILED', message: 'Not authenticated!' });
+		throw new Errors.AppError({ type: 'USER_FETCH_FAILED', message: 'Not authenticated!' });
 	}
 
 	try {
@@ -78,7 +78,7 @@ const userProfileQueryFn = async options => {
 
 		return user;
 	} catch (error) {
-		throw new AppError({ type: 'USER_INFO_FETCH_FAILED', error });
+		throw new Errors.AppError({ type: 'USER_INFO_FETCH_FAILED', error });
 	}
 };
 
@@ -101,6 +101,6 @@ export const useUserProfileQuery = options => {
 			}
 		);
 	} catch (error) {
-		throw new Error(`useUserProfileQuery init error [${error}]`);
+		throw new Errors.AppError({ message: 'useUserProfileQuery init error', error });
 	}
 };

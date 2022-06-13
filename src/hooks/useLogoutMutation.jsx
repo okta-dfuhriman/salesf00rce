@@ -1,4 +1,4 @@
-import { AppError, ApiError, Auth, Okta, ReactQuery } from '../common';
+import { Auth, Errors, Okta, ReactQuery } from '../common';
 
 const logoutFn = async ({
 	dispatch,
@@ -27,7 +27,7 @@ const logoutFn = async ({
 			if (!response.ok) {
 				const json = await response.json();
 
-				throw new ApiError({
+				throw new Errors.ApiError({
 					message: 'Unable to clear user sessions!',
 					type: 'LOGOUT_FAILED',
 					statusCode: response?.status,
@@ -45,7 +45,7 @@ const logoutFn = async ({
 		// 4) Do Okta Sign Out, which results in a redirect.
 		return oktaAuth.signOut(config);
 	} catch (error) {
-		throw new AppError({ type: 'LOGOUT_FAILED', error });
+		throw new Errors.AppError({ type: 'LOGOUT_FAILED', error });
 	}
 };
 

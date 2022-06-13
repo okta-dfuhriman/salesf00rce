@@ -1,4 +1,4 @@
-import { Auth, Link, React, ReactQuery, Images } from '../../common';
+import { Auth, Images, React, ReactQuery, ReactRouter } from '../../common';
 
 import AppLauncher from '../AppLauncher';
 import UserMenu from '../UserMenu';
@@ -26,9 +26,9 @@ const Header = () => {
 					id='logo'
 					className='slds-p-vertical_small slds-p-horizontal_medium slds-grid slds-grid_align-spread slds-grow slds-grid_vertical-align-center'
 				>
-					<Link to='/'>
+					<ReactRouter.Link to='/'>
 						<Images.TrailblazerLogo />
-					</Link>
+					</ReactRouter.Link>
 				</div>
 				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
 					{(isAuthenticated || isPendingLogout) && (

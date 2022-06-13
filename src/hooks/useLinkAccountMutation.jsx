@@ -1,4 +1,4 @@
-import { AppError, Okta, ReactQuery } from '../common';
+import { Errors, Okta, ReactQuery } from '../common';
 
 const GOOGLE_IDP_ID = '0oa3cdpdvdd3BHqDA1d7';
 const LINKEDIN_IDP_ID = '0oa3cdljzgEyGBMez1d7';
@@ -73,7 +73,7 @@ const linkAccountMutationFn = async options => {
 		const { tokens: renewedTokens } = await oktaAuth.token.getWithoutPrompt();
 
 		if (!renewedTokens) {
-			throw new AppError({
+			throw new Errors.AppError({
 				message: 'Unable to renew the tokens. Something went wrong!',
 				type: 'USER_LINK_FAILED',
 			});
@@ -103,7 +103,7 @@ const linkAccountMutationFn = async options => {
 			return false;
 		}
 
-		throw new AppError({ type: actionType });
+		throw new Errors.AppError({ type: actionType });
 	}
 };
 

@@ -1,4 +1,4 @@
-import { Icons, LDS, React, ReactQuery, useUserProfileQuery } from '../../../common';
+import { Icons, LDS, React, ReactQuery, Queries } from '../../../common';
 
 import './styles.css';
 
@@ -33,7 +33,7 @@ const AccountCardBody = ({ login, providerName, type: providerType }) => (
 );
 
 const AccountCard = props => {
-	const { isLoading: isLoadingUserProfile } = useUserProfileQuery();
+	const { isLoading: isLoadingUserProfile } = Queries.useUserProfileQuery();
 	const isPendingAccountLink = ReactQuery.useIsMutating('account-link') > 0;
 
 	const [isLoading, setIsLoading] = React.useState(false);

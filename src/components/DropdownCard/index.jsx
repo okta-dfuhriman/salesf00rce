@@ -1,20 +1,12 @@
-import {
-	LDS,
-	Link,
-	getProfilePicture,
-	getUserName,
-	useLogoutMutation,
-	useUserInfoQuery,
-	useUserProfileQuery,
-} from '../../common';
+import { LDS, Mutations, Queries, ReactRouter, Utils } from '../../common';
 
 import './styles.css';
 
 const DropdownCard = () => {
-	const logout = useLogoutMutation();
+	const logout = Mutations.useLogoutMutation();
 
-	const { data: userInfo } = useUserInfoQuery();
-	const { data: user } = useUserProfileQuery({ userInfo });
+	const { data: userInfo } = Queries.useUserInfoQuery();
+	const { data: user } = Queries.useUserProfileQuery({ userInfo });
 	const { profile } = user || {};
 
 	return (
@@ -23,20 +15,20 @@ const DropdownCard = () => {
 			<div
 				className='menu__banner-photo'
 				style={{
-					backgroundImage: `url(${getProfilePicture(userInfo, profile)})`,
+					backgroundImage: `url(${Utils.getProfilePicture(userInfo, profile)})`,
 				}}
 			/>
-			<div className='menu__header'>{getUserName(userInfo, profile)}</div>
+			<div className='menu__header'>{Utils.getUserName(userInfo, profile)}</div>
 			<ul className='menu__items'>
 				<li role='presentation'>
-					<Link to='/' className='menu__item' role='menuitem'>
+					<ReactRouter.Link to='/' className='menu__item' role='menuitem'>
 						Profile
-					</Link>
+					</ReactRouter.Link>
 				</li>
 				<li role='presentation'>
-					<Link to='/settings' className='menu__item' role='menuitem'>
+					<ReactRouter.Link to='/settings' className='menu__item' role='menuitem'>
 						Settings
-					</Link>
+					</ReactRouter.Link>
 				</li>
 			</ul>
 			<div className='menu__footer'>

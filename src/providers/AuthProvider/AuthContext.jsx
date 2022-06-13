@@ -1,32 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @format */
-import { useNavigate } from 'react-router-dom';
-
-import { PropTypes, React, ReactQuery, userInfoQueryFn, silentAuth } from '../../common';
-import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
-import { Security } from '@okta/okta-react';
-import { authConfig } from '../../common/config/authConfig';
-import { AuthReducer, initialState } from './AuthReducer';
-import AuthDispatchContext from './AuthDispatcher';
+import { Auth, PropTypes, Queries, Okta, React, ReactQuery, ReactRouter } from '../../common';
 
 export const AuthStateContext = React.createContext();
 
-const oktaAuth = new OktaAuth(authConfig.oidc);
+const oktaAuth = new Okta.Auth(Auth.config.oidc);
 
 const AuthProvider = ({ children }) => {
 	const queryClient = ReactQuery.useQueryClient();
 	const isPendingLogin = ReactQuery.useIsMutating('login') > 0;
 
-	const navigate = useNavigate();
+	const navigate = ReactRouter.useNavigate();
 
 	const restoreOriginalUri = async (_oktaAuth, originalUri) =>
-		navigate(toRelativeUrl(originalUri || '/', window.location.origin), { replace: true });
+		navigate(Okta.toRelativeUrl(originalUri || '/', window.location.origin), { replace: true });
 
 	const customAuthHandler = () => {
 		navigate('/', { replace: true });
 	};
 
-	const [state, dispatch] = React.useReducer(AuthReducer, initialState);
+	const [state, dispatch] = React.useReducer(Auth.Reducer, Auth.initialState);
 	React.useLayoutEffect(() => {
 		const initAuthState = async () => {
 			if (!oktaAuth.isLoginRedirect()) {
@@ -37,7 +30,7 @@ const AuthProvider = ({ children }) => {
 				console.groupEnd();
 
 				if (!isAuthenticated) {
-					const { isAuthenticated: _isAuthenticated } = await silentAuth({
+					const { isAuthenticated: _isAuthenticated } = await Auth.silentAuth({
 						oktaAuth,
 						options: {
 							isAuthenticated,
@@ -85,7 +78,7 @@ const AuthProvider = ({ children }) => {
 		if (isAuthenticated && (!oktaAuth.isLoginRedirect() || !isPendingLogin)) {
 			console.log('AuthContext > getUserInfo()');
 
-			queryClient.prefetchQuery(['user', 'info'], () => userInfoQueryFn({ oktaAuth }));
+			queryClient.prefetchQuery(['user', 'info'], () => Queries.userInfoQueryFn({ oktaAuth }));
 		}
 	}, [state?.isAuthenticated, isPendingLogin]);
 
@@ -96,13 +89,13 @@ const AuthProvider = ({ children }) => {
 
 	return (
 		<AuthStateContext.Provider value={contextValues}>
-			<Security
+			<Okta.Security
 				oktaAuth={oktaAuth}
 				restoreOriginalUri={restoreOriginalUri}
 				onAuthRequired={customAuthHandler}
 			>
-				<AuthDispatchContext.Provider value={dispatch}>{children}</AuthDispatchContext.Provider>
-			</Security>
+				<Auth.DispatchContext.Provider value={dispatch}>{children}</Auth.DispatchContext.Provider>
+			</Okta.Security>
 		</AuthStateContext.Provider>
 	);
 };

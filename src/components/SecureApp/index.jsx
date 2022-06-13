@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React from 'react';
-import { Outlet } from 'react-router-dom';
 
-import { Auth, LDS, PropTypes, Okta, ReactQuery, signInWithRedirect } from '../../common';
+import { Auth, LDS, PropTypes, Okta, React, ReactQuery, ReactRouter } from '../../common';
 
 import './styles.css';
 
@@ -32,7 +30,7 @@ const SecureApp = ({ header, onAuthRequired, children }) => {
 					await onAuthRequiredFn(oktaAuth);
 				} else {
 					console.debug('SecureApp > signInWithRedirect()');
-					await signInWithRedirect({ oktaAuth });
+					await Auth.signInWithRedirect({ oktaAuth });
 				}
 			}
 		};
@@ -60,7 +58,7 @@ const SecureApp = ({ header, onAuthRequired, children }) => {
 	return (
 		<>
 			{header}
-			<Outlet />
+			<ReactRouter.Outlet />
 		</>
 	);
 };

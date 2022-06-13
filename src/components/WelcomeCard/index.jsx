@@ -1,19 +1,10 @@
-import {
-	_,
-	Icons,
-	LDS,
-	ReactQuery,
-	getUserName,
-	getProfilePicture,
-	useUserProfileQuery,
-	useUserInfoQuery,
-} from '../../common';
+import { _, Icons, LDS, Queries, ReactQuery, Utils } from '../../common';
 
 const WelcomeCard = () => {
 	const isPendingAccountLink = ReactQuery.useIsMutating('account-link') > 0;
 
-	const { data: userInfo } = useUserInfoQuery();
-	const { isLoading: isLoadingUserProfile, data: user } = useUserProfileQuery({
+	const { data: userInfo } = Queries.useUserInfoQuery();
+	const { isLoading: isLoadingUserProfile, data: user } = Queries.useUserProfileQuery({
 		userInfo,
 	});
 
@@ -66,7 +57,7 @@ const WelcomeCard = () => {
 				</div>
 			)}
 			<div>
-				Hey {getUserName(userInfo, profile)}! You're logged in with your{' '}
+				Hey {Utils.getUserName(userInfo, profile)}! You're logged in with your{' '}
 				{_.capitalize(providerName)} account:&nbsp;&nbsp;
 				<span className='tds-text_bold break-word'>
 					{providerIcon} {login}.
@@ -80,8 +71,8 @@ const WelcomeCard = () => {
 			body={cardBody}
 			figure={
 				<LDS.Avatar
-					imgSrc={getProfilePicture(userInfo, profile)}
-					imgAlt={getUserName(userInfo, profile) ?? 'user avatar'}
+					imgSrc={Utils.getProfilePicture(userInfo, profile)}
+					imgAlt={Utils.getUserName(userInfo, profile) ?? 'user avatar'}
 					size='large'
 				/>
 			}

@@ -1,23 +1,17 @@
-import {
-	LDS,
-	React,
-	useUserProfileQuery,
-	useLinkAccountMutation,
-	useUnlinkAccountMutation,
-} from '../../common';
+import { LDS, Mutations, React, Queries } from '../../common';
 import AccountCard from './AccountCard';
 
 const Account = props => {
-	const { mutate: unlinkUser } = useUnlinkAccountMutation();
+	const { mutate: unlinkUser } = Mutations.useUnlinkAccountMutation();
 
 	const {
 		isError: isErrorLinkAccount,
 		error: linkAccountError,
 		mutate: linkAccount,
 		reset: linkAccountReset,
-	} = useLinkAccountMutation();
+	} = Mutations.useLinkAccountMutation();
 
-	const { isLoading: isLoadingUserProfile } = useUserProfileQuery();
+	const { isLoading: isLoadingUserProfile } = Queries.useUserProfileQuery();
 
 	React.useEffect(() => {
 		if (isErrorLinkAccount && !linkAccountError) {

@@ -1,5 +1,5 @@
 /** @format */
-import { LDS, Okta, React, ReactQuery, useLinkAccountMutation } from '../../common';
+import { LDS, Mutations, Okta, React, ReactQuery } from '../../common';
 import ErrorHandler from '../../components/ErrorHandler';
 
 export const UserLinkCallback = () => {
@@ -7,7 +7,7 @@ export const UserLinkCallback = () => {
 
 	const queryClient = ReactQuery.useQueryClient();
 
-	const { handleLinkRedirect } = useLinkAccountMutation();
+	const { handleLinkRedirect } = Mutations.useLinkAccountMutation();
 
 	const [callbackError] = React.useState();
 

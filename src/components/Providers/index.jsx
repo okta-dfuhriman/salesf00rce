@@ -1,9 +1,9 @@
-import { React, useUserProfileQuery } from '../../common';
+import { Queries, React } from '../../common';
 
 import Account from '../../components/Account';
 
 const Providers = () => {
-	const { data: user } = useUserProfileQuery();
+	const { data: user } = Queries.useUserProfileQuery();
 
 	const { credentials = [] } = user || {};
 

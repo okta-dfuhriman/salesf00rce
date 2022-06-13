@@ -1,4 +1,4 @@
-import { AppError, Auth, Okta, ReactQuery } from '../common';
+import { Auth, Errors, Okta, ReactQuery } from '../common';
 
 const GOOGLE_IDP_ID = '0oa3cdpdvdd3BHqDA1d7';
 const LINKEDIN_IDP_ID = '0oa3cdljzgEyGBMez1d7';
@@ -68,7 +68,7 @@ const silentAuthFn = async ({ dispatch, oktaAuth, options }) => {
 
 		return { isAuthenticated };
 	} catch (error) {
-		throw new AppError({ type: 'SILENT_AUTH_ERROR', error });
+		throw new Errors.AppError({ type: 'SILENT_AUTH_ERROR', error });
 	}
 };
 
@@ -114,7 +114,7 @@ const loginFn = async ({ dispatch, oktaAuth: _oktaAuth, options }) => {
 			return await silentAuthFn({ dispatch, oktaAuth, options: { hasSession } });
 		}
 	} catch (error) {
-		throw new AppError({ type: 'LOGIN_ERROR', error });
+		throw new Errors.AppError({ type: 'LOGIN_ERROR', error });
 	}
 };
 
@@ -130,7 +130,7 @@ export const useLoginMutation = options => {
 			}
 		);
 	} catch (error) {
-		throw new AppError({
+		throw new Errors.AppError({
 			message: 'useLoginMutation init error',
 			type: 'LOGIN_MUTATION_INIT_FAILED',
 			error,

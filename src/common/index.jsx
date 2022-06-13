@@ -1,22 +1,9 @@
-import * as React from 'react';
-import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
-
-import * as _ from 'lodash';
-
 // Okta SDKs
-import {
-	OktaAuth,
-	toRelativeUrl,
-	removeNils,
-	getOAuthUrls,
-	toQueryString,
-} from '@okta/okta-auth-js';
-import { LoginCallback, SecureRoute, Security, useOktaAuth } from '@okta/okta-react';
-import * as LDS from '@salesforce/design-system-react';
+import * as OktaAuthJs from '@okta/okta-auth-js';
+import * as OktaReact from '@okta/okta-react';
 
 import { authConfig } from './config/authConfig';
-
+import { AuthReducer, initialState } from '../providers/AuthProvider/AuthReducer';
 import AuthProvider from '../providers/AuthProvider/AuthContext';
 import AuthDispatchContext from '../providers/AuthProvider/AuthDispatcher';
 import useAuthState from '../hooks/useAuthState';
@@ -26,8 +13,11 @@ import { Mutations, Queries, silentAuth, signInWithRedirect } from '../hooks';
 export { Images, Icons } from './assets/images';
 
 export const Auth = {
+	Reducer: AuthReducer,
 	Provider: AuthProvider,
 	DispatchContext: AuthDispatchContext,
+	config: authConfig,
+	initialState,
 	silentAuth,
 	signInWithRedirect,
 	useAuthDispatch,
@@ -35,22 +25,19 @@ export const Auth = {
 };
 
 export const Okta = {
-	Auth: OktaAuth,
-	LoginCallback,
-	Security,
-	SecureRoute,
-	toRelativeUrl,
-	useOktaAuth,
-	removeNils,
-	getOAuthUrls,
-	toQueryString,
+	Auth: OktaAuthJs.OktaAuth,
 	config: authConfig,
+	...OktaReact,
+	...OktaAuthJs,
 };
 
-export { LDS, Link, Mutations, Queries, PropTypes, React, _ };
-
+export * as _ from 'lodash';
+export * as LDS from '@salesforce/design-system-react';
+export * as PropTypes from 'prop-types';
+export * as React from 'react';
 export * as ReactQuery from 'react-query';
+export * as ReactRouter from 'react-router-dom';
 
-export { default as ApiError } from './utils/ApiError';
-export { default as AppError } from './utils/AppError';
-export * from './utils';
+export { Mutations, Queries };
+export * as Errors from './utils/Errors';
+export * as Utils from './utils';
