@@ -7,7 +7,7 @@ const InputIcon = ({ ispublic }) => {
 	return <LDS.InputIcon id={`tooltip-icon-${name}`} name={name} category='utility' title={name} />;
 };
 
-const AddressForm = () => (
+export const AddressForm = () => (
 	<>
 		<LDS.Input
 			id='street'

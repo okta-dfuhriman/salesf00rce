@@ -1,10 +1,5 @@
 import { _, LDS, React, ReactQuery } from '../../common';
-
-import SettingsCard from '../../components/SettingsCard';
-import Providers from '../../components/Providers';
-import AddressForm from '../../components/AddressForm';
-
-import WelcomeCard from '../../components/WelcomeCard';
+import { AddressForm, Providers, SettingsCard, WelcomeCard } from '../../components';
 
 import './styles.css';
 

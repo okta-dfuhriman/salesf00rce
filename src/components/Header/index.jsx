@@ -1,7 +1,7 @@
 import { Auth, Images, React, ReactQuery, ReactRouter } from '../../common';
 
-import AppLauncher from '../AppLauncher';
-import UserMenu from '../UserMenu';
+import AppLauncher from './AppLauncher';
+import UserMenu from './UserMenu';
 
 const Header = () => {
 	const isPendingLogout = ReactQuery.useIsMutating('logout') > 0;

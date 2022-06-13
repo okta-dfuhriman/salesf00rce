@@ -1,4 +1,4 @@
-import { LDS, React } from '../../common';
+import { LDS, React } from '../../../common';
 
 import AppLauncherCard from './AppLauncherCard';
 

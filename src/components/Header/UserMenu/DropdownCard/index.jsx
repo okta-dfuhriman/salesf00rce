@@ -1,4 +1,4 @@
-import { LDS, Mutations, Queries, ReactRouter, Utils } from '../../common';
+import { LDS, Mutations, Queries, ReactRouter, Utils } from '../../../../common';
 
 import './styles.css';
 

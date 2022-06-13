@@ -1,9 +1,9 @@
 import { useLoginMutation, silentAuth, signInWithRedirect } from './useLoginMutation';
-import * as useLinkAccountMutation from './useLinkAccountMutation';
-import * as useLogoutMutation from './useLogoutMutation';
-import * as useUserInfoQuery from './useUserInfoQuery';
-import * as useUserProfileQuery from './useUserProfileQuery';
-import * as useUnlinkAccountMutation from './useUnlinkAccountMutation';
+import { useLinkAccountMutation } from './useLinkAccountMutation';
+import { useLogoutMutation } from './useLogoutMutation';
+import { useUserInfoQuery, userInfoQueryFn } from './useUserInfoQuery';
+import { useUserProfileQuery } from './useUserProfileQuery';
+import { useUnlinkAccountMutation } from './useUnlinkAccountMutation';
 
 export const Mutations = {
 	useLoginMutation,
@@ -17,7 +17,7 @@ export const Queries = {
 	useUserProfileQuery,
 };
 
-export { silentAuth, signInWithRedirect };
+export { silentAuth, signInWithRedirect, userInfoQueryFn };
 
 export * from './useAuthDispatch';
 export * from './useAuthState';

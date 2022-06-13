@@ -1,27 +1,26 @@
-import { Auth } from './common';
-import { Routes, Route } from 'react-router-dom';
+import { Auth, ReactRouter } from './common';
 
-import AppLoginCallback from './pages/LoginCallback';
-import Header from './components/Header';
-import PageSpinner from './components/PageSpinner';
+import { Header } from './components';
+import { SecureApp } from './components';
+import { AppLoginCallback } from './pages/AppLoginCallback';
+import Loading from './pages/Loading';
 import Profile from './pages/Profile';
-import SecureApp from './components/SecureApp';
 import Settings from './pages/Settings';
-import UserLinkCallback from './pages/UserLinkCallback';
+import { UserLinkCallback } from './pages/UserLinkCallback';
 
 const Router = () => {
 	const { isLoading } = Auth.useAuthState();
 
 	return (
 		<>
-			<Routes>
-				<Route path='/login/callback' element={<AppLoginCallback />} />
-				<Route path='/identities/callback' element={<UserLinkCallback />} />
-				<Route element={<SecureApp header={<Header />} />}>
-					<Route path='/' element={!isLoading ? <Profile /> : <PageSpinner />} />
-					<Route path='settings' element={!isLoading ? <Settings /> : <PageSpinner />} />
-				</Route>
-			</Routes>
+			<ReactRouter.Routes>
+				<ReactRouter.Route path='/login/callback' element={<AppLoginCallback />} />
+				<ReactRouter.Route path='/identities/callback' element={<UserLinkCallback />} />
+				<ReactRouter.Route element={<SecureApp header={<Header />} />}>
+					<ReactRouter.Route path='/' element={!isLoading ? <Profile /> : <Loading />} />
+					<ReactRouter.Route path='settings' element={!isLoading ? <Settings /> : <Loading />} />
+				</ReactRouter.Route>
+			</ReactRouter.Routes>
 		</>
 	);
 };

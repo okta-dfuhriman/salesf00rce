@@ -107,7 +107,7 @@ const linkAccountMutationFn = async options => {
 	}
 };
 
-const useLinkAccountMutation = options => {
+export const useLinkAccountMutation = options => {
 	const { oktaAuth } = Okta.useOktaAuth();
 	const queryClient = ReactQuery.useQueryClient();
 
@@ -118,5 +118,3 @@ const useLinkAccountMutation = options => {
 		}
 	);
 };
-
-export default useLinkAccountMutation;

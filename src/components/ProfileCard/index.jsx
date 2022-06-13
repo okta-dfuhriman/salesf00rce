@@ -1,6 +1,6 @@
 import { LDS, Queries, ReactRouter, Utils } from '../../common';
 
-import './ProfileCard.css';
+import './styles.css';
 
 const ProfileCard = () => {
 	const { isLoading: isLoadingUserInfo, data: userInfo } = Queries.useUserInfoQuery();

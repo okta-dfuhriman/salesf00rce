@@ -1,7 +1,5 @@
 import { Images } from '../assets/images';
 
-export { default as ApiError } from './Errors/ApiError';
-
 export const isUrl = string => {
 	try {
 		new URL(string);

@@ -1,6 +1,6 @@
-import { LDS, Queries, ReactQuery, Utils } from '../../common';
+import { LDS, Queries, ReactQuery, Utils } from '../../../common';
 
-import DropdownCard from '../DropdownCard';
+import DropdownCard from './DropdownCard';
 
 const UserMenu = () => {
 	const isPendingLogout = ReactQuery.useIsMutating('logout') > 0;

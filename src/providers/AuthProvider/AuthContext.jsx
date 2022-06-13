@@ -1,10 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @format */
-import { Auth, PropTypes, Queries, Okta, React, ReactQuery, ReactRouter } from '../../common';
+import * as React from 'react';
+import * as Okta from '@okta/okta-auth-js';
+import * as OktaReact from '@okta/okta-react';
+
+import { Auth, PropTypes, Queries, ReactQuery, ReactRouter } from '../../common';
+import AuthDispatchContext from './AuthDispatcher';
+import { authConfig } from '../../common/config/authConfig';
 
 export const AuthStateContext = React.createContext();
 
-const oktaAuth = new Okta.Auth(Auth.config.oidc);
+const oktaAuth = new Okta.OktaAuth(authConfig.oidc);
 
 const AuthProvider = ({ children }) => {
 	const queryClient = ReactQuery.useQueryClient();
@@ -78,7 +84,7 @@ const AuthProvider = ({ children }) => {
 		if (isAuthenticated && (!oktaAuth.isLoginRedirect() || !isPendingLogin)) {
 			console.log('AuthContext > getUserInfo()');
 
-			queryClient.prefetchQuery(['user', 'info'], () => Queries.userInfoQueryFn({ oktaAuth }));
+			queryClient.prefetchQuery(['user', 'info'], () => Auth.userInfoQuery({ oktaAuth }));
 		}
 	}, [state?.isAuthenticated, isPendingLogin]);
 
@@ -89,13 +95,13 @@ const AuthProvider = ({ children }) => {
 
 	return (
 		<AuthStateContext.Provider value={contextValues}>
-			<Okta.Security
+			<OktaReact.Security
 				oktaAuth={oktaAuth}
 				restoreOriginalUri={restoreOriginalUri}
 				onAuthRequired={customAuthHandler}
 			>
-				<Auth.DispatchContext.Provider value={dispatch}>{children}</Auth.DispatchContext.Provider>
-			</Okta.Security>
+				<AuthDispatchContext.Provider value={dispatch}>{children}</AuthDispatchContext.Provider>
+			</OktaReact.Security>
 		</AuthStateContext.Provider>
 	);
 };

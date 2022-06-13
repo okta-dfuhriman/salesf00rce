@@ -1,5 +1,6 @@
-import ProfileCard from '../../components/ProfileCard';
 import { Images } from '../../common';
+import { ProfileCard } from '../../components';
+
 import './styles.css';
 
 const Profile = () => {

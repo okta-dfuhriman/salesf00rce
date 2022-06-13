@@ -1,9 +1,7 @@
-import { LDS, React, ReactQuery, ReactRouter } from './common';
+import { LDS, React, ReactQuery, ReactRouter, useBodyClass } from './common';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
 import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor-experimental';
-
-import useBodyClass from './hooks/useBodyClass';
 
 import AuthProvider from './providers/AuthProvider/AuthContext';
 import Router from './Router';

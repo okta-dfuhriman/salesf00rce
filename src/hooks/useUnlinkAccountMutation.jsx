@@ -44,7 +44,7 @@ const unlinkAccountMutation = async ({ credential, oktaAuth }) => {
 	}
 };
 
-const useUnlinkAccountMutation = options => {
+export const useUnlinkAccountMutation = options => {
 	const { oktaAuth } = Okta.useOktaAuth();
 
 	const queryClient = ReactQuery.useQueryClient();
@@ -67,5 +67,3 @@ const useUnlinkAccountMutation = options => {
 		}
 	);
 };
-
-export default useUnlinkAccountMutation;
