@@ -51,12 +51,13 @@ module.exports = async (req, res) => {
 		const { method } = req;
 
 		switch (method) {
-			case 'POST':
-				await updateUser(req, res);
-				break;
 			case 'GET':
-			default:
+			case 'HEAD':
 				return await getUser(req, res);
+			case 'POST':
+				return await updateUser(req, res);
+			default:
+				return res.status(501).send();
 		}
 	} catch (error) {
 		return res
