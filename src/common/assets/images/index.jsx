@@ -19,18 +19,20 @@ import { ReactComponent as LinkedInIconRound } from './linkedin-round.svg';
 import { ReactComponent as SalesforceLogo } from './salesforce.svg';
 import { ReactComponent as SalesforceIcon } from './salesforce-icon.svg';
 import { ReactComponent as SalesforceIconRound } from './salesforce-round.svg';
-import { ReactComponent as TrailblazerCommunity } from './trailblazer-community.svg';
+import { ReactComponent as TrailblazerCommunityIcon } from './trailblazer-community.svg';
 import { ReactComponent as TrailblazerLogo } from './trailblazer-me.svg';
-import { ReactComponent as Trailhead } from './trailhead.svg';
-import { ReactComponent as TrailblazerMe } from './_tbme.svg';
+import { ReactComponent as TrailheadIcon } from './trailhead.svg';
+import { ReactComponent as TrailblazerMeLogo } from './_tbme.svg';
 
 export const Images = {
 	AridDunes,
 	Astro,
 	AstroLogin,
 	SalesforceLogo,
-	TrailblazerLogo,
-	TrailblazerMe,
+	Trailblazer: {
+		Logo: TrailblazerLogo,
+		Me: TrailblazerMeLogo,
+	},
 };
 
 export const Icons = {
@@ -63,6 +65,6 @@ export const Icons = {
 		Regular: SalesforceIcon,
 		Round: SalesforceIconRound,
 	},
-	TrailblazerCommunity,
-	Trailhead,
+	TrailblazerCommunity: TrailblazerCommunityIcon,
+	Trailhead: TrailheadIcon,
 };

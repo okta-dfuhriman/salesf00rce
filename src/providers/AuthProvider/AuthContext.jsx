@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as Okta from '@okta/okta-auth-js';
 import * as OktaReact from '@okta/okta-react';
 
-import { Auth, PropTypes, Queries, ReactQuery, ReactRouter } from '../../common';
+import { Auth, PropTypes, ReactQuery, ReactRouter } from '../../common';
 import AuthDispatchContext from './AuthDispatcher';
 import { authConfig } from '../../common/config/authConfig';
 

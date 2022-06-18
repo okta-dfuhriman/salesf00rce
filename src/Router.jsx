@@ -1,12 +1,11 @@
 import { Auth, ReactRouter } from './common';
 
-import { Header } from './components';
-import { SecureApp } from './components';
-import { AppLoginCallback } from './pages/AppLoginCallback';
+import { Header, SecureApp } from './components';
+import AppLoginCallback from './pages/AppLoginCallback';
 import Loading from './pages/Loading';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
-import { UserLinkCallback } from './pages/UserLinkCallback';
+import UserLinkCallback from './pages/UserLinkCallback';
 
 const Router = () => {
 	const { isLoading } = Auth.useAuthState();
