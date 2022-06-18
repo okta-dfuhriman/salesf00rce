@@ -27,7 +27,7 @@ const Header = () => {
 					className='slds-p-vertical_small slds-p-horizontal_medium slds-grid slds-grid_align-spread slds-grow slds-grid_vertical-align-center'
 				>
 					<ReactRouter.Link to='/'>
-						<Images.TrailblazerLogo />
+						<Images.Trailblazer.Logo />
 					</ReactRouter.Link>
 				</div>
 				<div className='slds-grid slds-grid_vertical-align-center slds-p-around_x-small'>
